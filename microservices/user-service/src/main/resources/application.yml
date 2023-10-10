@@ -1,1 +1,10 @@
+spring:
+  application:
+    name: user-service
 
+db:
+  host: Mysql Host 주소
+  port: 3306
+  id: Mysql ID
+  pw: Mysql Password
+  database: user
