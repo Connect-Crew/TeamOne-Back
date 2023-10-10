@@ -3,4 +3,5 @@ include ':microservices:user-service'
 include ':microservices:gateway'
 
 include ':modules:api'
+include ':modules:common'
 
