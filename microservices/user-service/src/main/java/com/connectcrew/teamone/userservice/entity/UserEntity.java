@@ -1,7 +1,5 @@
 package com.connectcrew.teamone.userservice.entity;
 
-
-import com.connectcrew.teamone.api.user.auth.Role;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -18,15 +16,17 @@ public class UserEntity {
     @Id
     private Long id;
 
+    private String provider; // Social login 구분
+
+    private String socialId; // Social에서 사용자를 구분하는 ID
+
     private String username;
 
     private String nickname;
 
-    private String password;
-
     private String email;
 
-    private Role role;
+    private String role;
 
     @Column("created_date")
     private String createdDate;
