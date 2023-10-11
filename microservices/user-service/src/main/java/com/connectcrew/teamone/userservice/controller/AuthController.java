@@ -2,8 +2,8 @@ package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
+import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
-import com.connectcrew.teamone.api.user.auth.res.UserRes;
 import com.connectcrew.teamone.exception.NotFoundException;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
@@ -22,14 +22,14 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @GetMapping("/")
-    public Mono<UserRes> find(String socialId, Social provider) {
+    public Mono<User> find(String socialId, Social provider) {
         return userRepository.findBySocialIdAndProvider(socialId, provider.name())
                 .switchIfEmpty(Mono.error(new NotFoundException("시용자를 찾을 수 없습니다.")))
                 .map(this::entityToResponse);
     }
 
     @PostMapping("/")
-    public Mono<UserRes> save(@RequestBody UserInputParam input) {
+    public Mono<User> save(@RequestBody UserInputParam input) {
         return userRepository.findBySocialIdAndProvider(input.socialId(), input.provider().name())
                 .defaultIfEmpty(inputToEntity(input))
                 .map(entity -> {
@@ -57,8 +57,8 @@ public class AuthController {
     }
 
     @NotNull
-    private UserRes entityToResponse(UserEntity entity) {
-        return new UserRes(
+    private User entityToResponse(UserEntity entity) {
+        return new User(
                 entity.getId(),
                 entity.getSocialId(),
                 Social.valueOf(entity.getProvider()),

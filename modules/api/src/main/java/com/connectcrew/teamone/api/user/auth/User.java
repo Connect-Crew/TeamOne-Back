@@ -1,9 +1,6 @@
-package com.connectcrew.teamone.api.user.auth.res;
+package com.connectcrew.teamone.api.user.auth;
 
-import com.connectcrew.teamone.api.user.auth.Role;
-import com.connectcrew.teamone.api.user.auth.Social;
-
-public record UserRes(
+public record User(
         Long id,
         String socialId,
         Social provider,

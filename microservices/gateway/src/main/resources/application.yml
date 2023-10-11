@@ -1,1 +1,19 @@
+spring:
+  profiles:
+    include: oauth
+
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: user
+          uri: http://localhost:8085
+          predicates:
+            - Path=/user/**
+
+service:
+  user: http://localhost:8085
+
 
