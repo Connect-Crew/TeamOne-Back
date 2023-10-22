@@ -1,5 +1,8 @@
 package com.connectcrew.teamone.api.user.auth;
 
+import lombok.Builder;
+
+@Builder
 public record User(
         Long id,
         String socialId,
