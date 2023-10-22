@@ -1,0 +1,13 @@
+= Rest Docs 작성 테스트를 위한 문서
+
+Rest Docs 테스트를 위한 요청입니다.
+
+.request
+include::{snippets}/setup-test/httpie-request.adoc[]
+
+include::{snippets}/setup-test/query-parameters.adoc[]
+
+.response
+include::{snippets}/setup-test/http-response.adoc[]
+
+include::{snippets}/setup-test/response-fields.adoc[]
