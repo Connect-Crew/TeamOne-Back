@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.auth;
 
 import com.connectcrew.teamone.api.user.auth.Social;
+import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -44,7 +45,8 @@ public class TokenResolver {
                         map.get("name"),
                         map.get("picture"),
                         Social.GOOGLE
-                ));
+                ))
+                .onErrorResume(e -> Mono.error(new UnauthorizedException(String.format("google token resolve error - %s", e.getMessage()))));
     }
 
     private Mono<Auth2User> resolveKakao(String token) {
@@ -71,7 +73,8 @@ public class TokenResolver {
                             (String) profile.get("profile_image_url"),
                             Social.KAKAO
                     );
-                });
+                })
+                .onErrorResume(e -> Mono.error(new UnauthorizedException(String.format("kakao token resolve error - %s", e.getMessage()))));
     }
 
     private Mono<Auth2User> resolveApple(String token) {

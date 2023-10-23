@@ -36,6 +36,7 @@ public class AuthController {
                     entity.setUsername(input.username());
                     entity.setNickname(input.nickname());
                     entity.setEmail(input.email());
+                    entity.setProfile(input.profile());
                     entity.setModifiedDate(LocalDateTime.now().toString());
                     return entity;
                 })
@@ -49,6 +50,7 @@ public class AuthController {
                 .provider(input.provider().name())
                 .username(input.username())
                 .nickname(input.nickname())
+                .profile(input.profile())
                 .email(input.email())
                 .role(Role.USER.name())
                 .createdDate(LocalDateTime.now().toString())
@@ -58,17 +60,18 @@ public class AuthController {
 
     @NotNull
     private User entityToResponse(UserEntity entity) {
-        return new User(
-                entity.getId(),
-                entity.getSocialId(),
-                Social.valueOf(entity.getProvider()),
-                entity.getUsername(),
-                entity.getNickname(),
-                entity.getEmail(),
-                Role.valueOf(entity.getRole()),
-                entity.getCreatedDate(),
-                entity.getModifiedDate()
-        );
+        return User.builder()
+                .id(entity.getId())
+                .socialId(entity.getSocialId())
+                .provider(Social.valueOf(entity.getProvider()))
+                .username(entity.getUsername())
+                .nickname(entity.getNickname())
+                .profile(entity.getProfile())
+                .email(entity.getEmail())
+                .role(Role.valueOf(entity.getRole()))
+                .createdDate(entity.getCreatedDate())
+                .modifiedDate(entity.getModifiedDate())
+                .build();
     }
 
 }

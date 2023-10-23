@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-/microservices/gateway/src/main/resources/application-oauth.yml
+/microservices/composite-service/src/main/resources/static/api/*.html
+/microservices/composite-service/src/main/resources/static/api/*/*.html

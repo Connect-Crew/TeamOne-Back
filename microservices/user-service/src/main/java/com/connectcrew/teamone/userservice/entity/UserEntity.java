@@ -24,6 +24,8 @@ public class UserEntity {
 
     private String nickname;
 
+    private String profile;
+
     private String email;
 
     private String role;

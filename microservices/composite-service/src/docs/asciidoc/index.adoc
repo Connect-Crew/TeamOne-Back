@@ -1,13 +1,7 @@
-= Rest Docs 작성 테스트를 위한 문서
+= TeamOne Service API Documentation
 
-Rest Docs 테스트를 위한 요청입니다.
+해당 문서는 TeamOne Service를 이용하기 위한 API 문서입니다.
 
-.request
-include::{snippets}/setup-test/httpie-request.adoc[]
+== 인증 관련 요청
 
-include::{snippets}/setup-test/query-parameters.adoc[]
-
-.response
-include::{snippets}/setup-test/http-response.adoc[]
-
-include::{snippets}/setup-test/response-fields.adoc[]
+- link:auth/login.html[로그인 - /auth/login]

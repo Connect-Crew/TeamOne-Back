@@ -1,0 +1,23 @@
+= Login
+
+link:../index.html[home으로 돌아가기]
+
+클라이언트에서 소셜 로그인을 진행하고 가져온 토큰을 기반으로 서버에서 사용자 정보를 불러오는 요청입니다.
+
+만약 해당 사용자가 처음 로그인하는 사용자라면, 서버에서는 해당 사용자를 생성해 저장합니다.
+
+.request
+include::{snippets}/auth/login-success/httpie-request.adoc[]
+include::{snippets}/auth/login-success/query-parameters.adoc[]
+
+.response (성공)
+
+include::{snippets}/auth/login-success/http-response.adoc[]
+
+include::{snippets}/auth/login-success/response-fields.adoc[]
+
+.response (실패)
+
+include::{snippets}/auth/login-failure/http-response.adoc[]
+
+include::{snippets}/auth/login-failure/response-fields.adoc[]

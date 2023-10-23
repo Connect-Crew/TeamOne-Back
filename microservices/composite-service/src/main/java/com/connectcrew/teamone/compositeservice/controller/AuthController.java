@@ -1,6 +1,5 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
-import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
@@ -27,24 +26,14 @@ public class AuthController {
     private final TokenResolver tokenResolver;
     private final UserRequest userRequest;
 
-    private TokenGenerator tokenGenerator = new TokenGenerator() {
-
-        @Override
-        public String createToken(String account, Role role) {
-            return "Access Token";
-        }
-
-        @Override
-        public String createRefreshToken(String account, Role role) {
-            return "Refresh Token";
-        }
-    };
+    private final TokenGenerator tokenGenerator;
 
     @GetMapping("/login")
     public Mono<LoginResult> login(String token, Social social) {
         log.trace("login token: {}, social: {}", token, social);
         return tokenResolver.resolve(token, social)
-                .switchIfEmpty(Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.")))
+                .onErrorResume(ex -> Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.", ex)))
+                .doOnError(ex -> log.debug("login error: {}", ex.getMessage(), ex))
                 .flatMap(auth2User -> userRequest.getUser(auth2User.socialId(), auth2User.social()).map(user -> Tuples.of(user, false))
                         .switchIfEmpty(saveUser(auth2User).map(user -> Tuples.of(user, true))))
                 .map(tuple -> generateLoginResult(tuple.getT1(), tuple.getT2()));
@@ -54,7 +43,14 @@ public class AuthController {
         String accessToken = tokenGenerator.createToken(user.socialId(), user.role());
         String refreshToken = tokenGenerator.createRefreshToken(user.socialId(), user.role());
 
-        return new LoginResult(accessToken, refreshToken, user.nickname(), user.email(), isNew);
+        return LoginResult.builder()
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .nickname(user.nickname())
+                .email(user.email())
+                .profile(user.profile())
+                .isNewUser(isNew)
+                .build();
     }
 
     private Mono<User> saveUser(Auth2User auth2User) {
@@ -63,6 +59,7 @@ public class AuthController {
                 auth2User.social(),
                 auth2User.name(),
                 auth2User.name(),
+                auth2User.profile(),
                 auth2User.email()
         ));
     }

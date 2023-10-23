@@ -7,6 +7,7 @@ public record UserInputParam(
         Social provider,
         String username,
         String nickname,
+        String profile,
         String email
 ) {
 }
