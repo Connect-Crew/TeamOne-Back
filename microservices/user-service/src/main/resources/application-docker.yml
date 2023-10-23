@@ -1,2 +1,8 @@
 server:
   port: 8080
+
+db:
+  host: user-mysql
+  port: 3306
+  id: root
+  pw: MYSQL_PASSWORD

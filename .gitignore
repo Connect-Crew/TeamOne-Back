@@ -36,5 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
+### Docker ###
+.env
+
 /microservices/composite-service/src/main/resources/static/api/*.html
 /microservices/composite-service/src/main/resources/static/api/*/*.html
