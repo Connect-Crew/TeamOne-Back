@@ -61,6 +61,7 @@ class AuthControllerTest {
     void setup(RestDocumentationContextProvider restDocumentation) {
         this.webTestClient = WebTestClient.bindToApplicationContext(this.context)
                 .configureClient()
+                .baseUrl("http://teamone.kro.kr:9080")
                 .filter(WebTestClientRestDocumentation.documentationConfiguration(restDocumentation))
                 .build();
     }
