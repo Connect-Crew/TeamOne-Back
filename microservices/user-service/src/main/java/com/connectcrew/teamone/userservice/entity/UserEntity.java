@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Data
 @Getter
 @Setter
@@ -18,6 +20,7 @@ public class UserEntity {
 
     private String provider; // Social login 구분
 
+    @Column("social_id")
     private String socialId; // Social에서 사용자를 구분하는 ID
 
     private String username;
@@ -31,8 +34,8 @@ public class UserEntity {
     private String role;
 
     @Column("created_date")
-    private String createdDate;
+    private LocalDateTime createdDate;
 
     @Column("modified_date")
-    private String modifiedDate;
+    private LocalDateTime modifiedDate;
 }

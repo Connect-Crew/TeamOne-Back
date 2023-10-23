@@ -4,7 +4,6 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
-import com.connectcrew.teamone.exception.NotFoundException;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class AuthController {
     @GetMapping("/")
     public Mono<User> find(String socialId, Social provider) {
         return userRepository.findBySocialIdAndProvider(socialId, provider.name())
-                .switchIfEmpty(Mono.error(new NotFoundException("시용자를 찾을 수 없습니다.")))
                 .map(this::entityToResponse);
     }
 
@@ -37,7 +35,7 @@ public class AuthController {
                     entity.setNickname(input.nickname());
                     entity.setEmail(input.email());
                     entity.setProfile(input.profile());
-                    entity.setModifiedDate(LocalDateTime.now().toString());
+                    entity.setModifiedDate(LocalDateTime.now());
                     return entity;
                 })
                 .flatMap(userRepository::save)
@@ -53,8 +51,8 @@ public class AuthController {
                 .profile(input.profile())
                 .email(input.email())
                 .role(Role.USER.name())
-                .createdDate(LocalDateTime.now().toString())
-                .modifiedDate(LocalDateTime.now().toString())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
     }
 
@@ -69,8 +67,8 @@ public class AuthController {
                 .profile(entity.getProfile())
                 .email(entity.getEmail())
                 .role(Role.valueOf(entity.getRole()))
-                .createdDate(entity.getCreatedDate())
-                .modifiedDate(entity.getModifiedDate())
+                .createdDate(entity.getCreatedDate().toString())
+                .modifiedDate(entity.getModifiedDate().toString())
                 .build();
     }
 
