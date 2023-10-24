@@ -9,6 +9,7 @@ import com.connectcrew.teamone.compositeservice.auth.Auth2User;
 import com.connectcrew.teamone.compositeservice.auth.TokenGenerator;
 import com.connectcrew.teamone.compositeservice.auth.TokenResolver;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
+import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,16 +28,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 @WebFluxTest
@@ -78,18 +75,15 @@ class AuthControllerTest {
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/auth/login")
-                        .queryParam("token", "sampleToken")
-                        .queryParam("social", Social.GOOGLE)
-                        .build())
+                .uri("/auth/login")
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
                 .consumeWith(document("auth/login-success",
-                        queryParameters(
-                                parameterWithName("token").description("Social 로그인 후 발급받은 토큰"),
-                                parameterWithName("social").description(String.format("Social 타입 %s", Arrays.toString(Social.values())))
+                        requestFields(
+                                fieldWithPath("token").type("String").description("Social 로그인 후 발급받은 토큰 Test123"),
+                                fieldWithPath("social").type("String").description(String.format("Social 타입 %s", Social.GOOGLE))
                         ),
                         responseFields(
                                 fieldWithPath("token").type("String").description("Access Token"),
@@ -124,10 +118,8 @@ class AuthControllerTest {
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/auth/login")
-                        .queryParam("token", "testToken")
-                        .queryParam("social", Social.GOOGLE)
-                        .build())
+                .uri("/auth/login")
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
@@ -148,10 +140,8 @@ class AuthControllerTest {
         when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.error(new UnauthorizedException("Invalid Token")));
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/auth/login")
-                        .queryParam("token", "testToken")
-                        .queryParam("social", Social.GOOGLE)
-                        .build())
+                .uri("/auth/login")
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorInfo.class)

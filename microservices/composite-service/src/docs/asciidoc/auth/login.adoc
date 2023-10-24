@@ -7,8 +7,8 @@ link:../index.html[home으로 돌아가기]
 만약 해당 사용자가 처음 로그인하는 사용자라면, 서버에서는 해당 사용자를 생성해 저장합니다.
 
 .request
-include::{snippets}/auth/login-success/httpie-request.adoc[]
-include::{snippets}/auth/login-success/query-parameters.adoc[]
+include::{snippets}/auth/login-success/http-request.adoc[]
+include::{snippets}/auth/login-success/request-fields.adoc[]
 
 .response (성공)
 
