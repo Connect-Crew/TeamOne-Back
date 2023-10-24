@@ -11,7 +11,7 @@ import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,7 @@ public class AuthController {
 
     private final TokenGenerator tokenGenerator;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public Mono<LoginResult> login(String token, Social social) {
         log.trace("login token: {}, social: {}", token, social);
         return tokenResolver.resolve(token, social)

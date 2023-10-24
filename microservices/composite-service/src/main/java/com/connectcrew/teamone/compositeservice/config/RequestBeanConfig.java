@@ -27,12 +27,12 @@ public class RequestBeanConfig {
         return new TokenGenerator() { // TODO 임시코드. 향후 제거
             @Override
             public String createToken(String account, Role role) {
-                return null;
+                return "Test-Access-Token";
             }
 
             @Override
             public String createRefreshToken(String account, Role role) {
-                return null;
+                return "Test-Refresh-Token";
             }
         };
     }

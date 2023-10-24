@@ -77,9 +77,10 @@ class AuthControllerTest {
         when(tokenGenerator.createToken(anyString(), any(Role.class))).thenReturn("accessToken");
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
-        webTestClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/auth/login")
-                        .queryParam("token", "testToken")
+        webTestClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/auth/login")
+                        .queryParam("token", "sampleToken")
                         .queryParam("social", Social.GOOGLE)
                         .build())
                 .exchange()
@@ -122,7 +123,7 @@ class AuthControllerTest {
         when(tokenGenerator.createToken(anyString(), any(Role.class))).thenReturn("accessToken");
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
-        webTestClient.get()
+        webTestClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/auth/login")
                         .queryParam("token", "testToken")
                         .queryParam("social", Social.GOOGLE)
@@ -144,9 +145,9 @@ class AuthControllerTest {
 
     @Test
     void invalidLoginTest() {
-         when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.error(new UnauthorizedException("Invalid Token")));
+        when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.error(new UnauthorizedException("Invalid Token")));
 
-        webTestClient.get()
+        webTestClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/auth/login")
                         .queryParam("token", "testToken")
                         .queryParam("social", Social.GOOGLE)
