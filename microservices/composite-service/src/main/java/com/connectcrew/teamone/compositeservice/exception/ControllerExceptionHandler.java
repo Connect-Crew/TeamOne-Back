@@ -1,7 +1,7 @@
-package com.connectcrew.teamone.compositeservice.controller;
+package com.connectcrew.teamone.compositeservice.exception;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,13 @@ public class ControllerExceptionHandler {
     })
     public Mono<ResponseEntity<ErrorInfo>> handleUnauthorized(ServerWebExchange exchange, Exception ex) {
         return createHttpErrorInfo(HttpStatus.UNAUTHORIZED, exchange, ex);
+    }
+
+    @ExceptionHandler(value = {
+            NotFoundException.class,
+    })
+    public Mono<ResponseEntity<ErrorInfo>> handleNotFound(ServerWebExchange exchange, Exception ex) {
+        return createHttpErrorInfo(HttpStatus.NOT_FOUND, exchange, ex);
     }
 
     @ExceptionHandler({

@@ -8,7 +8,6 @@ public record LoginResult(
         String refreshToken,
         String nickname,
         String profile,
-        String email,
-        boolean isNewUser
+        String email
 ) {
 }

@@ -5,3 +5,4 @@
 == 인증 관련 요청
 
 - link:auth/login.html[로그인 - /auth/login]
+- link:auth/register.html[회원가입 - /auth/register]

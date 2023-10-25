@@ -1,9 +1,15 @@
 spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
   profiles:
     include: oauth
 
 app:
-  user: http://localhost:8000
+  user: http://localhost:8085
 
 logging:
   level:

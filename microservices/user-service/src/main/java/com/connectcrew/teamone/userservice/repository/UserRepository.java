@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository extends ReactiveCrudRepository<UserEntity, Long> {
     Mono<UserEntity> findBySocialIdAndProvider(String socialId, String provider);
+    Mono<Boolean> existsByNickname(String nickname);
+    Mono<Boolean> existsBySocialIdAndProvider(String socialId, String provider);
 }

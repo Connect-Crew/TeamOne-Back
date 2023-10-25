@@ -1,0 +1,30 @@
+= Register - /auth/register
+
+link:../index.html[home으로 돌아가기]
+
+클라이언트에서 소셜 로그인을 진행하고 가져온 토큰을 기반으로 회원가입을 진행하는 요청입니다.
+
+== Request
+
+include::{snippets}/auth/register-success/http-request.adoc[]
+include::{snippets}/auth/register-success/request-fields.adoc[]
+
+== Response
+
+.response (성공)
+
+include::{snippets}/auth/register-success/http-response.adoc[]
+
+include::{snippets}/auth/register-success/response-fields.adoc[]
+
+.response (실패 - 유효하지 않은 토큰)
+
+include::{snippets}/auth/unauthorized-register-failure/http-response.adoc[]
+
+include::{snippets}/auth/unauthorized-register-failure/response-fields.adoc[]
+
+.response (실패 - 회원가입 실패)
+
+include::{snippets}/auth/register-failure/http-response.adoc[]
+
+include::{snippets}/auth/register-failure/response-fields.adoc[]

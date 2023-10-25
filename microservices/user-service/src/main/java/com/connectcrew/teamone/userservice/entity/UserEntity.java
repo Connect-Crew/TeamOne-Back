@@ -33,6 +33,14 @@ public class UserEntity {
 
     private String role;
 
+    private Boolean termsAgreement; // 서비스 이용 약관
+
+    private Boolean privacyAgreement; // 개인정보 처리 방침
+
+    private Boolean communityPolicyAgreement; // 커뮤니티 정책
+
+    private Boolean adNotificationAgreement; // 광고성 정보 수신 동의
+
     @Column("created_date")
     private LocalDateTime createdDate;
 
