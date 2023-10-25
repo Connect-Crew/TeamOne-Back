@@ -96,8 +96,8 @@ class AuthControllerTest {
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
                                 fieldWithPath("nickname").type("String").description("사용자 닉네임"),
-                                fieldWithPath("profile").type("String").description("사용자 프로필 사진 URL"),
-                                fieldWithPath("email").type("String").description("사용자 이메일")
+                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
+                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
                         )
                 ))
                 .consumeWith(response -> {
@@ -206,8 +206,8 @@ class AuthControllerTest {
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
                                 fieldWithPath("nickname").type("String").description("사용자 닉네임"),
-                                fieldWithPath("profile").type("String").description("사용자 프로필 사진 URL"),
-                                fieldWithPath("email").type("String").description("사용자 이메일")
+                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
+                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
                         )
                 ))
                 .consumeWith(response -> {
