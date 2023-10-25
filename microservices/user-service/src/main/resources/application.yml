@@ -17,3 +17,7 @@ db:
   id: Mysql ID
   pw: Mysql Password
   database: user
+
+logging:
+  level:
+    com.connectcrew.teamone: trace

@@ -7,6 +7,7 @@ import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class AuthController {
@@ -28,6 +30,7 @@ public class AuthController {
 
     @GetMapping("/")
     public Mono<User> find(String socialId, Social provider) {
+        log.trace("find socialId={}, provider={}", socialId, provider);
         return userRepository.findBySocialIdAndProvider(socialId, provider.name())
                 .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")))
                 .map(this::entityToResponse);
@@ -35,6 +38,7 @@ public class AuthController {
 
     @PostMapping("/")
     public Mono<User> save(@RequestBody UserInputParam input) {
+        log.trace("save input={}", input);
         return checkAgreement(input)
                 .then(checkNickname(input.nickname()))
                 .flatMap(unused -> userRepository.existsBySocialIdAndProvider(input.socialId(), input.provider().name()))

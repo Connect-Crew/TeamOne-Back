@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.exception;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class WebClientExceptionHandler {
     public <T> Mono<T> handleException(Throwable ex) {
         if (ex instanceof WebClientResponseException webEx) {
             if (webEx.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return Mono.error(new IllegalAccessException(getErrorMessage(webEx)));
+                return Mono.error(new NotFoundException(getErrorMessage(webEx)));
             } else if (webEx.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 return Mono.error(new IllegalArgumentException(getErrorMessage(webEx)));
             } else {
