@@ -78,7 +78,7 @@ class AuthControllerTest {
 
         when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.just(authUser));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
-        when(tokenGenerator.createToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
@@ -117,7 +117,7 @@ class AuthControllerTest {
 
         when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.just(authUser));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
-        when(tokenGenerator.createToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
@@ -183,7 +183,7 @@ class AuthControllerTest {
 
         when(tokenResolver.resolve(anyString(), any(Social.class))).thenReturn(Mono.just(authUser));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
-        when(tokenGenerator.createToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
         when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()

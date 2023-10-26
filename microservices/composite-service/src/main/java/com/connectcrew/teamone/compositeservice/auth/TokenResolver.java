@@ -2,9 +2,6 @@ package com.connectcrew.teamone.compositeservice.auth;
 
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -89,25 +86,26 @@ public class TokenResolver {
     }
 
     private Mono<Auth2User> resolveApple(String token) {
-        return getApplePublicKey(Jwts.parser().build().parseSignedClaims(token).getHeader().getKeyId())
-                .flatMap(publicKey -> {
-                    try {
-                        Jws<Claims> verifiedClaims = Jwts.parser()
-                                .setSigningKey(publicKey)
-                                .build()
-                                .parseSignedClaims(token);
-                        Claims body = verifiedClaims.getPayload();
-                        return Mono.just(new Auth2User(
-                                body.getSubject(),
-                                body.get("email", String.class),
-                                body.get("name", String.class),
-                                null,
-                                Social.APPLE
-                        ));
-                    } catch (Exception ex) {
-                        return Mono.error(new UnauthorizedException(String.format("apple token resolve error - %s", ex.getMessage())));
-                    }
-                });
+        return null;
+//        return getApplePublicKey(Jwts.parserBuilder().build().parse(token).getHeader().get())
+//                .flatMap(publicKey -> {
+//                    try {
+//                        Jws<Claims> verifiedClaims = Jwts.parser()
+//                                .setSigningKey(publicKey)
+//                                .build()
+//                                .parseSignedClaims(token);
+//                        Claims body = verifiedClaims.getPayload();
+//                        return Mono.just(new Auth2User(
+//                                body.getSubject(),
+//                                body.get("email", String.class),
+//                                body.get("name", String.class),
+//                                null,
+//                                Social.APPLE
+//                        ));
+//                    } catch (Exception ex) {
+//                        return Mono.error(new UnauthorizedException(String.format("apple token resolve error - %s", ex.getMessage())));
+//                    }
+//                });
     }
 
     private Mono<PublicKey> getApplePublicKey(String kid) {

@@ -12,10 +12,7 @@ import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -66,7 +63,7 @@ public class AuthController {
     }
 
     private LoginResult generateLoginResult(User user) {
-        String accessToken = tokenGenerator.createToken(user.socialId(), user.role());
+        String accessToken = tokenGenerator.createAccessToken(user.socialId(), user.role());
         String refreshToken = tokenGenerator.createRefreshToken(user.socialId(), user.role());
 
         return LoginResult.builder()
@@ -77,5 +74,4 @@ public class AuthController {
                 .profile(user.profile())
                 .build();
     }
-
 }
