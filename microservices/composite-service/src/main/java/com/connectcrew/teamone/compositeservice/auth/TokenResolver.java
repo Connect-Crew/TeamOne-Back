@@ -2,6 +2,11 @@ package com.connectcrew.teamone.compositeservice.auth;
 
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -9,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -86,26 +92,45 @@ public class TokenResolver {
     }
 
     private Mono<Auth2User> resolveApple(String token) {
-        return null;
-//        return getApplePublicKey(Jwts.parserBuilder().build().parse(token).getHeader().get())
-//                .flatMap(publicKey -> {
-//                    try {
-//                        Jws<Claims> verifiedClaims = Jwts.parser()
-//                                .setSigningKey(publicKey)
-//                                .build()
-//                                .parseSignedClaims(token);
-//                        Claims body = verifiedClaims.getPayload();
-//                        return Mono.just(new Auth2User(
-//                                body.getSubject(),
-//                                body.get("email", String.class),
-//                                body.get("name", String.class),
-//                                null,
-//                                Social.APPLE
-//                        ));
-//                    } catch (Exception ex) {
-//                        return Mono.error(new UnauthorizedException(String.format("apple token resolve error - %s", ex.getMessage())));
-//                    }
-//                });
+        try {
+            // 1. JWT 토큰 헤더를 디코드
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) {
+                return Mono.error(new UnauthorizedException("invalid token format"));
+            }
+
+            String headerEncoded = parts[0];
+            String headerJson = new String(Base64.getUrlDecoder().decode(headerEncoded), StandardCharsets.UTF_8);
+            Map<String, Object> header = new ObjectMapper().readValue(headerJson, Map.class);
+            String kid = (String) header.get("kid");
+
+            // 2. 올바른 "kid"를 가진 애플의 공개 키를 가져옴
+            return getApplePublicKey(kid)
+                    .flatMap(publicKey -> {
+                        try {
+                            // 3. 공개 키를 사용하여 JWT 토큰을 검증
+                            Jws<Claims> jwsClaims = Jwts.parserBuilder()
+                                    .setSigningKey(publicKey)
+                                    .build()
+                                    .parseClaimsJws(token);
+
+                            // 4. JWT 토큰에서 사용자 세부 정보를 추출
+                            Claims body = jwsClaims.getBody();
+                            return Mono.just(new Auth2User(
+                                    body.getSubject(),
+                                    (String) body.get("email"),
+                                    null,
+                                    null,
+                                    Social.APPLE
+                            ));
+                        } catch (JwtException e) {
+                            return Mono.error(new UnauthorizedException(String.format("apple token verify error - %s", e.getMessage())));
+                        }
+                    });
+        } catch (Exception e) {
+            return Mono.error(new UnauthorizedException(String.format("apple token resolve error - %s", e.getMessage())));
+        }
+
     }
 
     private Mono<PublicKey> getApplePublicKey(String kid) {
