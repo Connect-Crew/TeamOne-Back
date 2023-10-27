@@ -9,6 +9,7 @@ import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.compositeservice.auth.Auth2User;
 import com.connectcrew.teamone.compositeservice.auth.TokenGenerator;
 import com.connectcrew.teamone.compositeservice.auth.TokenResolver;
+import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
 import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.param.RegisterParam;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -42,6 +44,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 
 @WebFluxTest
 @ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 @ExtendWith(RestDocumentationExtension.class)
 class AuthControllerTest {
     @MockBean
