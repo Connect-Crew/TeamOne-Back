@@ -7,13 +7,14 @@ import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.compositeservice.auth.Auth2TokenValidator;
-import com.connectcrew.teamone.compositeservice.auth.TokenGenerator;
-import com.connectcrew.teamone.compositeservice.auth.TokenResolver;
+import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
 import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.param.RegisterParam;
 import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
+import com.connectcrew.teamone.compositeservice.resposne.RefreshResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -36,12 +38,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 @WebFluxTest
 @ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 @ExtendWith(RestDocumentationExtension.class)
 class AuthControllerTest {
     @MockBean
@@ -50,7 +55,7 @@ class AuthControllerTest {
     @MockBean
     private UserRequest userRequest;
     @MockBean
-    private TokenGenerator tokenGenerator;
+    private JwtProvider jwtProvider;
 
     @Autowired
     private ApplicationContext context;
@@ -77,8 +82,8 @@ class AuthControllerTest {
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
-        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -93,7 +98,9 @@ class AuthControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("token").type("String").description("Access Token"),
+                                fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
+                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간"),
                                 fieldWithPath("nickname").type("String").description("사용자 닉네임"),
                                 fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
@@ -114,8 +121,8 @@ class AuthControllerTest {
     void notRegisterLogin() {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
-        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -179,8 +186,8 @@ class AuthControllerTest {
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
-        when(tokenGenerator.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(tokenGenerator.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/register")
@@ -203,7 +210,9 @@ class AuthControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("token").type("String").description("Access Token"),
+                                fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
+                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간"),
                                 fieldWithPath("nickname").type("String").description("사용자 닉네임"),
                                 fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
@@ -279,5 +288,29 @@ class AuthControllerTest {
                     assertThat(result.getError()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
                     assertThat(result.getMessage()).isEqualTo("공백과 특수문자는 들어갈 수 없어요.");
                 });
+    }
+
+    @Test
+    void refreshTest() {
+        when(jwtProvider.getAccount(anyString())).thenReturn("socialId");
+        when(jwtProvider.getRole(anyString())).thenReturn(Role.USER);
+        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.validateToken(anyString())).thenReturn(true);
+
+        webTestClient.post()
+                .uri("/auth/refresh")
+                .header(JwtProvider.AUTH_HEADER, "Bearer refreshToken")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RefreshResult.class)
+                .consumeWith(document("auth/refresh",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description("Bearer RefreshToken")
+                        ),
+                        responseFields(
+                                fieldWithPath("token").type("String").description("새로 발급된 Access Token"),
+                                fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간")
+                        )
+                ));
     }
 }

@@ -1,4 +1,4 @@
-= Login - /auth/login
+= Login - /auth/login (POST)
 
 link:../index.html[home으로 돌아가기]
 
@@ -7,24 +7,24 @@ link:../index.html[home으로 돌아가기]
 == Request
 
 include::{snippets}/auth/login-success/http-request.adoc[]
+
+=== request body
 include::{snippets}/auth/login-success/request-fields.adoc[]
 
 
 == Response
-
-.response (성공)
-
+=== response (성공)
 include::{snippets}/auth/login-success/http-response.adoc[]
 
 include::{snippets}/auth/login-success/response-fields.adoc[]
 
-.response (실패 - 유효하지 않은 토큰)
+=== response (실패 - 유효하지 않은 토큰)
 
 include::{snippets}/auth/login-failure/http-response.adoc[]
 
 include::{snippets}/auth/login-failure/response-fields.adoc[]
 
-.response (실패 - 가입하지 않은 사용자)
+=== response (실패 - 가입하지 않은 사용자)
 
 include::{snippets}/auth/login-failure-not-register/http-response.adoc[]
 
