@@ -25,9 +25,15 @@ public class Project {
 
     private String memberIntroduction;
 
+    private Integer careerMin;
+
+    private Integer careerMax;
+
     private Long leader;
 
     private Boolean withOnline;
+
+    private String region;
 
     private LocalDateTime createdAt;
 
@@ -38,4 +44,6 @@ public class Project {
     private String state;
 
     private String goal;
+
+    private Integer favorite;
 }

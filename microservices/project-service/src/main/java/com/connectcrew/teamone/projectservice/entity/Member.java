@@ -9,11 +9,10 @@ import org.springframework.data.annotation.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectMember {
+public class Member {
 
     @Id
     private Long id;
-    private Long project;
-    private String part;
+    private Long part_id;
     private Long user;
 }

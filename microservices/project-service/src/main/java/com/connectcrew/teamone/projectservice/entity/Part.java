@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberCondition {
+public class Part {
     @Id
     private Long id;
     private Long project;
@@ -17,4 +17,6 @@ public class MemberCondition {
     private Integer careerMin;
     private Integer careerMax;
     private String comment;
+    private Integer collected;
+    private Integer targetCollect;
 }
