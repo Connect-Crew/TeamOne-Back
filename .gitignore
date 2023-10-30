@@ -41,3 +41,6 @@ out/
 
 /microservices/composite-service/src/main/resources/static/api/*.html
 /microservices/composite-service/src/main/resources/static/api/*/*.html
+
+### application-dev.yml ###
+/microservices/*/src/main/resources/application-dev.yml
