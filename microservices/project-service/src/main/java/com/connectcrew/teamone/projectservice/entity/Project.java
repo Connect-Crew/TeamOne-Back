@@ -21,8 +21,6 @@ public class Project {
 
     private String introduction;
 
-    private String thumbnail;
-
     private String memberIntroduction;
 
     private Integer careerMin;

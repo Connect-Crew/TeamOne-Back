@@ -1,37 +1,29 @@
 package com.connectcrew.teamone.api.project;
 
-import com.connectcrew.teamone.api.project.values.Career;
 import com.connectcrew.teamone.api.project.values.ProjectGoal;
 import com.connectcrew.teamone.api.project.values.ProjectState;
 import com.connectcrew.teamone.api.project.values.Region;
-import lombok.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
-public record ProjectDetail(
-        Long id,
+public record ProjectInput(
         String title,
         List<String> banners,
         Region region,
         Boolean online,
-        LocalDateTime createdAt,
-        LocalDate startDate,
-        LocalDate endDate,
+        LocalDate start,
+        LocalDate end,
         ProjectState state,
-        Career careerMin,
-        Career careerMax,
+        String careerMin,
+        String careerMax,
+        Long leader,
+        List<String> leaderParts,
         List<String> category,
         ProjectGoal goal,
-        Long leader,
         String introduction,
-        Integer favorite,
-        List<RecruitStatus> recruitStatuses,
+        List<RecruitInput> recruits,
         String membersIntroduction,
-        List<ProjectMember> members,
         List<String> skills
 ) {
-
 }

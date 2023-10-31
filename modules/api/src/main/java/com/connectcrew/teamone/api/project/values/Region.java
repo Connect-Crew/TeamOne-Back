@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum Region {
+    NONE("미설정"),
     SEOUL("서울"),
     GYEONGGI("경기"),
     INCHEON("인천"),
@@ -29,4 +30,6 @@ public enum Region {
     public String toString() {
         return description;
     }
+
+
 }

@@ -24,7 +24,7 @@ public enum Career {
         return id;
     }
 
-    public Career valueOf(Integer id) {
+    public static Career valueOf(Integer id) {
         for (Career career : Career.values()) {
             if (career.getId().equals(id)) {
                 return career;

@@ -14,8 +14,6 @@ public class Part {
     private Long id;
     private Long project;
     private String part;
-    private Integer careerMin;
-    private Integer careerMax;
     private String comment;
     private Integer collected;
     private Integer targetCollect;

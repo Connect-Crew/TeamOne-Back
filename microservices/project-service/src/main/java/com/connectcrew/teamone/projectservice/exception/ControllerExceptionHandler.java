@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.exception;
+package com.connectcrew.teamone.projectservice.exception;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
@@ -22,13 +22,6 @@ public class ControllerExceptionHandler {
     })
     public Mono<ResponseEntity<ErrorInfo>> handleBadRequest(ServerWebExchange exchange, Exception ex) {
         return createHttpErrorInfo(HttpStatus.BAD_REQUEST, exchange, ex);
-    }
-
-    @ExceptionHandler(value = {
-            UnauthorizedException.class,
-    })
-    public Mono<ResponseEntity<ErrorInfo>> handleUnauthorized(ServerWebExchange exchange, Exception ex) {
-        return createHttpErrorInfo(HttpStatus.UNAUTHORIZED, exchange, ex);
     }
 
     @ExceptionHandler(value = {

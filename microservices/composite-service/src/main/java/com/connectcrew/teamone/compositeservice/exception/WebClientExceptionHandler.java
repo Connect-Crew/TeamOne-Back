@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.exception;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
+import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,6 +30,8 @@ public class WebClientExceptionHandler {
                 return Mono.error(new NotFoundException(getErrorMessage(webEx)));
             } else if (webEx.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 return Mono.error(new IllegalArgumentException(getErrorMessage(webEx)));
+            } else if(webEx.getStatusCode() == HttpStatus.NOT_ACCEPTABLE) {
+                return Mono.error(new InvalidOwnerException(getErrorMessage(webEx)));
             } else {
                 log.warn("Unexpected error: {}", webEx.getStatusCode());
                 log.warn("Error: {}", webEx.getResponseBodyAsString());
