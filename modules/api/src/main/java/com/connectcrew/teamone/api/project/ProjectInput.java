@@ -1,8 +1,6 @@
 package com.connectcrew.teamone.api.project;
 
-import com.connectcrew.teamone.api.project.values.ProjectGoal;
-import com.connectcrew.teamone.api.project.values.ProjectState;
-import com.connectcrew.teamone.api.project.values.Region;
+import com.connectcrew.teamone.api.project.values.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,15 +13,14 @@ public record ProjectInput(
         LocalDate start,
         LocalDate end,
         ProjectState state,
-        String careerMin,
-        String careerMax,
+        Career careerMin,
+        Career careerMax,
         Long leader,
-        List<String> leaderParts,
-        List<String> category,
+        List<MemberPart> leaderParts,
+        List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,
         List<RecruitInput> recruits,
-        String membersIntroduction,
-        List<String> skills
+        List<SkillType> skills
 ) {
 }

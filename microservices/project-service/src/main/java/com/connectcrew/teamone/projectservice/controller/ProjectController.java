@@ -3,13 +3,12 @@ package com.connectcrew.teamone.projectservice.controller;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.project.*;
-import com.connectcrew.teamone.api.project.values.Career;
-import com.connectcrew.teamone.api.project.values.ProjectGoal;
-import com.connectcrew.teamone.api.project.values.ProjectState;
-import com.connectcrew.teamone.api.project.values.Region;
+import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.projectservice.entity.*;
+import com.connectcrew.teamone.projectservice.exception.ProjectExceptionMessage;
 import com.connectcrew.teamone.projectservice.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,16 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ProjectController {
+
+    private static final String RESOURCE_PATH = "/projects";
+    private static final String UUID_PATTERNS = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
 
     private final ProjectRepository projectRepository;
     private final BannerRepository bannerRepository;
@@ -37,9 +41,9 @@ public class ProjectController {
     @PostMapping("/")
     @Transactional
     public Mono<Long> createProject(@RequestBody ProjectInput input) {
-        // TODO input validation
-
-        return projectRepository.save(inputToProject(input))
+        log.trace("createProject - input: {}", input);
+        return validateInput(input)
+                .then(projectRepository.save(inputToProject(input)))
                 .flatMap(p -> {
                     Long id = p.getId();
 
@@ -52,20 +56,86 @@ public class ProjectController {
 
                     return Mono.zip(saveBanners, savePartsAndMember, saveSkills, saveCategories)
                             .map(tuple -> id);
+                })
+                .onErrorResume(e -> {
+                    log.error("createProject - error: {}", e.getMessage(), e);
+                    return Mono.error(new RuntimeException(ProjectExceptionMessage.CREATE_PROJECT_FAILED.toString()));
                 });
 
     }
 
-    private Project inputToProject(ProjectInput input) {
-        Career careerMin = Career.valueOf(input.careerMin());
-        Career careerMax = Career.valueOf(input.careerMax());
+    private Mono<ProjectInput> validateInput(ProjectInput input) {
+        // 1. title은 2글자 이상 30글자 이하
+        if (input.title().length() < 2)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_2_OVER.toString()));
+        if (input.title().length() > 30)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString()));
 
+        // 2. banner는 최대 3개. 경로, 이름, 확장자가 유효한지 검사
+        if (input.banners() != null && input.banners().size() > 3)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.BANNER_MAX_3.toString()));
+
+        if (input.banners() != null) {
+            for (String banner : input.banners()) {
+                if (!banner.startsWith(RESOURCE_PATH))
+                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_PATH.toString()));
+
+                String[] split = banner.split("/");
+                String[] fileNameAndExtensions = split[split.length - 1].split("\\.");
+                String filename = fileNameAndExtensions[0];
+                String extension = fileNameAndExtensions[1];
+                if (!Pattern.matches(UUID_PATTERNS, filename)) {
+                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString()));
+                }
+
+                if (!extension.equals("jpg") && !extension.equals("png") && !extension.equals("jpeg")) {
+                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString()));
+                }
+            }
+        }
+
+        // 3. start와 end는 start가 end보다 빠른 날짜여야 함
+        if (input.start().isAfter(input.end()))
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.START_BEFORE_END.toString()));
+
+        // 4. careerMin은 careerMax보다 이전 값이어야 함.
+        if (input.careerMin().getId() > input.careerMax().getId())
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CAREER_MIN_BEFORE_MAX.toString()));
+
+        // 6. category는 최소 1개 최대 3개
+        if (input.category().size() < 1)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MIN_1.toString()));
+
+        if (input.category().size() > 3)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MAX_3.toString()));
+
+        // 7. introduction은 1000글자 이하
+        if (input.introduction().length() > 1000)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.INTRODUCTION_LENGTH_1000_UNDER.toString()));
+
+        // 8. recruit 조건 검사 (comment는 최대 30글자, max는 0 이상인지, 모든 recruit의 max의 합이 10 이하인지)
+        int recruitMaxSum = 0;
+        for(RecruitInput recruit : input.recruits()) {
+            if(recruit.comment().length() > 30)
+                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_COMMENT_LENGTH_30_UNDER.toString()));
+
+            if(recruit.max() < 0)
+                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_0_OVER.toString()));
+
+            recruitMaxSum += recruit.max();
+        }
+        if(recruitMaxSum > 10)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_10_UNDER.toString()));
+
+        return Mono.just(input);
+    }
+
+    private Project inputToProject(ProjectInput input) {
         return Project.builder()
                 .title(input.title())
                 .introduction(input.introduction())
-                .memberIntroduction(input.membersIntroduction())
-                .careerMin(careerMin.getId())
-                .careerMax(careerMax.getId())
+                .careerMin(input.careerMin().getId())
+                .careerMax(input.careerMax().getId())
                 .leader(input.leader())
                 .withOnline(input.online())
                 .region(input.region().name())
@@ -81,10 +151,10 @@ public class ProjectController {
     @NotNull
     private Mono<Long> saveCategories(ProjectInput input, Long id) {
         List<Category> categories = new ArrayList<>();
-        for (String category : input.category()) {
+        for (ProjectCategory category : input.category()) {
             categories.add(Category.builder()
                     .project(id)
-                    .category(category)
+                    .category(category.name())
                     .build());
         }
 
@@ -96,10 +166,10 @@ public class ProjectController {
     @NotNull
     private Mono<Long> saveSkills(ProjectInput input, Long id) {
         List<Skill> skills = new ArrayList<>();
-        for (String skill : input.skills()) {
+        for (SkillType skill : input.skills()) {
             skills.add(Skill.builder()
                     .project(id)
-                    .skill(skill)
+                    .skill(skill.name())
                     .build());
         }
 
@@ -114,7 +184,7 @@ public class ProjectController {
         for (RecruitInput recruit : input.recruits()) {
             parts.add(Part.builder()
                     .project(id)
-                    .part(recruit.part())
+                    .part(recruit.part().name())
                     .comment(recruit.comment())
                     .collected(0)
                     .targetCollect(recruit.max())
@@ -126,7 +196,7 @@ public class ProjectController {
 
     @NotNull
     private Mono<Long> saveLeaderMember(ProjectInput input, Long id, List<Part> parts) {
-        List<String> leaderParts = input.leaderParts();
+        List<String> leaderParts = input.leaderParts().stream().map(MemberPart::name).toList();
         List<Member> members = new ArrayList<>();
         for (Part part : parts) {
             if (!leaderParts.contains(part.getPart())) continue;
@@ -161,10 +231,9 @@ public class ProjectController {
 
     @GetMapping("/")
     public Mono<ProjectDetail> getProject(Long id) {
-        // TODO Input validation
-
+        log.trace("getProject - id: {}", id);
         return projectRepository.findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException("프로젝트를 찾을 수 없습니다.")))
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
                 .flatMap(project -> {
                     Mono<List<Banner>> banners = bannerRepository.findAllByProject(id).collectList();
                     Mono<List<Part>> parts = partRepository.findAllByProject(id).collectList();
@@ -215,23 +284,25 @@ public class ProjectController {
                                         .introduction(project.getIntroduction())
                                         .favorite(project.getFavorite())
                                         .recruitStatuses(recruits)
-                                        .membersIntroduction(project.getMemberIntroduction())
                                         .members(projectMembers)
                                         .skills(skillNames)
                                         .build();
+                            })
+                            .onErrorResume(e -> {
+                                log.trace("getProject - error: {}", e.getMessage());
+                                return Mono.error(new RuntimeException(ProjectExceptionMessage.LOAD_PROJECT_FAILED.toString()));
                             });
                 });
     }
 
     @DeleteMapping("/")
     public Mono<Long> deleteProject(Long id, Long leader) {
-        // TODO Input validation
-
+        log.trace("deleteProject - id: {}, leader: {}", id, leader);
         return projectRepository.findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException("프로젝트를 찾을 수 없습니다.")))
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
                 .flatMap(project -> {
                     if (!project.getLeader().equals(leader))
-                        return Mono.error(new InvalidOwnerException("프로젝트의 리더가 아닙니다."));
+                        return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
 
                     return projectRepository.delete(project).thenReturn(project.getId());
                 });
