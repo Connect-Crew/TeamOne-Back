@@ -1,7 +1,9 @@
 package com.connectcrew.teamone.api.project.values;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum ProjectState {
     RECRUITING("모집중"),

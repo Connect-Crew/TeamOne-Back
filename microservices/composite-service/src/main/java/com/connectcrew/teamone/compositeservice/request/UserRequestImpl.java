@@ -7,7 +7,7 @@ import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHand
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-public class UserRequestImpl implements UserRequest {
+public class UserRequestImpl implements UserRequest, ProfileRequest {
 
     public final String host;
 
@@ -38,4 +38,5 @@ public class UserRequestImpl implements UserRequest {
                 .bodyToMono(User.class)
                 .onErrorResume(exHandler::handleException);
     }
+
 }

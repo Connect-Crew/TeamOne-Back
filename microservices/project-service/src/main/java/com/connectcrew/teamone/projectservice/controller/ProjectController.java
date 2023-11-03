@@ -248,13 +248,14 @@ public class ProjectController {
                                         .map(Banner::getPath).toList();
 
                                 List<RecruitStatus> recruits = new ArrayList<>();
-                                Map<Long, String> partMap = new HashMap<>();
+                                Map<Long, MemberPart> partMap = new HashMap<>();
                                 for (Part p : tuple.getT2()) {
-                                    partMap.put(p.getId(), p.getPart());
-                                    recruits.add(new RecruitStatus(p.getPart(), p.getComment(), p.getCollected(), p.getTargetCollect()));
+                                    MemberPart part = MemberPart.valueOf(p.getPart());
+                                    partMap.put(p.getId(), part);
+                                    recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect()));
                                 }
 
-                                List<String> skillNames = tuple.getT3().stream().map(Skill::getSkill).toList();
+                                List<SkillType> skillNames = tuple.getT3().stream().map(Skill::getSkill).map(SkillType::valueOf).toList();
 
                                 List<String> categoryNames = tuple.getT4().stream()
                                         .map(Category::getCategory).toList();

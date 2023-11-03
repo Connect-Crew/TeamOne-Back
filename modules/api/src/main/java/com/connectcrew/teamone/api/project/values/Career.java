@@ -1,9 +1,12 @@
 package com.connectcrew.teamone.api.project.values;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum Career {
+    NONE("경력무관", -1),
     SEEKER("준비생", 0),
     ENTRY("신입", 1),
     YEAR_1("1년", 2),
@@ -20,9 +23,6 @@ public enum Career {
     private final String description;
     private final Integer id;
 
-    public Integer getId() {
-        return id;
-    }
 
     public static Career valueOf(Integer id) {
         for (Career career : Career.values()) {

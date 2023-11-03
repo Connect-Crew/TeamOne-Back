@@ -1,9 +1,6 @@
 package com.connectcrew.teamone.api.project;
 
-import com.connectcrew.teamone.api.project.values.Career;
-import com.connectcrew.teamone.api.project.values.ProjectGoal;
-import com.connectcrew.teamone.api.project.values.ProjectState;
-import com.connectcrew.teamone.api.project.values.Region;
+import com.connectcrew.teamone.api.project.values.*;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -30,7 +27,7 @@ public record ProjectDetail(
         Integer favorite,
         List<RecruitStatus> recruitStatuses,
         List<ProjectMember> members,
-        List<String> skills
+        List<SkillType> skills
 ) {
 
 }

@@ -1,7 +1,13 @@
 package com.connectcrew.teamone.api.project.values;
 
+import com.connectcrew.teamone.api.project.NameKey;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Getter
 @RequiredArgsConstructor
 public enum Region {
     NONE("미설정"),
@@ -31,5 +37,7 @@ public enum Region {
         return description;
     }
 
-
+    public static List<NameKey> getNameKeys() {
+        return Arrays.stream(Region.values()).map(r -> new NameKey(r.description, r.name())).toList();
+    }
 }
