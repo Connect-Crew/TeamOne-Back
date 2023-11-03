@@ -23,9 +23,10 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-public class JwtProvider implements TokenGenerator {
+public class JwtProvider {
 
     public static final String AUTH_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer ";
     private final Key secret;
 
     public static final long accessExp = 1000L * 60 * 60 * 24 * 2; // 2 days
@@ -36,12 +37,10 @@ public class JwtProvider implements TokenGenerator {
     }
 
     // 토큰 생성
-    @Override
     public String createAccessToken(String account, Role role) {
         return createToken(account, role, accessExp);
     }
 
-    @Override
     public String createRefreshToken(String account, Role role) {
         return createToken(account, role, refreshExp);
     }
@@ -65,8 +64,8 @@ public class JwtProvider implements TokenGenerator {
     public Authentication getAuthentication(String token) throws UnauthorizedException {
         // token에서 bearer 제거
         String removeBearer;
-        if (token.startsWith("Bearer "))
-            removeBearer = token.replace("Bearer ", "");
+        if (token.startsWith(BEARER_PREFIX))
+            removeBearer = token.replace(BEARER_PREFIX, "");
         else
             throw new UnauthorizedException("Invalid token"); // Bearer 없으면 Invalid token
 

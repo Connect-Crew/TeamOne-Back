@@ -1,4 +1,4 @@
-= Register - /auth/register
+= Register - /auth/register (POST)
 
 link:../index.html[home으로 돌아가기]
 
@@ -7,23 +7,26 @@ link:../index.html[home으로 돌아가기]
 == Request
 
 include::{snippets}/auth/register-success/http-request.adoc[]
+
+=== request body
+
 include::{snippets}/auth/register-success/request-fields.adoc[]
 
 == Response
 
-.response (성공)
+=== response (성공)
 
 include::{snippets}/auth/register-success/http-response.adoc[]
 
 include::{snippets}/auth/register-success/response-fields.adoc[]
 
-.response (실패 - 유효하지 않은 토큰)
+=== response (실패 - 유효하지 않은 토큰)
 
 include::{snippets}/auth/unauthorized-register-failure/http-response.adoc[]
 
 include::{snippets}/auth/unauthorized-register-failure/response-fields.adoc[]
 
-.response (실패 - 회원가입 실패)
+=== response (실패 - 회원가입 실패)
 
 include::{snippets}/auth/register-failure/http-response.adoc[]
 
