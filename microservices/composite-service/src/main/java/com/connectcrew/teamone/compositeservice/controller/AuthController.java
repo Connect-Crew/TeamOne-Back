@@ -51,10 +51,10 @@ public class AuthController {
 
     private LoginResult generateLoginResult(User user) {
         LocalDateTime now = LocalDateTime.now();
-        String accessToken = jwtProvider.createAccessToken(user.socialId(), user.role());
+        String accessToken = jwtProvider.createAccessToken(user.socialId(), user.id(), user.role());
         LocalDateTime accessExp = now.plusSeconds(JwtProvider.accessExp / 1000);
 
-        String refreshToken = jwtProvider.createRefreshToken(user.socialId(), user.role());
+        String refreshToken = jwtProvider.createRefreshToken(user.socialId(), user.id(), user.role());
         LocalDateTime refreshExp = now.plusSeconds(JwtProvider.refreshExp / 1000);
 
         return LoginResult.builder()
@@ -74,8 +74,9 @@ public class AuthController {
 
         String account = jwtProvider.getAccount(removedPrefix);
         Role role = jwtProvider.getRole(removedPrefix);
+        Long id = jwtProvider.getId(removedPrefix);
 
-        String accessToken = jwtProvider.createAccessToken(account, role);
+        String accessToken = jwtProvider.createAccessToken(account, id, role);
         LocalDateTime accessExp = LocalDateTime.now().plusSeconds(JwtProvider.accessExp / 1000);
 
         return RefreshResult.builder()

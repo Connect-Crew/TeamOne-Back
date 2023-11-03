@@ -12,7 +12,7 @@ import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
 import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.param.RegisterParam;
-import com.connectcrew.teamone.compositeservice.request.UserRequest;
+import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import com.connectcrew.teamone.compositeservice.resposne.RefreshResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +35,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -53,7 +52,7 @@ class AuthControllerTest {
     private Auth2TokenValidator tokenValidator;
 
     @MockBean
-    private UserRequest userRequest;
+    private UserRequestImpl userRequest;
     @MockBean
     private JwtProvider jwtProvider;
 
@@ -82,8 +81,8 @@ class AuthControllerTest {
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
-        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -121,8 +120,8 @@ class AuthControllerTest {
     void notRegisterLogin() {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
-        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -186,8 +185,8 @@ class AuthControllerTest {
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
-        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/register")
@@ -294,7 +293,7 @@ class AuthControllerTest {
     void refreshTest() {
         when(jwtProvider.getAccount(anyString())).thenReturn("socialId");
         when(jwtProvider.getRole(anyString())).thenReturn(Role.USER);
-        when(jwtProvider.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.validateToken(anyString())).thenReturn(true);
 
         webTestClient.post()
