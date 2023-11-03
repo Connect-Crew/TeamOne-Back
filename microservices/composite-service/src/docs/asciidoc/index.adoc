@@ -6,3 +6,4 @@
 
 - link:auth/login.html[로그인 - /auth/login]
 - link:auth/register.html[회원가입 - /auth/register]
+- link:auth/refresh.html[토큰 갱신 - /auth/refresh]

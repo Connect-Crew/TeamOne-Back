@@ -1,0 +1,23 @@
+= Register - /auth/refresh (POST)
+
+link:../index.html[home으로 돌아가기]
+
+로그인하며 발급받은 Refresh Token을 이용하여 Access Token을 재발급 받는 요청입니다.
+
+== Request
+
+=== request
+
+include::{snippets}/auth/refresh/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/auth/refresh/request-headers.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/auth/refresh/http-response.adoc[]
+
+include::{snippets}/auth/refresh/response-fields.adoc[]

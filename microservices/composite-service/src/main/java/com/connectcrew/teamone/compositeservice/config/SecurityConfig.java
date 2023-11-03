@@ -51,6 +51,7 @@ public class SecurityConfig {
                 })
                 .authorizeExchange(spec -> {
                     spec.pathMatchers("/auth/login", "/auth/register", "/actuator/**", "/project/", "/project/list").permitAll();
+                    spec.pathMatchers("/api/**").permitAll();
                     spec.anyExchange().denyAll();
                 })
                 .build();
