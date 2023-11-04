@@ -2,18 +2,20 @@ package com.connectcrew.teamone.projectservice.controller;
 
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
+import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.projectservice.entity.*;
-import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.projectservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -38,25 +40,171 @@ public class ProjectController {
 
     private final MemberRepository memberRepository;
 
+    @GetMapping("/list")
+    public Flux<ProjectItem> getProjectList(ProjectFilterOption option) {
+        log.trace("getProjectList - option: {}", option);
+        return Flux.fromIterable(List.of(
+                        new ProjectItem(
+                                0L,
+                                "[서울] 강아지 의료 플랫폼 기획",
+                                null,
+                                Region.SEOUL,
+                                false,
+                                Career.SEEKER,
+                                Career.YEAR_1,
+                                LocalDateTime.now().minusMinutes(5),
+                                LocalDate.now().plusDays(2),
+                                LocalDate.now().plusDays(5),
+                                ProjectState.RECRUITING,
+                                49,
+                                List.of(ProjectCategory.IT),
+                                ProjectGoal.PORTFOLIO,
+                                List.of(
+                                        new RecruitStatus(
+                                                MemberPart.PLANNER,
+                                                "프로토타입 기획자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.DESIGNER,
+                                                "프로토타입 디자이너를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.ANDROID,
+                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.IOS,
+                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.BACKEND,
+                                                "Spring 백엔드 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        )
+                                )
+                        ),
+                        new ProjectItem(
+                                1L,
+                                "배달비 없는 배달앱 - 함께 하실 크루원을 모집합니다!",
+                                null,
+                                Region.NONE,
+                                true,
+                                Career.NONE,
+                                Career.NONE,
+                                LocalDateTime.now().minusMinutes(10),
+                                null,
+                                null,
+                                ProjectState.PROCEEDING,
+                                40,
+                                List.of(ProjectCategory.APP),
+                                ProjectGoal.STARTUP,
+                                List.of(
+                                        new RecruitStatus(
+                                                MemberPart.PLANNER,
+                                                "프로토타입 기획자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.DESIGNER,
+                                                "프로토타입 디자이너를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.ANDROID,
+                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.IOS,
+                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.BACKEND,
+                                                "Spring 백엔드 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        )
+                                )
+                        ),
+                        new ProjectItem(
+                                2L,
+                                "이루다",
+                                null,
+                                Region.BUSAN,
+                                false,
+                                Career.NONE,
+                                Career.NONE,
+                                LocalDateTime.now().minusMinutes(15),
+                                LocalDate.now().plusDays(2),
+                                LocalDate.now().plusDays(15),
+                                ProjectState.RECRUITING,
+                                49,
+                                List.of(ProjectCategory.AI),
+                                ProjectGoal.STARTUP,
+                                List.of(
+                                        new RecruitStatus(
+                                                MemberPart.PLANNER,
+                                                "프로토타입 기획자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.DESIGNER,
+                                                "프로토타입 디자이너를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.ANDROID,
+                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.IOS,
+                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        ),
+                                        new RecruitStatus(
+                                                MemberPart.BACKEND,
+                                                "Spring 백엔드 개발자를 모집합니다.",
+                                                1,
+                                                2
+                                        )
+                                )
+                        )
+                )
+        );
+    }
+
     @PostMapping("/")
     @Transactional
     public Mono<Long> createProject(@RequestBody ProjectInput input) {
         log.trace("createProject - input: {}", input);
         return validateInput(input)
                 .then(projectRepository.save(inputToProject(input)))
-                .flatMap(p -> {
-                    Long id = p.getId();
-
-                    Mono<Long> saveBanners = saveBanners(input, id);
-                    Mono<Long> savePartsAndMember = saveParts(input, id)
-                            .flatMap(parts -> saveLeaderMember(input, id, parts));
-                    Mono<Long> saveSkills = saveSkills(input, id);
-                    Mono<Long> saveCategories = saveCategories(input, id);
-
-
-                    return Mono.zip(saveBanners, savePartsAndMember, saveSkills, saveCategories)
-                            .map(tuple -> id);
-                })
+                .flatMap(p -> saveBanners(input, p.getId()).thenReturn(p))
+                .flatMap(p -> saveParts(input, p.getId())
+                        .flatMap(parts -> saveLeaderMember(input, p.getId(), parts))
+                        .thenReturn(p))
+                .flatMap(p -> saveSkills(input, p.getId()).thenReturn(p))
+                .flatMap(p -> saveCategories(input, p.getId()).thenReturn(p))
+                .map(Project::getId)
                 .onErrorResume(e -> {
                     log.error("createProject - error: {}", e.getMessage(), e);
                     return Mono.error(new RuntimeException(ProjectExceptionMessage.CREATE_PROJECT_FAILED.toString()));
@@ -115,16 +263,16 @@ public class ProjectController {
 
         // 8. recruit 조건 검사 (comment는 최대 30글자, max는 0 이상인지, 모든 recruit의 max의 합이 10 이하인지)
         int recruitMaxSum = 0;
-        for(RecruitInput recruit : input.recruits()) {
-            if(recruit.comment().length() > 30)
+        for (RecruitInput recruit : input.recruits()) {
+            if (recruit.comment().length() > 30)
                 return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_COMMENT_LENGTH_30_UNDER.toString()));
 
-            if(recruit.max() < 0)
+            if (recruit.max() < 0)
                 return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_0_OVER.toString()));
 
             recruitMaxSum += recruit.max();
         }
-        if(recruitMaxSum > 10)
+        if (recruitMaxSum > 10)
             return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_10_UNDER.toString()));
 
         return Mono.just(input);
@@ -154,7 +302,7 @@ public class ProjectController {
         for (ProjectCategory category : input.category()) {
             categories.add(Category.builder()
                     .project(id)
-                    .category(category.name())
+                    .name(category.name())
                     .build());
         }
 
@@ -169,7 +317,7 @@ public class ProjectController {
         for (SkillType skill : input.skills()) {
             skills.add(Skill.builder()
                     .project(id)
-                    .skill(skill.name())
+                    .name(skill.name())
                     .build());
         }
 
@@ -255,10 +403,10 @@ public class ProjectController {
                                     recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect()));
                                 }
 
-                                List<SkillType> skillNames = tuple.getT3().stream().map(Skill::getSkill).map(SkillType::valueOf).toList();
+                                List<SkillType> skillNames = tuple.getT3().stream().map(Skill::getName).map(SkillType::valueOf).toList();
 
                                 List<ProjectCategory> categoryNames = tuple.getT4().stream()
-                                        .map(Category::getCategory).map(ProjectCategory::valueOf).toList();
+                                        .map(Category::getName).map(ProjectCategory::valueOf).toList();
 
                                 List<ProjectMember> projectMembers = tuple.getT5().stream()
                                         .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPart_id()), Collectors.toList())))

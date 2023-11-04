@@ -13,5 +13,5 @@ public class Skill {
     @Id
     private Long id;
     private Long project;
-    private String skill;
+    private String name;
 }

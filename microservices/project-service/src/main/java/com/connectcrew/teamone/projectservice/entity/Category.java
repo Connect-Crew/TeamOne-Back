@@ -13,5 +13,5 @@ public class Category {
     @Id
     private Long id;
     private Long project;
-    private String category;
+    private String name;
 }
