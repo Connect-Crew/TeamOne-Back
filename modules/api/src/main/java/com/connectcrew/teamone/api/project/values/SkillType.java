@@ -14,8 +14,6 @@ public enum SkillType {
     ReactNative,
     React,
     Vue,
-    IOS,
-    Android,
     Angular,
     Spring,
     Django,

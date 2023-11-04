@@ -2,14 +2,12 @@ package com.connectcrew.teamone.compositeservice.param;
 
 import com.connectcrew.teamone.api.project.RecruitInput;
 import com.connectcrew.teamone.api.project.values.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public record ProjectInputParam(
         String title,
-        MultipartFile[] banners,
         Region region,
         Boolean online,
         LocalDate start,

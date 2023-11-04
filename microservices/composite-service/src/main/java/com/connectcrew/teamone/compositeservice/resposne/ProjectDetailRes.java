@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.resposne;
 
 import com.connectcrew.teamone.api.project.ProjectDetail;
+import com.connectcrew.teamone.api.project.values.ProjectCategory;
 import com.connectcrew.teamone.api.project.values.SkillType;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public record ProjectDetailRes(
         String leader, // TODO 임시 코드 (향후 객체로 수정)
         String introduction,
         Integer favorite,
-        List<RecruitStatusRes> recruitStatuses,
+        List<RecruitStatusRes> recruitStatus,
         List<ProjectMemberRes> members,
         List<String> skills
 ) {
@@ -42,7 +43,7 @@ public record ProjectDetailRes(
                 detail.state().getDescription(),
                 detail.careerMin().getDescription(),
                 detail.careerMax().getDescription(),
-                detail.category(),
+                detail.category().stream().map(ProjectCategory::getDescription).toList(),
                 detail.goal().getDescription(),
                 "" + detail.leader(), // TODO 임시 코드 (향후 객체로 수정)
                 detail.introduction(),

@@ -1,6 +1,9 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.project.ProjectFilterOption;
+import com.connectcrew.teamone.api.project.ProjectInput;
+import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
@@ -10,18 +13,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
+    private JwtProvider jwtProvider;
     private final ProfileRequest profileRequest;
     private final ProjectRequest projectRequest;
 
     private final ProjectBasicInfo projectBasicInfo;
 
-    public ProjectController(ProfileRequest profileRequest, ProjectRequest projectRequest) {
+    public ProjectController(JwtProvider provider, ProfileRequest profileRequest, ProjectRequest projectRequest) {
+        this.jwtProvider = provider;
         this.profileRequest = profileRequest;
         this.projectRequest = projectRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
@@ -33,8 +39,8 @@ public class ProjectController {
     }
 
     @GetMapping("/list")
-    private Mono<List<ProjectItemRes>> getProjectList(@RequestParam(required = false, defaultValue = "-1") int lastId, int size, @RequestBody(required = false) ProjectFilterOption option) {
-        return projectRequest.getProjectList(lastId, size, option)
+    private Mono<List<ProjectItemRes>> getProjectList(ProjectFilterOption option) {
+        return projectRequest.getProjectList(option)
                 .map(ProjectItemRes::new)
                 .collectList();
     }
@@ -46,4 +52,32 @@ public class ProjectController {
                 .map(ProjectDetailRes::new);
     }
 
+    @PostMapping("/")
+    private Mono<Long> createProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectInputParam param) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
+        // TODO 베너 이미지 저장
+
+        ProjectInput input = new ProjectInput(
+                param.title(),
+                new ArrayList<>(),
+                param.region(),
+                param.online(),
+                param.start(),
+                param.end(),
+                param.state(),
+                param.careerMin(),
+                param.careerMax(),
+                id,
+                param.leaderParts(),
+                param.category(),
+                param.goal(),
+                param.introduction(),
+                param.recruits(),
+                param.skills()
+        );
+
+        return projectRequest.saveProject(input);
+    }
 }

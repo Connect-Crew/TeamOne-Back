@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.projectservice.exception;
+package com.connectcrew.teamone.api.exception.message;
 
 import lombok.RequiredArgsConstructor;
 

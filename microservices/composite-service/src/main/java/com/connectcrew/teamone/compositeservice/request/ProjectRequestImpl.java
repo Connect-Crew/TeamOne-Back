@@ -1,9 +1,6 @@
 package com.connectcrew.teamone.compositeservice.request;
 
-import com.connectcrew.teamone.api.project.ProjectDetail;
-import com.connectcrew.teamone.api.project.ProjectFilterOption;
-import com.connectcrew.teamone.api.project.ProjectItem;
-import com.connectcrew.teamone.api.project.RecruitStatus;
+import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -29,7 +26,7 @@ public class ProjectRequestImpl implements ProjectRequest {
     }
 
     @Override
-    public Flux<ProjectItem> getProjectList(int lastId, int size, ProjectFilterOption option) {
+    public Flux<ProjectItem> getProjectList(ProjectFilterOption option) {
         return Flux.fromIterable(List.of(
                         new ProjectItem(
                                 0L,
@@ -185,6 +182,16 @@ public class ProjectRequestImpl implements ProjectRequest {
                 .uri(String.format("%s/", host))
                 .retrieve()
                 .bodyToMono(ProjectDetail.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Long> saveProject(ProjectInput input) {
+        return webClient.post()
+                .uri(String.format("%s/", host))
+                .bodyValue(input)
+                .retrieve()
+                .bodyToMono(Long.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

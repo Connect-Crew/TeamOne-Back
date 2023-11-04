@@ -5,7 +5,7 @@ import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.projectservice.entity.*;
-import com.connectcrew.teamone.projectservice.exception.ProjectExceptionMessage;
+import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.projectservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -257,8 +257,8 @@ public class ProjectController {
 
                                 List<SkillType> skillNames = tuple.getT3().stream().map(Skill::getSkill).map(SkillType::valueOf).toList();
 
-                                List<String> categoryNames = tuple.getT4().stream()
-                                        .map(Category::getCategory).toList();
+                                List<ProjectCategory> categoryNames = tuple.getT4().stream()
+                                        .map(Category::getCategory).map(ProjectCategory::valueOf).toList();
 
                                 List<ProjectMember> projectMembers = tuple.getT5().stream()
                                         .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPart_id()), Collectors.toList())))

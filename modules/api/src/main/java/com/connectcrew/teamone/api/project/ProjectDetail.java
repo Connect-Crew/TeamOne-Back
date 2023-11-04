@@ -20,7 +20,7 @@ public record ProjectDetail(
         ProjectState state,
         Career careerMin,
         Career careerMax,
-        List<String> category,
+        List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,
         String introduction,
