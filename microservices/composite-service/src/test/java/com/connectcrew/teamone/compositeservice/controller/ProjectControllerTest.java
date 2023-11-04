@@ -184,8 +184,8 @@ class ProjectControllerTest {
                         .queryParam("region", Region.SEOUL.name())
                         .queryParam("online", true)
                         .queryParam("part", MemberPart.ANDROID.name())
-                        .queryParam("startDate", LocalDate.of(2023, 10, 20))
-                        .queryParam("endDate", LocalDate.of(2023, 12, 20))
+                        .queryParam("skills", List.of(SkillType.Jira.name(), SkillType.Github.name()))
+                        .queryParam("states", List.of(ProjectState.PROCEEDING.name(), ProjectState.RECRUITING.name()))
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
                         .build()
                 )
@@ -202,8 +202,8 @@ class ProjectControllerTest {
                                 parameterWithName("region").optional().description("프로젝트 지역 (Optional)"),
                                 parameterWithName("online").optional().description("온라인 여부 (Optional)"),
                                 parameterWithName("part").optional().description("프로젝트 파트 (Optional)"),
-                                parameterWithName("startDate").optional().description("프로젝트 시작 날짜 (Optional)"),
-                                parameterWithName("endDate").optional().description("프로젝트 종료 날짜 (Optional)"),
+                                parameterWithName("skills").optional().description("프로젝트 기술 (Optional)"),
+                                parameterWithName("states").optional().description("프로젝트 상태 (Optional)"),
                                 parameterWithName("category").optional().description("프로젝트 카테고리 (Optional)")
                         ),
                         responseFields(
@@ -320,7 +320,6 @@ class ProjectControllerTest {
                 ));
     }
 
-    // TODO create test (success, fail)
     @Test
     void createProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
