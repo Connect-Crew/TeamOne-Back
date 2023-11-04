@@ -25,8 +25,26 @@ public class ProjectRequestImpl implements ProjectRequest {
 
     @Override
     public Flux<ProjectItem> getProjectList(ProjectFilterOption option) {
+        String[] host = this.host.replace("http://", "").split(":");
+
         return webClient.get()
-                .uri(String.format("%s/list", host))
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host(host[0].trim())
+                        .port(Integer.parseInt(host[1].trim()))
+                        .path("/list")
+                        .queryParam("lastId", option.lastId())
+                        .queryParam("size", option.size())
+                        .queryParam("goal", option.goal())
+                        .queryParam("career", option.career())
+                        .queryParam("region", option.region())
+                        .queryParam("online", option.online())
+                        .queryParam("part", option.part())
+                        .queryParam("skills", option.skills())
+                        .queryParam("states", option.states())
+                        .queryParam("category", option.category())
+                        .build()
+                )
                 .retrieve()
                 .bodyToFlux(ProjectItem.class)
                 .onErrorResume(exHandler::handleException);
