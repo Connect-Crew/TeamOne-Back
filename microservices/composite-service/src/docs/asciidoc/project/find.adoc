@@ -1,0 +1,27 @@
+= 프로젝트 모집글 불러오기 - /project/\{projectId\} (GET)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트 모집글을 불러오는 요청입니다.
+
+== Request
+
+include::{snippets}/project/find-success/http-request.adoc[]
+
+=== path param
+
+include::{snippets}/project/find-success/path-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/find-success/http-response.adoc[]
+
+include::{snippets}/project/find-success/response-fields.adoc[]
+
+=== response (실패)
+
+include::{snippets}/project/find-not-found/http-response.adoc[]
+
+include::{snippets}/project/find-not-found/response-fields.adoc[]

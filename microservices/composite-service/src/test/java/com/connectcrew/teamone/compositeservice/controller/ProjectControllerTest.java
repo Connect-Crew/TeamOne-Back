@@ -195,9 +195,9 @@ class ProjectControllerTest {
                 })
                 .consumeWith(document("project/list",
                         queryParameters(
-                                parameterWithName("lastId").optional().description("기준 프로젝트 ID (Optional)\n해당 ID를 기준으로 과거 프로젝트를 불러옵니다\n미 입력시 가장 최신 프로젝트를 불러옵니다."),
+                                parameterWithName("lastId").optional().description("기준 프로젝트 ID (Optional) \n해당 ID를 기준으로 과거 프로젝트를 불러옵니다 \n미 입력시 가장 최신 프로젝트를 불러옵니다."),
                                 parameterWithName("size").description("프로젝트 개수"),
-                                parameterWithName("goal").description("프로젝트 목표"),
+                                parameterWithName("goal").description("프로젝트 목표 (Optional)"),
                                 parameterWithName("career").optional().description("프로젝트 경력 (Optional)"),
                                 parameterWithName("region").optional().description("프로젝트 지역 (Optional)"),
                                 parameterWithName("online").optional().description("온라인 여부 (Optional)"),
@@ -210,10 +210,10 @@ class ProjectControllerTest {
                                 fieldWithPath("[].id").type("Number").description("프로젝트 ID"),
                                 fieldWithPath("[].title").type("String").description("프로젝트 제목"),
                                 fieldWithPath("[].thumbnail").type("String (Optional)").optional().description("프로젝트 썸네일"),
-                                fieldWithPath("[].region").type("String (Optional)").optional().description("프로젝트 지역"),
+                                fieldWithPath("[].region").type("String").description("프로젝트 지역"),
                                 fieldWithPath("[].online").type("Boolean").description("온라인 여부"),
-                                fieldWithPath("[].careerMin").type("String (Optional)").optional().description("최소 프로젝트 경력"),
-                                fieldWithPath("[].careerMax").type("String (Optional)").optional().description("최대 프로젝트 경력"),
+                                fieldWithPath("[].careerMin").type("String").description("최소 프로젝트 경력"),
+                                fieldWithPath("[].careerMax").type("String").description("최대 프로젝트 경력"),
                                 fieldWithPath("[].createdAt").type("Datetime").description("프로젝트 생성 날짜"),
                                 fieldWithPath("[].startDate").type("Date (Optional)").optional().description("프로젝트 시작 날짜"),
                                 fieldWithPath("[].endDate").type("Date (Optional)").optional().description("프로젝트 종료 날짜"),
@@ -274,10 +274,10 @@ class ProjectControllerTest {
                                 fieldWithPath("id").type("Number").description("프로젝트 ID"),
                                 fieldWithPath("title").type("String").description("프로젝트 제목"),
                                 fieldWithPath("banners[]").type("String[]").optional().description("프로젝트 베너 이미지"),
-                                fieldWithPath("region").type("String (Optional)").optional().description("프로젝트 지역"),
+                                fieldWithPath("region").type("String").optional().description("프로젝트 지역"),
                                 fieldWithPath("online").type("Boolean").description("온라인 여부"),
-                                fieldWithPath("careerMin").type("String (Optional)").optional().description("최소 프로젝트 경력"),
-                                fieldWithPath("careerMax").type("String (Optional)").optional().description("최대 프로젝트 경력"),
+                                fieldWithPath("careerMin").type("String").optional().description("최소 프로젝트 경력"),
+                                fieldWithPath("careerMax").type("String").optional().description("최대 프로젝트 경력"),
                                 fieldWithPath("createdAt").type("Datetime").description("프로젝트 생성 날짜"),
                                 fieldWithPath("startDate").type("Date (Optional)").optional().description("프로젝트 시작 날짜"),
                                 fieldWithPath("endDate").type("Date (Optional)").optional().description("프로젝트 종료 날짜"),
@@ -359,7 +359,7 @@ class ProjectControllerTest {
                 .expectBody(Long.class)
                 .consumeWith(document("project/create-success",
                                 requestHeaders(
-                                        headerWithName(JwtProvider.AUTH_HEADER).description("Access Token")
+                                        headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
                                 ),
                                 requestFields(
                                         fieldWithPath("title").type("String").description("프로젝트 제목"),

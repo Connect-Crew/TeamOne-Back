@@ -7,3 +7,9 @@
 - link:auth/login.html[로그인 - /auth/login]
 - link:auth/register.html[회원가입 - /auth/register]
 - link:auth/refresh.html[토큰 갱신 - /auth/refresh]
+
+== 프로젝트 모집 관련 요청
+
+- link:project/list.html[프로젝트 모집 목록 - /project/list]
+- link:project/find.html[프로젝트 모집글 불러오기 - /project/]
+- link:project/create.html[프로젝트 모집글 작성 - /project/]

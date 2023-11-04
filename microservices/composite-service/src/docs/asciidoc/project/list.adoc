@@ -1,0 +1,21 @@
+= 프로젝트 모집 목록 - /project/list (GET)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트 모집글 목록을 조회하는 요청입니다.
+
+== Request
+
+include::{snippets}/project/list/http-request.adoc[]
+
+=== query param
+
+include::{snippets}/project/list/query-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/list/http-response.adoc[]
+
+include::{snippets}/project/list/response-fields.adoc[]
