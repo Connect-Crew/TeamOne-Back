@@ -61,19 +61,19 @@ public class ProjectController {
                                 ProjectGoal.PORTFOLIO,
                                 List.of(
                                         new RecruitStatus(
-                                                MemberPart.PLANNER,
+                                                MemberPart.PL_PM_PO,
                                                 "프로토타입 기획자를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.DESIGNER,
+                                                MemberPart.UI_UX_DESIGNER,
                                                 "프로토타입 디자이너를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.ANDROID,
+                                                MemberPart.AOS,
                                                 "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                                                 1,
                                                 2
@@ -109,19 +109,19 @@ public class ProjectController {
                                 ProjectGoal.STARTUP,
                                 List.of(
                                         new RecruitStatus(
-                                                MemberPart.PLANNER,
+                                                MemberPart.PL_PM_PO,
                                                 "프로토타입 기획자를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.DESIGNER,
+                                                MemberPart.UI_UX_DESIGNER,
                                                 "프로토타입 디자이너를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.ANDROID,
+                                                MemberPart.AOS,
                                                 "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                                                 1,
                                                 2
@@ -157,19 +157,19 @@ public class ProjectController {
                                 ProjectGoal.STARTUP,
                                 List.of(
                                         new RecruitStatus(
-                                                MemberPart.PLANNER,
+                                                MemberPart.PL_PM_PO,
                                                 "프로토타입 기획자를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.DESIGNER,
+                                                MemberPart.UI_UX_DESIGNER,
                                                 "프로토타입 디자이너를 모집합니다.",
                                                 1,
                                                 2
                                         ),
                                         new RecruitStatus(
-                                                MemberPart.ANDROID,
+                                                MemberPart.AOS,
                                                 "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                                                 1,
                                                 2

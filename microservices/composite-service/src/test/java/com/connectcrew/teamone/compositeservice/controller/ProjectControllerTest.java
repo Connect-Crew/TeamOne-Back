@@ -82,19 +82,19 @@ class ProjectControllerTest {
     private List<RecruitStatus> initRecruits() {
         return List.of(
                 new RecruitStatus(
-                        MemberPart.PLANNER,
+                        MemberPart.PL_PM_PO,
                         "프로토타입 기획자를 모집합니다.",
                         1,
                         2
                 ),
                 new RecruitStatus(
-                        MemberPart.DESIGNER,
+                        MemberPart.UI_UX_DESIGNER,
                         "프로토타입 디자이너를 모집합니다.",
                         1,
                         2
                 ),
                 new RecruitStatus(
-                        MemberPart.ANDROID,
+                        MemberPart.AOS,
                         "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                         1,
                         2
@@ -184,7 +184,7 @@ class ProjectControllerTest {
                         .queryParam("career", Career.YEAR_1.name())
                         .queryParam("region", Region.SEOUL.name())
                         .queryParam("online", true)
-                        .queryParam("part", MemberPart.ANDROID.name())
+                        .queryParam("part", MemberPart.AOS.name())
                         .queryParam("skills", List.of(SkillType.Jira.name(), SkillType.Github.name()))
                         .queryParam("states", List.of(ProjectState.PROCEEDING.name(), ProjectState.RECRUITING.name()))
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
@@ -252,8 +252,8 @@ class ProjectControllerTest {
                 14,
                 initRecruits(),
                 List.of(
-                        new ProjectMember(0L, List.of(MemberPart.PLANNER, MemberPart.DESIGNER)),
-                        new ProjectMember(1L, List.of(MemberPart.ANDROID)),
+                        new ProjectMember(0L, List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER)),
+                        new ProjectMember(1L, List.of(MemberPart.AOS)),
                         new ProjectMember(2L, List.of(MemberPart.IOS)),
                         new ProjectMember(3L, List.of(MemberPart.BACKEND))
                 ),
@@ -336,14 +336,14 @@ class ProjectControllerTest {
                 ProjectState.RECRUITING,
                 Career.SEEKER,
                 Career.YEAR_1,
-                List.of(MemberPart.PLANNER, MemberPart.DESIGNER),
+                List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new RecruitInput(MemberPart.PLANNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.DESIGNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.ANDROID, "코멘트", 2),
+                        new RecruitInput(MemberPart.PL_PM_PO, "코멘트", 2),
+                        new RecruitInput(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
+                        new RecruitInput(MemberPart.AOS, "코멘트", 2),
                         new RecruitInput(MemberPart.IOS, "코멘트", 2),
                         new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
                 ),
@@ -400,14 +400,14 @@ class ProjectControllerTest {
                 ProjectState.RECRUITING,
                 Career.SEEKER,
                 Career.YEAR_1,
-                List.of(MemberPart.PLANNER, MemberPart.DESIGNER),
+                List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new RecruitInput(MemberPart.PLANNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.DESIGNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.ANDROID, "코멘트", 2),
+                        new RecruitInput(MemberPart.PL_PM_PO, "코멘트", 2),
+                        new RecruitInput(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
+                        new RecruitInput(MemberPart.AOS, "코멘트", 2),
                         new RecruitInput(MemberPart.IOS, "코멘트", 2),
                         new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
                 ),

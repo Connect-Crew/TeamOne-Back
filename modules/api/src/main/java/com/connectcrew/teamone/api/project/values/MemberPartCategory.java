@@ -9,7 +9,7 @@ public enum MemberPartCategory {
     DEVELOP("개발"),
     DESIGN("디자인"),
     MARKETING("마케팅"),
-    PLANNING("기획"),
+    MANAGER("기획"),
     SALES("영업"),
     CS("고객서비스"),
     SPECIALIST("전문직"),
