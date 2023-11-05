@@ -10,6 +10,7 @@
 
 == 프로젝트 모집 관련 요청
 
+- link:project/basicinfo.html[프로젝트 기본 정보 불러오기 - /project/]
 - link:project/list.html[프로젝트 모집 목록 - /project/list]
 - link:project/find.html[프로젝트 모집글 불러오기 - /project/]
 - link:project/create.html[프로젝트 모집글 작성 - /project/]

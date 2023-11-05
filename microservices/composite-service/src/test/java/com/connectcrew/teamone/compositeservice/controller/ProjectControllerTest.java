@@ -10,6 +10,7 @@ import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
 import org.junit.jupiter.api.BeforeEach;
@@ -428,6 +429,32 @@ class ProjectControllerTest {
                                 fieldWithPath("error").type("String").description("에러 유형"),
                                 fieldWithPath("message").type("String").description("실패 메시지"),
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void basicInfoTest() {
+        webTestClient.get()
+                .uri("/project/")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectBasicInfo.class)
+                .consumeWith(document("project/basic-info",
+                        responseFields(
+                                fieldWithPath("region[]").type("NameKey[]").description("지역 이름 및 키값 배열"),
+                                fieldWithPath("region[].name").type("String").description("지역 이름"),
+                                fieldWithPath("region[].key").type("String").description("지역 키값"),
+                                fieldWithPath("job[]").type("NameKeyValue[]").description("직군별 이름 및 키값, 세부 직군 배열"),
+                                fieldWithPath("job[].name").type("String").description("직군 이름"),
+                                fieldWithPath("job[].key").type("String").description("직군 키값"),
+                                fieldWithPath("job[].value").type("NameKey[]").description("세부 직군 배열"),
+                                fieldWithPath("job[].value[].name").type("String").description("세부 직군 이름"),
+                                fieldWithPath("job[].value[].key").type("String").description("세부 직군 키값"),
+                                fieldWithPath("skill[]").type("String[]").description("스킬 배열"),
+                                fieldWithPath("category[]").type("NameKey[]").description("프로젝트 분야 이름 및 키값 배열"),
+                                fieldWithPath("category[].name").type("String").description("프로젝트 분야 이름"),
+                                fieldWithPath("category[].key").type("String").description("프로젝트 분야 키값")
                         )
                 ));
     }
