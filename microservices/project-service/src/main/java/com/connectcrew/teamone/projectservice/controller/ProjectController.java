@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,157 +39,63 @@ public class ProjectController {
     private final CategoryRepository categoryRepository;
 
     private final MemberRepository memberRepository;
+    private final CustomRepository customRepository;
+
+    private ProjectCustomFindOption paramToOption(ProjectFilterOption option) {
+        return new ProjectCustomFindOption(
+                option.lastId(),
+                option.size(),
+                option.goal(),
+                option.career(),
+                option.region(),
+                option.online(),
+                option.part(),
+                option.skills(),
+                option.states(),
+                option.category()
+        );
+    }
 
     @GetMapping("/list")
     public Flux<ProjectItem> getProjectList(ProjectFilterOption option) {
         log.trace("getProjectList - option: {}", option);
-        return Flux.fromIterable(List.of(
-                        new ProjectItem(
-                                0L,
-                                "[서울] 강아지 의료 플랫폼 기획",
-                                null,
-                                Region.SEOUL,
-                                false,
-                                Career.SEEKER,
-                                Career.YEAR_1,
-                                LocalDateTime.now().minusMinutes(5),
-                                LocalDate.now().plusDays(2),
-                                LocalDate.now().plusDays(5),
-                                ProjectState.RECRUITING,
-                                49,
-                                List.of(ProjectCategory.IT),
-                                ProjectGoal.PORTFOLIO,
-                                List.of(
-                                        new RecruitStatus(
-                                                MemberPart.PL_PM_PO,
-                                                "프로토타입 기획자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.UI_UX_DESIGNER,
-                                                "프로토타입 디자이너를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.AOS,
-                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.IOS,
-                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.BACKEND,
-                                                "Spring 백엔드 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        )
-                                )
-                        ),
-                        new ProjectItem(
-                                1L,
-                                "배달비 없는 배달앱 - 함께 하실 크루원을 모집합니다!",
-                                null,
-                                Region.NONE,
-                                true,
-                                Career.NONE,
-                                Career.NONE,
-                                LocalDateTime.now().minusMinutes(10),
-                                null,
-                                null,
-                                ProjectState.PROCEEDING,
-                                40,
-                                List.of(ProjectCategory.APP),
-                                ProjectGoal.STARTUP,
-                                List.of(
-                                        new RecruitStatus(
-                                                MemberPart.PL_PM_PO,
-                                                "프로토타입 기획자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.UI_UX_DESIGNER,
-                                                "프로토타입 디자이너를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.AOS,
-                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.IOS,
-                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.BACKEND,
-                                                "Spring 백엔드 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        )
-                                )
-                        ),
-                        new ProjectItem(
-                                2L,
-                                "이루다",
-                                null,
-                                Region.BUSAN,
-                                false,
-                                Career.NONE,
-                                Career.NONE,
-                                LocalDateTime.now().minusMinutes(15),
-                                LocalDate.now().plusDays(2),
-                                LocalDate.now().plusDays(15),
-                                ProjectState.RECRUITING,
-                                49,
-                                List.of(ProjectCategory.AI),
-                                ProjectGoal.STARTUP,
-                                List.of(
-                                        new RecruitStatus(
-                                                MemberPart.PL_PM_PO,
-                                                "프로토타입 기획자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.UI_UX_DESIGNER,
-                                                "프로토타입 디자이너를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.AOS,
-                                                "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.IOS,
-                                                "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        ),
-                                        new RecruitStatus(
-                                                MemberPart.BACKEND,
-                                                "Spring 백엔드 개발자를 모집합니다.",
-                                                1,
-                                                2
-                                        )
-                                )
-                        )
-                )
-        );
+        return customRepository.findAllByOption(paramToOption(option))
+                .flatMap(p -> bannerRepository.findByProjectOrderByIdx(p.id())
+                        .defaultIfEmpty(new Banner())
+                        .map(b -> Tuples.of(p, b)))
+                .flatMap(tuple2 -> partRepository.findAllByProject(tuple2.getT1().id())
+                        .collectList()
+                        .defaultIfEmpty(Collections.emptyList())
+                        .map(parts -> Tuples.of(tuple2.getT1(), tuple2.getT2(), parts)))
+                .map(tuple3 -> {
+                    ProjectCustomEntity project = tuple3.getT1();
+                    Banner banner = tuple3.getT2();
+                    List<RecruitStatus> recruitStatuses = tuple3.getT3().stream()
+                            .map(p -> RecruitStatus.builder()
+                                    .part(MemberPart.valueOf(p.getPart()))
+                                    .comment(p.getComment())
+                                    .current(p.getCollected())
+                                    .max(p.getTargetCollect())
+                                    .build())
+                            .toList();
+
+                    return ProjectItem.builder()
+                            .id(project.id())
+                            .title(project.title())
+                            .thumbnail(banner.getPath())
+                            .online(project.online())
+                            .careerMin(project.careerMin())
+                            .careerMax(project.careerMax())
+                            .createdAt(project.createdAt())
+                            .startDate(project.startDate())
+                            .endDate(project.endDate())
+                            .state(project.state())
+                            .favorite(project.favorite())
+                            .category(project.category())
+                            .goal(project.goal())
+                            .recruitStatus(recruitStatuses)
+                            .build();
+                });
     }
 
     @PostMapping("/")

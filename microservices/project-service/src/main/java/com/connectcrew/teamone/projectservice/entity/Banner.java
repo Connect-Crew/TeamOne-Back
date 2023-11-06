@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class Banner {
 
@@ -16,4 +15,11 @@ public class Banner {
     private Long project;
     private Integer idx;
     private String path;
+
+    public Banner(){
+        id = null;
+        project = null;
+        idx = null;
+        path = null;
+    }
 }
