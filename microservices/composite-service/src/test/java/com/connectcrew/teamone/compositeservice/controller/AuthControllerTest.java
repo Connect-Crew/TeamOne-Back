@@ -78,7 +78,7 @@ class AuthControllerTest {
 
     @Test
     void loginTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, false, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
@@ -182,7 +182,7 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, false, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
@@ -191,7 +191,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
@@ -204,9 +204,7 @@ class AuthControllerTest {
                                 fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("termsAgreement").type("Boolean").description("이용약관 동의 여부"),
-                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부"),
-                                fieldWithPath("communityPolicyAgreement").type("Boolean").description("커뮤니티 정책 동의 여부"),
-                                fieldWithPath("adNotificationAgreement").type("Boolean").description("광고성 혜택 알림 수신 동의 여부")
+                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부")
                         ),
                         responseFields(
                                 fieldWithPath("token").type("String").description("Access Token"),
@@ -235,7 +233,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorInfo.class)
@@ -266,7 +264,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)

@@ -5,12 +5,15 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
+import com.connectcrew.teamone.userservice.repository.ProfileRepository;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
@@ -21,11 +24,12 @@ import java.util.regex.Pattern;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final Pattern nicknamePattern = Pattern.compile("^[a-zA-Z0-9가-힣]{2,10}$");
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, ProfileRepository profileRepository) {
         this.userRepository = userRepository;
-
+        this.profileRepository = profileRepository;
     }
 
     @GetMapping("/")
@@ -33,7 +37,8 @@ public class AuthController {
         log.trace("find socialId={}, provider={}", socialId, provider);
         return userRepository.findBySocialIdAndProvider(socialId, provider.name())
                 .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")))
-                .map(this::entityToResponse);
+                .flatMap(user -> profileRepository.findByUserId(user.getId()).map(profile -> Tuples.of(user, profile)))
+                .map(tuple -> entityToResponse(tuple.getT1(), tuple.getT2()));
     }
 
     @PostMapping("/")
@@ -46,9 +51,10 @@ public class AuthController {
                     if (exists) return Mono.error(new IllegalArgumentException("이미 존재하는 사용자입니다."));
                     return Mono.just(false);
                 })
-                .map(exists -> inputToEntity(input))
+                .map(exists -> inputToUserEntity(input))
                 .flatMap(userRepository::save)
-                .map(this::entityToResponse);
+                .flatMap(user -> profileRepository.save(inputToProfileEntity(user.getId(), input)).map(profile -> Tuples.of(user, profile)))
+                .map(tuple -> entityToResponse(tuple.getT1(), tuple.getT2()));
     }
 
     private Mono<Boolean> checkAgreement(UserInputParam input) {
@@ -56,8 +62,6 @@ public class AuthController {
             return Mono.error(new IllegalArgumentException("서비스 이용약관에 동의해주세요."));
         } else if (!input.privacyAgreement()) {
             return Mono.error(new IllegalArgumentException("개인정보 처리방침에 동의해주세요."));
-        } else if (!input.communityPolicyAgreement()) {
-            return Mono.error(new IllegalArgumentException("커뮤니티 정책에 동의해주세요."));
         } else {
             return Mono.just(true);
         }
@@ -78,38 +82,45 @@ public class AuthController {
                 });
     }
 
-    private UserEntity inputToEntity(UserInputParam input) {
+    private UserEntity inputToUserEntity(UserInputParam input) {
         return UserEntity.builder()
                 .socialId(input.socialId())
                 .provider(input.provider().name())
                 .username(input.username())
-                .nickname(input.nickname())
-                .profile(input.profile())
                 .email(input.email())
                 .role(Role.USER.name())
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .termsAgreement(input.termsAgreement())
                 .privacyAgreement(input.privacyAgreement())
-                .communityPolicyAgreement(input.communityPolicyAgreement())
-                .adNotificationAgreement(input.adNotificationAgreement())
+                .build();
+    }
+
+    private ProfileEntity inputToProfileEntity(Long id, UserInputParam input) {
+        return ProfileEntity.builder()
+                .userId(id)
+                .nickname(input.nickname())
+                .profile(input.profile())
+                .introduction("")
+                .temperature(36.5)
+                .recvApply(0)
+                .resApply(0)
                 .build();
     }
 
     @NotNull
-    private User entityToResponse(UserEntity entity) {
+    private User entityToResponse(UserEntity user, ProfileEntity profile) {
         return User.builder()
-                .id(entity.getId())
-                .socialId(entity.getSocialId())
-                .provider(Social.valueOf(entity.getProvider()))
-                .username(entity.getUsername())
-                .nickname(entity.getNickname())
-                .profile(entity.getProfile())
-                .email(entity.getEmail())
-                .role(Role.valueOf(entity.getRole()))
-                .adNotifAgree(entity.getAdNotificationAgreement())
-                .createdDate(entity.getCreatedDate().toString())
-                .modifiedDate(entity.getModifiedDate().toString())
+                .id(user.getId())
+                .socialId(user.getSocialId())
+                .provider(Social.valueOf(user.getProvider()))
+                .username(user.getUsername())
+                .nickname(profile.getNickname())
+                .profile(profile.getProfile())
+                .email(user.getEmail())
+                .role(Role.valueOf(user.getRole()))
+                .createdDate(user.getCreatedDate().toString())
+                .modifiedDate(user.getModifiedDate().toString())
                 .build();
     }
 
