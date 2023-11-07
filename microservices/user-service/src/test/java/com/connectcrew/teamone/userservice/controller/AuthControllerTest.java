@@ -5,7 +5,11 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
+import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
+import com.connectcrew.teamone.userservice.repository.PartRepository;
+import com.connectcrew.teamone.userservice.repository.ProfileRepository;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +26,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -33,7 +36,16 @@ class AuthControllerTest {
     @Autowired
     private WebTestClient webTestClient;
     @MockBean
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @MockBean
+    private ProfileRepository profileRepository;
+
+    @MockBean
+    private FavoriteRepository favoriteRepository;
+
+    @MockBean
+    private PartRepository partRepository;
 
     @Test
     void find() {
@@ -42,8 +54,6 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
@@ -52,7 +62,19 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
+        ProfileEntity profile = ProfileEntity.builder()
+                .profileId(1L)
+                .userId(user.getId())
+                .nickname("testNick")
+                .profile("testProfile")
+                .introduction("testIntroduction")
+                .temperature(36.5)
+                .recvApply(1)
+                .resApply(1)
+                .build();
+
+        when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
+        when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.just(profile));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -67,7 +89,7 @@ class AuthControllerTest {
 
     @Test
     void notfoundFind() {
-        when(repository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.empty());
+        when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.empty());
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -99,8 +121,6 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
@@ -109,10 +129,11 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")
@@ -134,8 +155,6 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
@@ -144,9 +163,10 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(true));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(true));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")
@@ -167,8 +187,6 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
@@ -177,9 +195,10 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")

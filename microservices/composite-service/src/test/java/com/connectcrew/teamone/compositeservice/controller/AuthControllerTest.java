@@ -204,9 +204,7 @@ class AuthControllerTest {
                                 fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("termsAgreement").type("Boolean").description("이용약관 동의 여부"),
-                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부"),
-                                fieldWithPath("communityPolicyAgreement").type("Boolean").description("커뮤니티 정책 동의 여부"),
-                                fieldWithPath("adNotificationAgreement").type("Boolean").description("광고성 혜택 알림 수신 동의 여부")
+                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부")
                         ),
                         responseFields(
                                 fieldWithPath("token").type("String").description("Access Token"),
