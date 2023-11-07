@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.userservice.controller;
 
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.userservice.entity.PartEntity;
 import com.connectcrew.teamone.userservice.repository.PartRepository;
@@ -24,6 +25,7 @@ public class ProfileController {
     @GetMapping("/")
     Mono<Profile> getProfile(Long id) {
         return profileRepository.findByProfileId(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("프로필을 찾지 못했습니다.")))
                 .flatMap(profileEntity -> partRepository.findAllByProfileId(id).collectList().map(partEntity -> Tuples.of(profileEntity, partEntity)))
                 .map(tuple -> Profile.builder()
                         .id(tuple.getT1().getProfileId())

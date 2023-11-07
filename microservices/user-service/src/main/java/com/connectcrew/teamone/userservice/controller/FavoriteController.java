@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.userservice.controller;
 
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.userservice.entity.FavoriteEntity;
 import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +30,15 @@ public class FavoriteController {
     private final FavoriteRepository favoriteRepository;
 
     @GetMapping("/favorites")
-    Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, List<Long> ids) {
+    Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, Long[] ids) {
+        System.out.println("userId = " + userId);
         return profileRepository.findByUserId(userId)
-                .flatMap(profile -> favoriteRepository.findAllByProfileIdAndTypeAndTargetIn(profile.getProfileId(), type.name(), Flux.fromIterable(ids)).collectList())
+                .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾지 못했습니다.")))
+                .flatMap(profile -> favoriteRepository.findAllByProfileIdAndTypeAndTargetIn(profile.getProfileId(), type.name(), Flux.fromArray(ids)).collectList())
                 .map(favorites -> {
                     Map<Long, Boolean> result = new HashMap<>();
                     favorites.forEach(favorite -> result.put(favorite.getTarget(), true));
-                    ids.forEach(id -> result.putIfAbsent(id, false));
+                    Arrays.stream(ids).forEach(id -> result.putIfAbsent(id, false));
                     return result;
                 });
     }
@@ -42,12 +46,14 @@ public class FavoriteController {
     @GetMapping("/")
     Mono<Boolean> getFavorite(Long userId, FavoriteType type, Long target) {
         return profileRepository.findByUserId(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾지 못했습니다.")))
                 .flatMap(profile -> favoriteRepository.existsByProfileIdAndTypeAndTarget(profile.getProfileId(), type.name(), target));
     }
 
     @PostMapping("/")
     Mono<Boolean> setFavorite(Long userId, FavoriteType type, Long target) {
         return profileRepository.findByUserId(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾지 못했습니다.")))
                 .flatMap(profile -> favoriteRepository.existsByProfileIdAndTypeAndTarget(profile.getProfileId(), type.name(), target))
                 .flatMap(exists -> {
                     if (exists) {
