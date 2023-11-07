@@ -20,14 +20,9 @@ public class UserEntity {
 
     private String provider; // Social login 구분
 
-    @Column("social_id")
     private String socialId; // Social에서 사용자를 구분하는 ID
 
     private String username;
-
-    private String nickname;
-
-    private String profile;
 
     private String email;
 
@@ -37,9 +32,7 @@ public class UserEntity {
 
     private Boolean privacyAgreement; // 개인정보 처리 방침
 
-    @Column("created_date")
     private LocalDateTime createdDate;
 
-    @Column("modified_date")
     private LocalDateTime modifiedDate;
 }
