@@ -12,7 +12,6 @@ public record User(
         String profile,
         String email,
         Role role,
-        boolean adNotifAgree,
         String createdDate,
         String modifiedDate
 ) {

@@ -12,8 +12,6 @@ public record UserInputParam(
         String profile,
         String email,
         boolean termsAgreement,
-        boolean privacyAgreement,
-        boolean communityPolicyAgreement,
-        boolean adNotificationAgreement
+        boolean privacyAgreement
 ) {
 }

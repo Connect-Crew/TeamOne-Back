@@ -5,7 +5,11 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
+import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
+import com.connectcrew.teamone.userservice.repository.PartRepository;
+import com.connectcrew.teamone.userservice.repository.ProfileRepository;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +26,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -33,7 +36,16 @@ class AuthControllerTest {
     @Autowired
     private WebTestClient webTestClient;
     @MockBean
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @MockBean
+    private ProfileRepository profileRepository;
+
+    @MockBean
+    private FavoriteRepository favoriteRepository;
+
+    @MockBean
+    private PartRepository partRepository;
 
     @Test
     void find() {
@@ -42,19 +54,27 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
+        ProfileEntity profile = ProfileEntity.builder()
+                .profileId(1L)
+                .userId(user.getId())
+                .nickname("testNick")
+                .profile("testProfile")
+                .introduction("testIntroduction")
+                .temperature(36.5)
+                .recvApply(1)
+                .resApply(1)
+                .build();
+
+        when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
+        when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.just(profile));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -69,7 +89,7 @@ class AuthControllerTest {
 
     @Test
     void notfoundFind() {
-        when(repository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.empty());
+        when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.empty());
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -84,13 +104,12 @@ class AuthControllerTest {
 
     static Stream<Arguments> registerFailArgs() {
         return Stream.of(
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, true, true), "서비스 이용약관에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, true, true), "개인정보 처리방침에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, false, true), "커뮤니티 정책에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, true, true), "최소 2글자 이상 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, true, true), "최대 10글자 이하로 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, true, true), "공백과 특수문자는 들어갈 수 없어요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, true, true), "이미 존재하는 닉네임입니다.")
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true), "서비스 이용약관에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false), "개인정보 처리방침에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true), "최소 2글자 이상 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true), "최대 10글자 이하로 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true), "공백과 특수문자는 들어갈 수 없어요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true), "이미 존재하는 닉네임입니다.")
         );
     }
 
@@ -102,22 +121,19 @@ class AuthControllerTest {
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")
@@ -133,27 +149,24 @@ class AuthControllerTest {
     // 중복 회원가입 테스트
     @Test
     void duplicateRegisterTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(true));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(true));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")
@@ -168,27 +181,24 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
                 .socialId("123456789")
                 .username("testName")
-                .nickname("testNick")
-                .profile("testProfile")
                 .email("email@google.com")
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(repository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(repository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
-        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
+        when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
 
         webTestClient.post()
                 .uri("/user/")
