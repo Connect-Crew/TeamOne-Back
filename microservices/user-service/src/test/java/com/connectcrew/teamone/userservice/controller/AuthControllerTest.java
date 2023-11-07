@@ -48,8 +48,6 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
@@ -84,13 +82,12 @@ class AuthControllerTest {
 
     static Stream<Arguments> registerFailArgs() {
         return Stream.of(
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, true, true), "서비스 이용약관에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, true, true), "개인정보 처리방침에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, false, true), "커뮤니티 정책에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, true, true), "최소 2글자 이상 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, true, true), "최대 10글자 이하로 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, true, true), "공백과 특수문자는 들어갈 수 없어요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, true, true), "이미 존재하는 닉네임입니다.")
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true), "서비스 이용약관에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false), "개인정보 처리방침에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true), "최소 2글자 이상 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true), "최대 10글자 이하로 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true), "공백과 특수문자는 들어갈 수 없어요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true), "이미 존재하는 닉네임입니다.")
         );
     }
 
@@ -108,8 +105,6 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
@@ -133,7 +128,7 @@ class AuthControllerTest {
     // 중복 회원가입 테스트
     @Test
     void duplicateRegisterTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -145,8 +140,6 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();
@@ -168,7 +161,7 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -180,8 +173,6 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .communityPolicyAgreement(true)
-                .adNotificationAgreement(true)
                 .createdDate(LocalDateTime.now())
                 .modifiedDate(LocalDateTime.now())
                 .build();

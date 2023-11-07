@@ -78,7 +78,7 @@ class AuthControllerTest {
 
     @Test
     void loginTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, false, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
@@ -182,7 +182,7 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, false, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
@@ -191,7 +191,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
@@ -235,7 +235,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorInfo.class)
@@ -266,7 +266,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)

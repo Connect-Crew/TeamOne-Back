@@ -56,8 +56,6 @@ public class AuthController {
             return Mono.error(new IllegalArgumentException("서비스 이용약관에 동의해주세요."));
         } else if (!input.privacyAgreement()) {
             return Mono.error(new IllegalArgumentException("개인정보 처리방침에 동의해주세요."));
-        } else if (!input.communityPolicyAgreement()) {
-            return Mono.error(new IllegalArgumentException("커뮤니티 정책에 동의해주세요."));
         } else {
             return Mono.just(true);
         }
@@ -91,8 +89,6 @@ public class AuthController {
                 .modifiedDate(LocalDateTime.now())
                 .termsAgreement(input.termsAgreement())
                 .privacyAgreement(input.privacyAgreement())
-                .communityPolicyAgreement(input.communityPolicyAgreement())
-                .adNotificationAgreement(input.adNotificationAgreement())
                 .build();
     }
 
@@ -107,7 +103,6 @@ public class AuthController {
                 .profile(entity.getProfile())
                 .email(entity.getEmail())
                 .role(Role.valueOf(entity.getRole()))
-                .adNotifAgree(entity.getAdNotificationAgreement())
                 .createdDate(entity.getCreatedDate().toString())
                 .modifiedDate(entity.getModifiedDate().toString())
                 .build();
