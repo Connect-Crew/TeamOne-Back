@@ -7,4 +7,6 @@ import reactor.core.publisher.Mono;
 public interface ProfileRepository extends ReactiveCrudRepository<ProfileEntity, Long> {
 
     Mono<ProfileEntity> findByUserId(Long userId);
+
+    Mono<ProfileEntity> findByProfileId(Long profileId);
 }
