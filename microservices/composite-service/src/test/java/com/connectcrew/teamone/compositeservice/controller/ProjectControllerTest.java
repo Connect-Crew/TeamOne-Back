@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
@@ -261,6 +262,42 @@ class ProjectControllerTest {
         );
 
         when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.just(project));
+        when(userRequest.getProfile(0L)).thenReturn(Mono.just(new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+        )));
+        when(userRequest.getProfile(1L)).thenReturn(Mono.just(new Profile(
+                1L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+        )));
+        when(userRequest.getProfile(2L)).thenReturn(Mono.just(new Profile(
+                2L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+        )));
+        when(userRequest.getProfile(3L)).thenReturn(Mono.just(new Profile(
+                3L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+        )));
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
@@ -287,15 +324,29 @@ class ProjectControllerTest {
                                 fieldWithPath("favorite").type("Number").description("프로젝트 좋아요 수"),
                                 fieldWithPath("category").type("String[]").description("프로젝트 분야"),
                                 fieldWithPath("goal").type("String").description("프로젝트 목표"),
-                                fieldWithPath("leader").type("Profile").description("프로젝트 리더 정보 (향후 추가 예정)"),
+                                fieldWithPath("leader").type("Profile").description("프로젝트 리더 정보"),
+                                fieldWithPath("leader.id").type("Number").description("프로젝트 리더 ID"),
+                                fieldWithPath("leader.nickname").type("String").description("프로젝트 리더 이름"),
+                                fieldWithPath("leader.profile").type("String").description("프로젝트 리더 프로필 이미지"),
+                                fieldWithPath("leader.introduction").type("String").description("프로젝트 리더 소개"),
+                                fieldWithPath("leader.temperature").type("String").description("프로젝트 리더 온도"),
+                                fieldWithPath("leader.responseRate").type("Number").description("프로젝트 리더 응답률"),
+                                fieldWithPath("leader.parts[]").type("String[]").description("프로젝트 리더 분야"),
                                 fieldWithPath("recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
                                 fieldWithPath("recruitStatus[].part").type("String").description("프로젝트 모집 분야"),
                                 fieldWithPath("recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
                                 fieldWithPath("recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
                                 fieldWithPath("members[]").type("String").description("프로젝트 멤버 정보"),
-                                fieldWithPath("members[].profile").type("Profile").description("프로젝트 멤버 프로필 정보 (향후 추가 예정)"),
-                                fieldWithPath("members[].parts[]").type("String[]").description("프로젝트 멤버 분야"),
+                                fieldWithPath("members[].profile").type("Profile").description("프로젝트 멤버 프로필 정보"),
+                                fieldWithPath("members[].profile.id").type("Number").description("프로젝트 멤버 ID"),
+                                fieldWithPath("members[].profile.nickname").type("String").description("프로젝트 멤버 이름"),
+                                fieldWithPath("members[].profile.profile").type("String").description("프로젝트 멤버 프로필 이미지"),
+                                fieldWithPath("members[].profile.introduction").type("String").description("프로젝트 멤버 소개"),
+                                fieldWithPath("members[].profile.temperature").type("String").description("프로젝트 멤버 온도"),
+                                fieldWithPath("members[].profile.responseRate").type("Number").description("프로젝트 멤버 응답률"),
+                                fieldWithPath("members[].profile.parts[]").type("String[]").description("프로젝트 멤버 분야 (프로필)"),
+                                fieldWithPath("members[].parts[]").type("String[]").description("프로젝트 멤버 분야 (팀)"),
                                 fieldWithPath("skills[]").type("String[]").description("프로젝트 스킬 정보")
                         )
                 ));

@@ -2,6 +2,8 @@ package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.project.ProjectFilterOption;
 import com.connectcrew.teamone.api.project.ProjectInput;
+import com.connectcrew.teamone.api.project.ProjectMember;
+import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
@@ -11,10 +13,14 @@ import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -48,8 +54,18 @@ public class ProjectController {
     @GetMapping("/{projectId}")
     private Mono<ProjectDetailRes> getProjectDetail(@PathVariable Long projectId) {
         return projectRequest.getProjectDetail(projectId)
-                // TODO 향후 Profile 정보 추가
-                .map(ProjectDetailRes::new);
+//                .flatMap(project -> profileRequest.getProfile(project.leader()).map(leader -> Tuples.of(project, leader)))
+                .flatMap(project -> {
+                    Set<Long> profileIds = new HashSet<>();
+                    profileIds.add(project.leader());
+                    profileIds.addAll(project.members().stream().map(ProjectMember::memberId).toList());
+
+                    return Flux.fromIterable(profileIds)
+                            .flatMap(profileRequest::getProfile)
+                            .collectMap(Profile::id, p -> p)
+                            .map(profileMap -> Tuples.of(project, profileMap));
+                })
+                .map(tuple -> new ProjectDetailRes(tuple.getT1(), tuple.getT2()));
     }
 
     @PostMapping("/")

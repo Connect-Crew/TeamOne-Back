@@ -3,6 +3,7 @@ package com.connectcrew.teamone.compositeservice.request;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -39,4 +40,12 @@ public class UserRequestImpl implements UserRequest, ProfileRequest {
                 .onErrorResume(exHandler::handleException);
     }
 
+    @Override
+    public Mono<Profile> getProfile(Long id) {
+        return webClient.get()
+                .uri(String.format("%s/profile/?id=%d", host, id))
+                .retrieve()
+                .bodyToMono(Profile.class)
+                .onErrorResume(exHandler::handleException);
+    }
 }
