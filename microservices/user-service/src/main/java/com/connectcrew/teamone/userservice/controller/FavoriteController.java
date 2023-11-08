@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -31,7 +30,6 @@ public class FavoriteController {
 
     @GetMapping("/favorites")
     Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, Long[] ids) {
-        System.out.println("userId = " + userId);
         return profileRepository.findByUserId(userId)
                 .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾지 못했습니다.")))
                 .flatMap(profile -> favoriteRepository.findAllByProfileIdAndTypeAndTargetIn(profile.getProfileId(), type.name(), Flux.fromArray(ids)).collectList())

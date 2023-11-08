@@ -27,12 +27,13 @@ public record ProjectDetailRes(
         Profile leader,
         String introduction,
         Integer favorite,
+        Boolean myFavorite,
         List<RecruitStatusRes> recruitStatus,
         List<ProjectMemberRes> members,
         List<String> skills
 ) {
 
-    public ProjectDetailRes(ProjectDetail detail, Map<Long, Profile> profileMap) {
+    public ProjectDetailRes(ProjectDetail detail, Boolean myFavorite, Map<Long, Profile> profileMap) {
         this(
                 detail.id(),
                 detail.title(),
@@ -50,6 +51,7 @@ public record ProjectDetailRes(
                 profileMap.get(detail.leader()),
                 detail.introduction(),
                 detail.favorite(),
+                myFavorite,
                 detail.recruitStatuses().stream().map(RecruitStatusRes::new).toList(),
                 detail.members().stream().map(m -> new ProjectMemberRes(m, profileMap.get(m.memberId()))).toList(),
                 detail.skills().stream().map(SkillType::name).toList()

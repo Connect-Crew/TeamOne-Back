@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
-import com.connectcrew.teamone.api.project.ProjectFilterOption;
-import com.connectcrew.teamone.api.project.ProjectInput;
-import com.connectcrew.teamone.api.project.ProjectMember;
+import com.connectcrew.teamone.api.project.*;
+import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
+import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
@@ -17,10 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -30,12 +27,15 @@ public class ProjectController {
     private final ProfileRequest profileRequest;
     private final ProjectRequest projectRequest;
 
+    private final FavoriteRequest favoriteRequest;
+
     private final ProjectBasicInfo projectBasicInfo;
 
-    public ProjectController(JwtProvider provider, ProfileRequest profileRequest, ProjectRequest projectRequest) {
+    public ProjectController(JwtProvider provider, ProfileRequest profileRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest) {
         this.jwtProvider = provider;
         this.profileRequest = profileRequest;
         this.projectRequest = projectRequest;
+        this.favoriteRequest = favoriteRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
     }
 
@@ -45,16 +45,35 @@ public class ProjectController {
     }
 
     @GetMapping("/list")
-    private Mono<List<ProjectItemRes>> getProjectList(ProjectFilterOption option) {
+    private Mono<List<ProjectItemRes>> getProjectList(@RequestHeader(JwtProvider.AUTH_HEADER) String token, ProjectFilterOption option) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
         return projectRequest.getProjectList(option)
-                .map(ProjectItemRes::new)
-                .collectList();
+                .collectList()
+                .flatMap(projects -> {
+                    List<Long> profileIds = projects.stream().map(ProjectItem::id).toList();
+
+                    return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, profileIds)
+                            .map(favoriteMap -> Tuples.of(projects, favoriteMap));
+                })
+                .map(tuple -> {
+                    Map<Long, Boolean> favoriteMap = tuple.getT2();
+                    return tuple.getT1().stream()
+                            .map(project -> {
+                                Boolean isFavorite = favoriteMap.getOrDefault(project.id(), false);
+                                return new ProjectItemRes(project, isFavorite);
+                            })
+                            .toList();
+                });
     }
 
     @GetMapping("/{projectId}")
-    private Mono<ProjectDetailRes> getProjectDetail(@PathVariable Long projectId) {
+    private Mono<ProjectDetailRes> getProjectDetail(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
         return projectRequest.getProjectDetail(projectId)
-//                .flatMap(project -> profileRequest.getProfile(project.leader()).map(leader -> Tuples.of(project, leader)))
                 .flatMap(project -> {
                     Set<Long> profileIds = new HashSet<>();
                     profileIds.add(project.leader());
@@ -65,7 +84,14 @@ public class ProjectController {
                             .collectMap(Profile::id, p -> p)
                             .map(profileMap -> Tuples.of(project, profileMap));
                 })
-                .map(tuple -> new ProjectDetailRes(tuple.getT1(), tuple.getT2()));
+                .flatMap(tuple -> {
+                    ProjectDetail project = tuple.getT1();
+                    Map<Long, Profile> profileMap = tuple.getT2();
+
+                    return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
+                            .map(favorite -> Tuples.of(project, favorite, profileMap));
+                })
+                .map(tuple -> new ProjectDetailRes(tuple.getT1(), tuple.getT2(), tuple.getT3()));
     }
 
     @PostMapping("/")

@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
@@ -35,6 +36,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -174,7 +176,9 @@ class ProjectControllerTest {
     @Test
     void listTest() {
         List<ProjectItem> items = initItems();
+        when(jwtProvider.getId(anyString())).thenReturn(1L);
         when(projectRequest.getProjectList(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
+        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0, true, 1, false, 2, true)));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -191,6 +195,7 @@ class ProjectControllerTest {
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
                         .build()
                 )
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(new ParameterizedTypeReference<List<ProjectItemRes>>() {
@@ -221,6 +226,7 @@ class ProjectControllerTest {
                                 fieldWithPath("[].endDate").type("Date (Optional)").optional().description("프로젝트 종료 날짜"),
                                 fieldWithPath("[].state").type("String").description("프로젝트 상태"),
                                 fieldWithPath("[].favorite").type("Number").description("프로젝트 좋아요 수"),
+                                fieldWithPath("[].myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트 여부"),
                                 fieldWithPath("[].category").type("String[]").description("프로젝트 분야"),
                                 fieldWithPath("[].goal").type("String").description("프로젝트 목표"),
                                 fieldWithPath("[].recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
@@ -298,9 +304,12 @@ class ProjectControllerTest {
                 40,
                 List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
         )));
+        when(jwtProvider.getId(anyString())).thenReturn(1L);
+        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ProjectDetailRes.class)
@@ -322,6 +331,7 @@ class ProjectControllerTest {
                                 fieldWithPath("state").type("String").description("프로젝트 상태"),
                                 fieldWithPath("introduction").type("String").description("프로젝트 소개"),
                                 fieldWithPath("favorite").type("Number").description("프로젝트 좋아요 수"),
+                                fieldWithPath("myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트인지 여부"),
                                 fieldWithPath("category").type("String[]").description("프로젝트 분야"),
                                 fieldWithPath("goal").type("String").description("프로젝트 목표"),
                                 fieldWithPath("leader").type("Profile").description("프로젝트 리더 정보"),
@@ -355,9 +365,11 @@ class ProjectControllerTest {
     @Test
     void notFoundTest() {
         when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(jwtProvider.getId(anyString())).thenReturn(1L);
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorInfo.class)

@@ -20,11 +20,12 @@ public record ProjectItemRes(
         LocalDate endDate,
         String state,
         Integer favorite,
+        Boolean myFavorite,
         List<String> category,
         String goal,
         List<RecruitStatusRes> recruitStatus
 ) {
-    public ProjectItemRes(ProjectItem item) {
+    public ProjectItemRes(ProjectItem item, Boolean myFavorite) {
         this(
                 item.id(),
                 item.title(),
@@ -38,6 +39,7 @@ public record ProjectItemRes(
                 item.endDate(),
                 item.state().getDescription(),
                 item.favorite(),
+                myFavorite,
                 item.category().stream().map(ProjectCategory::name).toList(),
                 item.goal().getDescription(),
                 item.recruitStatus().stream().map(RecruitStatusRes::new).toList()
