@@ -196,6 +196,9 @@ class ProjectControllerTest {
                 .expectBody(new ParameterizedTypeReference<List<ProjectItemRes>>() {
                 })
                 .consumeWith(document("project/list",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
                         queryParameters(
                                 parameterWithName("lastId").optional().description("기준 프로젝트 ID (Optional) \n해당 ID를 기준으로 과거 프로젝트를 불러옵니다 \n미 입력시 가장 최신 프로젝트를 불러옵니다."),
                                 parameterWithName("size").description("프로젝트 개수"),
@@ -305,6 +308,9 @@ class ProjectControllerTest {
                 .expectStatus().isOk()
                 .expectBody(ProjectDetailRes.class)
                 .consumeWith(document("project/find-success",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
                         pathParameters(
                                 parameterWithName("projectId").description("Project Id")
                         ),

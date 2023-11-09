@@ -8,6 +8,10 @@ link:../index.html[home으로 돌아가기]
 
 include::{snippets}/project/list/http-request.adoc[]
 
+=== request header
+
+include::{snippets}/project/list/request-headers.adoc[]
+
 === query param
 
 include::{snippets}/project/list/query-parameters.adoc[]
