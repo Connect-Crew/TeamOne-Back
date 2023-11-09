@@ -87,8 +87,6 @@ public class ProjectController {
                             .careerMin(project.careerMin())
                             .careerMax(project.careerMax())
                             .createdAt(project.createdAt())
-                            .startDate(project.startDate())
-                            .endDate(project.endDate())
                             .state(project.state())
                             .favorite(project.favorite())
                             .category(project.category())
@@ -148,10 +146,6 @@ public class ProjectController {
             }
         }
 
-        // 3. start와 end는 start가 end보다 빠른 날짜여야 함
-        if (input.start().isAfter(input.end()))
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.START_BEFORE_END.toString()));
-
         // 4. careerMin은 careerMax보다 이전 값이어야 함.
         if (input.careerMin().getId() > input.careerMax().getId())
             return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CAREER_MIN_BEFORE_MAX.toString()));
@@ -194,8 +188,6 @@ public class ProjectController {
                 .withOnline(input.online())
                 .region(input.region().name())
                 .createdAt(LocalDateTime.now())
-                .startDate(input.start())
-                .endDate(input.end())
                 .state(input.state().name())
                 .goal(input.goal().name())
                 .favorite(0)
@@ -329,8 +321,6 @@ public class ProjectController {
                                         .region(Region.valueOf(project.getRegion()))
                                         .online(project.getWithOnline())
                                         .createdAt(project.getCreatedAt())
-                                        .startDate(project.getStartDate())
-                                        .endDate(project.getEndDate())
                                         .state(ProjectState.valueOf(project.getState()))
                                         .careerMin(Career.valueOf(project.getCareerMin()))
                                         .careerMax(Career.valueOf(project.getCareerMax()))

@@ -12,7 +12,6 @@ public enum ProjectExceptionMessage {
     ILLEGAL_BANNER_PATH("프로젝트 배너 경로가 올바르지 않습니다."),
     ILLEGAL_BANNER_NAME("프로젝트 배너 이름이 올바르지 않습니다."),
     ILLEGAL_BANNER_EXTENSION("프로젝트 배너 확장자가 올바르지 않습니다."),
-    START_BEFORE_END("프로젝트 시작일은 종료일보다 빨라야 합니다."),
     CAREER_MIN_BEFORE_MAX("경력 최소값은 최대값보다 작아야 합니다."),
     CATEGORY_MIN_1("카테고리는 1개 이상이어야 합니다."),
     CATEGORY_MAX_3("카테고리는 3개 이하여야 합니다."),

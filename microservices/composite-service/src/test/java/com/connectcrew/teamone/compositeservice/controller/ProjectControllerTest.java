@@ -33,7 +33,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -128,8 +127,6 @@ class ProjectControllerTest {
                         Career.SEEKER,
                         Career.YEAR_1,
                         LocalDateTime.now().minusMinutes(5),
-                        LocalDate.now().plusDays(2),
-                        LocalDate.now().plusDays(5),
                         ProjectState.RECRUITING,
                         49,
                         List.of(ProjectCategory.IT),
@@ -145,8 +142,6 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(10),
-                        null,
-                        null,
                         ProjectState.PROCEEDING,
                         40,
                         List.of(ProjectCategory.APP),
@@ -162,8 +157,6 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(15),
-                        LocalDate.now().plusDays(2),
-                        LocalDate.now().plusDays(15),
                         ProjectState.RECRUITING,
                         49,
                         List.of(ProjectCategory.AI),
@@ -222,8 +215,6 @@ class ProjectControllerTest {
                                 fieldWithPath("[].careerMin").type("String").description("최소 프로젝트 경력"),
                                 fieldWithPath("[].careerMax").type("String").description("최대 프로젝트 경력"),
                                 fieldWithPath("[].createdAt").type("Datetime").description("프로젝트 생성 날짜"),
-                                fieldWithPath("[].startDate").type("Date (Optional)").optional().description("프로젝트 시작 날짜"),
-                                fieldWithPath("[].endDate").type("Date (Optional)").optional().description("프로젝트 종료 날짜"),
                                 fieldWithPath("[].state").type("String").description("프로젝트 상태"),
                                 fieldWithPath("[].favorite").type("Number").description("프로젝트 좋아요 수"),
                                 fieldWithPath("[].myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트 여부"),
@@ -247,8 +238,6 @@ class ProjectControllerTest {
                 Region.SEOUL,
                 true,
                 LocalDateTime.now(),
-                LocalDate.of(2023, 10, 20),
-                LocalDate.of(2023, 12, 20),
                 ProjectState.PROCEEDING,
                 Career.SEEKER,
                 Career.YEAR_1,
@@ -326,8 +315,6 @@ class ProjectControllerTest {
                                 fieldWithPath("careerMin").type("String").optional().description("최소 프로젝트 경력"),
                                 fieldWithPath("careerMax").type("String").optional().description("최대 프로젝트 경력"),
                                 fieldWithPath("createdAt").type("Datetime").description("프로젝트 생성 날짜"),
-                                fieldWithPath("startDate").type("Date (Optional)").optional().description("프로젝트 시작 날짜"),
-                                fieldWithPath("endDate").type("Date (Optional)").optional().description("프로젝트 종료 날짜"),
                                 fieldWithPath("state").type("String").description("프로젝트 상태"),
                                 fieldWithPath("introduction").type("String").description("프로젝트 소개"),
                                 fieldWithPath("favorite").type("Number").description("프로젝트 좋아요 수"),
@@ -394,8 +381,6 @@ class ProjectControllerTest {
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                LocalDate.of(2023, 10, 20),
-                LocalDate.of(2023, 12, 20),
                 ProjectState.RECRUITING,
                 Career.SEEKER,
                 Career.YEAR_1,
@@ -429,8 +414,6 @@ class ProjectControllerTest {
                                         fieldWithPath("title").type("String").description("프로젝트 제목"),
                                         fieldWithPath("region").description("프로젝트 지역"),
                                         fieldWithPath("online").description("온라인 여부"),
-                                        fieldWithPath("start").description("프로젝트 시작 날짜"),
-                                        fieldWithPath("end").description("프로젝트 종료 날짜"),
                                         fieldWithPath("state").description("프로젝트 상태"),
                                         fieldWithPath("careerMin").description("최소 프로젝트 경력"),
                                         fieldWithPath("careerMax").description("최대 프로젝트 경력"),
@@ -458,8 +441,6 @@ class ProjectControllerTest {
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                LocalDate.of(2023, 10, 20),
-                LocalDate.of(2023, 12, 20),
                 ProjectState.RECRUITING,
                 Career.SEEKER,
                 Career.YEAR_1,

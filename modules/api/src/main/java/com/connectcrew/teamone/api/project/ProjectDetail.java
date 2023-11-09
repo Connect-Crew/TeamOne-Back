@@ -3,7 +3,6 @@ package com.connectcrew.teamone.api.project;
 import com.connectcrew.teamone.api.project.values.*;
 import lombok.Builder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,8 +14,6 @@ public record ProjectDetail(
         Region region,
         Boolean online,
         LocalDateTime createdAt,
-        LocalDate startDate,
-        LocalDate endDate,
         ProjectState state,
         Career careerMin,
         Career careerMax,

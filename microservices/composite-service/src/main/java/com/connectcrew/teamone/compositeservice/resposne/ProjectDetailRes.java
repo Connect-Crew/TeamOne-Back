@@ -5,7 +5,6 @@ import com.connectcrew.teamone.api.project.values.ProjectCategory;
 import com.connectcrew.teamone.api.project.values.SkillType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +16,6 @@ public record ProjectDetailRes(
         String region,
         Boolean online,
         LocalDateTime createdAt,
-        LocalDate startDate,
-        LocalDate endDate,
         String state,
         String careerMin,
         String careerMax,
@@ -41,8 +38,6 @@ public record ProjectDetailRes(
                 detail.region().getDescription(),
                 detail.online(),
                 detail.createdAt(),
-                detail.startDate(),
-                detail.endDate(),
                 detail.state().getDescription(),
                 detail.careerMin().getDescription(),
                 detail.careerMax().getDescription(),

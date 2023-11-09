@@ -2,7 +2,6 @@ package com.connectcrew.teamone.api.project;
 
 import com.connectcrew.teamone.api.project.values.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public record ProjectInput(
@@ -10,8 +9,6 @@ public record ProjectInput(
         List<String> banners,
         Region region,
         Boolean online,
-        LocalDate start,
-        LocalDate end,
         ProjectState state,
         Career careerMin,
         Career careerMax,

@@ -7,7 +7,6 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,8 +111,6 @@ public class CustomRepositoryImpl implements CustomRepository {
                     Boolean withOnline = row.get("with_online", Boolean.class);
                     Region region = Region.valueOf(row.get("region", String.class));
                     LocalDateTime createdAt = row.get("created_at", LocalDateTime.class);
-                    LocalDate startDate = row.get("start_date", LocalDate.class);
-                    LocalDate endDate = row.get("end_date", LocalDate.class);
                     ProjectState state = ProjectState.valueOf(row.get("state", String.class));
                     ProjectGoal goal = ProjectGoal.valueOf(row.get("goal", String.class));
                     Integer favorite = row.get("favorite", Integer.class);
@@ -125,7 +122,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                                 .toList();
                     }
 
-                    return new ProjectCustomEntity(id, title, region, withOnline, careerMin, careerMax, createdAt, startDate, endDate, state, favorite, categories, goal);
+                    return new ProjectCustomEntity(id, title, region, withOnline, careerMin, careerMax, createdAt, state, favorite, categories, goal);
                 })
                 .all();
     }

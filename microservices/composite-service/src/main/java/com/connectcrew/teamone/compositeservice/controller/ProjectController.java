@@ -106,8 +106,6 @@ public class ProjectController {
                 new ArrayList<>(),
                 param.region(),
                 param.online(),
-                param.start(),
-                param.end(),
                 param.state(),
                 param.careerMin(),
                 param.careerMax(),

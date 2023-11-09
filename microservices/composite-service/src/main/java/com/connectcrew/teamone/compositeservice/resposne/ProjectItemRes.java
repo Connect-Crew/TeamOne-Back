@@ -3,7 +3,6 @@ package com.connectcrew.teamone.compositeservice.resposne;
 import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.project.values.ProjectCategory;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,8 +15,6 @@ public record ProjectItemRes(
         String careerMin,
         String careerMax,
         LocalDateTime createdAt,
-        LocalDate startDate,
-        LocalDate endDate,
         String state,
         Integer favorite,
         Boolean myFavorite,
@@ -35,8 +32,6 @@ public record ProjectItemRes(
                 item.careerMin().getDescription(),
                 item.careerMax().getDescription(),
                 item.createdAt(),
-                item.startDate(),
-                item.endDate(),
                 item.state().getDescription(),
                 item.favorite(),
                 myFavorite,
