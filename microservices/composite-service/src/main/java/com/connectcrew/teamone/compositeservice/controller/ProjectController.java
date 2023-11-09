@@ -47,13 +47,17 @@ public class ProjectController {
     }
 
     @GetMapping("/list")
-    private Mono<List<ProjectItemRes>> getProjectList(@RequestHeader(JwtProvider.AUTH_HEADER) String token, ProjectFilterOption option) {
-        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
-        Long id = jwtProvider.getId(removedPrefix);
+    private Mono<List<ProjectItemRes>> getProjectList(ProjectFilterOption option) { // @RequestHeader(JwtProvider.AUTH_HEADER) String token,
+//        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+//        Long id = jwtProvider.getId(removedPrefix);
+        Long id = 2L;
 
         return projectRequest.getProjectList(option)
                 .collectList()
                 .flatMap(projects -> {
+                    if (projects.size() == 0) {
+                        return Mono.just(Tuples.of(projects, new HashMap<Long, Boolean>()));
+                    }
                     List<Long> profileIds = projects.stream().map(ProjectItem::id).toList();
 
                     return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, profileIds)
@@ -64,10 +68,12 @@ public class ProjectController {
                     return tuple.getT1().stream()
                             .map(project -> {
                                 Boolean isFavorite = favoriteMap.getOrDefault(project.id(), false);
+
                                 return new ProjectItemRes(project, isFavorite);
                             })
                             .toList();
-                });
+                })
+                .doOnError(e -> log.error("getProjectList error", e));
     }
 
     @GetMapping("/{projectId}")

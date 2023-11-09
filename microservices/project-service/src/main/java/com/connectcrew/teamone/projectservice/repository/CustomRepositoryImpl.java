@@ -60,7 +60,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         LIMIT 10;
          */
         List<String> optionSql = new ArrayList<>();
-        if (option.lastId() >= 0) optionSql.add(String.format("p.id < %d", option.lastId()));
+        if (option.lastId() != null && option.lastId() >= 0) optionSql.add(String.format("p.id < %d", option.lastId()));
         if (option.goal() != null) optionSql.add(String.format("p.goal = '%s'", option.goal().name()));
         if (option.career() != null)
             optionSql.add(String.format("p.career_min <= %d AND p.career_max >= %d", option.career().getId(), option.career().getId()));
@@ -69,7 +69,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         if (option.online() != null) optionSql.add(String.format("p.with_online = %d", option.online() ? 1 : 0));
 
         if (option.part() != null) {
-            if(option.part().name().startsWith("TOTAL_")) {
+            if (option.part().name().startsWith("TOTAL_")) {
                 optionSql.add(String.format("p.part_category = '%s'", option.part().getCategory().name()));
             } else {
                 optionSql.add(String.format("p.part = '%s'", option.part().name()));
@@ -89,7 +89,7 @@ public class CustomRepositoryImpl implements CustomRepository {
 
         String sql = String.format(
                 "SELECT p.*," +
-                        "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories," +
+                        "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
                         "FROM project p " +
                         "LEFT JOIN part pt ON p.id = pt.project " +
                         "LEFT JOIN category cat ON p.id = cat.project " +
@@ -108,7 +108,8 @@ public class CustomRepositoryImpl implements CustomRepository {
                     String title = row.get("title", String.class);
                     Career careerMin = Career.valueOf(row.get("career_min", Integer.class));
                     Career careerMax = Career.valueOf(row.get("career_max", Integer.class));
-                    Boolean withOnline = row.get("with_online", Boolean.class);
+                    Integer withOnlineInt = row.get("with_online", Integer.class);
+                    Boolean withOnline = withOnlineInt != null && withOnlineInt == 1;
                     Region region = Region.valueOf(row.get("region", String.class));
                     LocalDateTime createdAt = row.get("created_at", LocalDateTime.class);
                     ProjectState state = ProjectState.valueOf(row.get("state", String.class));

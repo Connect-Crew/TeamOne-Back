@@ -5,7 +5,7 @@ import com.connectcrew.teamone.api.project.values.*;
 import java.util.List;
 
 public record ProjectCustomFindOption(
-        int lastId,
+        Integer lastId,
         int size,
         ProjectGoal goal,
         Career career,

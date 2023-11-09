@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 public record ProjectFilterOption(
-        @RequestParam(required = false, defaultValue = "-1") int lastId,
+        @RequestParam(required = false, defaultValue = "-1") Integer lastId,
         int size,
         @RequestParam(required = false) ProjectGoal goal,
         @RequestParam(required = false) Career career,

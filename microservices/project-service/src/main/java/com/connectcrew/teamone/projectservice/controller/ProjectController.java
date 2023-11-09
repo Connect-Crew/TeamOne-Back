@@ -83,6 +83,7 @@ public class ProjectController {
                             .id(project.id())
                             .title(project.title())
                             .thumbnail(banner.getPath())
+                            .region(project.region())
                             .online(project.online())
                             .careerMin(project.careerMin())
                             .careerMax(project.careerMax())
