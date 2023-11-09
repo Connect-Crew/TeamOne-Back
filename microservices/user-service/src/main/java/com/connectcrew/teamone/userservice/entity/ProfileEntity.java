@@ -12,8 +12,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table(name = "profile")
 public class ProfileEntity {
+
     @Id
-    private Long profileId;
+    private Long id;
 
     private Long userId;
 

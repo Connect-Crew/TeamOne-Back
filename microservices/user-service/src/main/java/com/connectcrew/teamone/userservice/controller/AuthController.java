@@ -11,6 +11,7 @@ import com.connectcrew.teamone.userservice.repository.ProfileRepository;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
@@ -42,6 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/")
+    @Transactional
     public Mono<User> save(@RequestBody UserInputParam input) {
         log.trace("save input={}", input);
         return checkAgreement(input)
@@ -75,7 +77,7 @@ public class AuthController {
         if (!nicknamePattern.matcher(nickname).matches())
             return Mono.error(new IllegalArgumentException("공백과 특수문자는 들어갈 수 없어요."));
 
-        return userRepository.existsByNickname(nickname)
+        return profileRepository.existsByNickname(nickname)
                 .flatMap(duplicate -> { // 이름 중복 검사
                     if (duplicate) return Mono.error(new IllegalArgumentException("이미 존재하는 닉네임입니다."));
                     return Mono.just(nickname);

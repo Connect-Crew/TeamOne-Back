@@ -8,5 +8,5 @@ public interface ProfileRepository extends ReactiveCrudRepository<ProfileEntity,
 
     Mono<ProfileEntity> findByUserId(Long userId);
 
-    Mono<ProfileEntity> findByProfileId(Long profileId);
+    Mono<Boolean> existsByNickname(String nickname);
 }
