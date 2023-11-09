@@ -4,10 +4,12 @@ import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
+import com.connectcrew.teamone.compositeservice.resposne.FavoriteRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
@@ -23,7 +25,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
-    private JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
     private final ProfileRequest profileRequest;
     private final ProjectRequest projectRequest;
 
@@ -119,5 +121,13 @@ public class ProjectController {
         );
 
         return projectRequest.saveProject(input);
+    }
+
+    @PostMapping("/favorite")
+    private Mono<FavoriteRes> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteParam param) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
+        return favoriteRequest.setFavorite(id, FavoriteType.PROJECT, param.projectId()).map(FavoriteRes::new);
     }
 }

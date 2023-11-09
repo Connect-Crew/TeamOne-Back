@@ -9,9 +9,11 @@ import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
+import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.resposne.FavoriteRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
@@ -499,6 +501,32 @@ class ProjectControllerTest {
                                 fieldWithPath("category[]").type("NameKey[]").description("프로젝트 분야 이름 및 키값 배열"),
                                 fieldWithPath("category[].name").type("String").description("프로젝트 분야 이름"),
                                 fieldWithPath("category[].key").type("String").description("프로젝트 분야 키값")
+                        )
+                ));
+    }
+
+    @Test
+    void favoriteTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(userRequest.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
+
+        webTestClient.post()
+                .uri("/project/favorite")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ProjectFavoriteParam(1L))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(FavoriteRes.class)
+                .consumeWith(document("project/favorite",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("value").type("Boolean").description("좋아요 여부")
                         )
                 ));
     }
