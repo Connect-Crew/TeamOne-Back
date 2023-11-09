@@ -178,7 +178,7 @@ class ProjectControllerTest {
         List<ProjectItem> items = initItems();
         when(jwtProvider.getId(anyString())).thenReturn(1L);
         when(projectRequest.getProjectList(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
-        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0, true, 1, false, 2, true)));
+        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
