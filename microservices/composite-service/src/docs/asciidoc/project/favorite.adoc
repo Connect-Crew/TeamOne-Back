@@ -1,0 +1,25 @@
+= 프로젝트 좋아요 설정 및 해지 - /project/favorite (POST)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트를 좋아요 설정하거나 해지하는 요청입니다.
+
+== Request
+
+include::{snippets}/project/favorite/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/favorite/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/project/favorite/request-fields.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/favorite/http-response.adoc[]
+
+include::{snippets}/project/favorite/response-fields.adoc[]
