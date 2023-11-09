@@ -47,10 +47,9 @@ public class ProjectController {
     }
 
     @GetMapping("/list")
-    private Mono<List<ProjectItemRes>> getProjectList(ProjectFilterOption option) { // @RequestHeader(JwtProvider.AUTH_HEADER) String token,
-//        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
-//        Long id = jwtProvider.getId(removedPrefix);
-        Long id = 2L;
+    private Mono<List<ProjectItemRes>> getProjectList(@RequestHeader(JwtProvider.AUTH_HEADER) String token, ProjectFilterOption option) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
 
         return projectRequest.getProjectList(option)
                 .collectList()
@@ -72,8 +71,7 @@ public class ProjectController {
                                 return new ProjectItemRes(project, isFavorite);
                             })
                             .toList();
-                })
-                .doOnError(e -> log.error("getProjectList error", e));
+                });
     }
 
     @GetMapping("/{projectId}")
