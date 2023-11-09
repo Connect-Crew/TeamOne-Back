@@ -238,6 +238,7 @@ public class ProjectController {
         for (RecruitInput recruit : input.recruits()) {
             parts.add(Part.builder()
                     .project(id)
+                    .partCategory(recruit.part().getCategory().name())
                     .part(recruit.part().name())
                     .comment(recruit.comment())
                     .collected(0)

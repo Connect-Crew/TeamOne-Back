@@ -13,6 +13,7 @@ public class Part {
     @Id
     private Long id;
     private Long project;
+    private String partCategory;
     private String part;
     private String comment;
     private Integer collected;

@@ -41,7 +41,7 @@ public class CustomRepositoryImpl implements CustomRepository {
           # 온라인
           AND p.with_online = 1
           # 직무
-          AND pt.part = 'BACKEND'
+          AND pt.part = 'BACKEND' # or pt.part_category = 'DEVELOP'
           # 상태
           AND p.state IN ('RECRUITING')
           # 카테고리
@@ -68,7 +68,15 @@ public class CustomRepositoryImpl implements CustomRepository {
         if (option.region() != null && option.region().size() > 0)
             optionSql.add(String.format("p.region IN (%s)", String.join(",", option.region().stream().map(r -> String.format("'%s'", r.name())).toList())));
         if (option.online() != null) optionSql.add(String.format("p.with_online = %d", option.online() ? 1 : 0));
-        if (option.part() != null) optionSql.add(String.format("p.part = '%s'", option.part().name()));
+
+        if (option.part() != null) {
+            if(option.part().name().startsWith("TOTAL_")) {
+                optionSql.add(String.format("p.part_category = '%s'", option.part().getCategory().name()));
+            } else {
+                optionSql.add(String.format("p.part = '%s'", option.part().name()));
+            }
+
+        }
         if (option.states() != null && option.states().size() > 0)
             optionSql.add(String.format("p.state IN (%s)", String.join(",", option.states().stream().map(s -> String.format("'%s'", s.name())).toList())));
         if (option.skills() != null && option.skills().size() > 0) {
