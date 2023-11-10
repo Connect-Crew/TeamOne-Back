@@ -52,7 +52,8 @@ public class ProjectController {
                 option.part(),
                 option.skills(),
                 option.states(),
-                option.category()
+                option.category(),
+                option.search()
         );
     }
 

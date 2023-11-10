@@ -3,6 +3,7 @@ package com.connectcrew.teamone.projectservice.repository;
 import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.projectservice.entity.ProjectCustomEntity;
 import com.connectcrew.teamone.projectservice.entity.ProjectCustomFindOption;
+import io.r2dbc.spi.Row;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -11,9 +12,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class CustomRepositoryImpl implements CustomRepository {
+    private final Pattern pattern = Pattern.compile("[^a-zA-Z0-9가-힣?]");
+
     private final DatabaseClient dc;
 
     public CustomRepositoryImpl(DatabaseClient dc) {
@@ -55,10 +59,15 @@ public class CustomRepositoryImpl implements CustomRepository {
                        HAVING COUNT(DISTINCT name) =
                               (SELECT COUNT(DISTINCT name) FROM skill WHERE name IN ('Kotlin', 'Spring')))
 
+          # 키워드 검색
+          AND (p.title LIKE '%프로젝트%' OR p.introduction LIKE '%프로젝트%')
+
         GROUP BY p.id
         ORDER BY p.id DESC
         LIMIT 10;
          */
+
+
         List<String> optionSql = new ArrayList<>();
         if (option.lastId() != null && option.lastId() >= 0) optionSql.add(String.format("p.id < %d", option.lastId()));
         if (option.goal() != null) optionSql.add(String.format("p.goal = '%s'", option.goal().name()));
@@ -79,11 +88,25 @@ public class CustomRepositoryImpl implements CustomRepository {
         if (option.states() != null && option.states().size() > 0)
             optionSql.add(String.format("p.state IN (%s)", String.join(",", option.states().stream().map(s -> String.format("'%s'", s.name())).toList())));
         if (option.skills() != null && option.skills().size() > 0) {
-            String skills = String.join(",", option.skills().stream().map(s -> String.format("'%s'", s.name())).toList());
+            for (String skill : option.skills()) {
+                if (!pattern.matcher(skill).find()) continue;
+                return Flux.error(new IllegalArgumentException("기술은 영어, 한글, 숫자, ?만 입력 가능합니다."));
+            }
+            String skills = String.join(",", option.skills().stream().map(s -> String.format("'%s'", s)).toList());
             optionSql.add(String.format("p.id IN (SELECT project FROM skill WHERE name IN (%s) GROUP BY project HAVING COUNT(DISTINCT name) = (SELECT COUNT(DISTINCT name) FROM skill WHERE name IN (%s)))", skills, skills));
         }
         if (option.category() != null && option.category().size() > 0)
             optionSql.add(String.format("p.id IN (SELECT project FROM category WHERE name IN (%s))", String.join(",", option.category().stream().map(c -> String.format("'%s'", c.name())).toList())));
+
+        if (option.search() != null && option.search().length() > 0) {
+            String[] keywords = option.search().split(" ");
+            for (String keyword : keywords) {
+                if (pattern.matcher(keyword).find())
+                    return Flux.error(new IllegalArgumentException("검색어는 영어, 한글, 숫자, ?만 입력 가능합니다."));
+
+                optionSql.add(String.format("(title LIKE '%%%s%%' OR introduction LIKE '%%%s%%')", keyword, keyword));
+            }
+        }
 
         String whereSql = optionSql.size() > 0 ? "WHERE " + String.join(" AND ", optionSql) : "";
 
@@ -102,29 +125,33 @@ public class CustomRepositoryImpl implements CustomRepository {
                 option.size()
         );
 
-        return dc.sql(sql)
-                .map((row, meta) -> {
-                    Long id = row.get("id", Long.class);
-                    String title = row.get("title", String.class);
-                    Career careerMin = Career.valueOf(row.get("career_min", Integer.class));
-                    Career careerMax = Career.valueOf(row.get("career_max", Integer.class));
-                    Integer withOnlineInt = row.get("with_online", Integer.class);
-                    Boolean withOnline = withOnlineInt != null && withOnlineInt == 1;
-                    Region region = Region.valueOf(row.get("region", String.class));
-                    LocalDateTime createdAt = row.get("created_at", LocalDateTime.class);
-                    ProjectState state = ProjectState.valueOf(row.get("state", String.class));
-                    ProjectGoal goal = ProjectGoal.valueOf(row.get("goal", String.class));
-                    Integer favorite = row.get("favorite", Integer.class);
-                    String categoriesStr = row.get("categories", String.class);
-                    List<ProjectCategory> categories = new ArrayList<>();
-                    if (categoriesStr != null) {
-                        categories = Arrays.stream(categoriesStr.split(","))
-                                .map(ProjectCategory::valueOf)
-                                .toList();
-                    }
+        System.out.println(sql);
 
-                    return new ProjectCustomEntity(id, title, region, withOnline, careerMin, careerMax, createdAt, state, favorite, categories, goal);
-                })
+        return dc.sql(sql)
+                .map((row, meta) -> rowToEntity(row))
                 .all();
+    }
+
+    private ProjectCustomEntity rowToEntity(Row row) {
+        Long id = row.get("id", Long.class);
+        String title = row.get("title", String.class);
+        Career careerMin = Career.valueOf(row.get("career_min", Integer.class));
+        Career careerMax = Career.valueOf(row.get("career_max", Integer.class));
+        Integer withOnlineInt = row.get("with_online", Integer.class);
+        Boolean withOnline = withOnlineInt != null && withOnlineInt == 1;
+        Region region = Region.valueOf(row.get("region", String.class));
+        LocalDateTime createdAt = row.get("created_at", LocalDateTime.class);
+        ProjectState state = ProjectState.valueOf(row.get("state", String.class));
+        ProjectGoal goal = ProjectGoal.valueOf(row.get("goal", String.class));
+        Integer favorite = row.get("favorite", Integer.class);
+        String categoriesStr = row.get("categories", String.class);
+        List<ProjectCategory> categories = new ArrayList<>();
+        if (categoriesStr != null) {
+            categories = Arrays.stream(categoriesStr.split(","))
+                    .map(ProjectCategory::valueOf)
+                    .toList();
+        }
+
+        return new ProjectCustomEntity(id, title, region, withOnline, careerMin, careerMax, createdAt, state, favorite, categories, goal);
     }
 }

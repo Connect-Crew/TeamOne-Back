@@ -43,6 +43,7 @@ public class ProjectRequestImpl implements ProjectRequest {
                         .queryParam("skills", option.skills())
                         .queryParam("states", option.states())
                         .queryParam("category", option.category())
+                        .queryParam("search", option.search())
                         .build()
                 )
                 .retrieve()

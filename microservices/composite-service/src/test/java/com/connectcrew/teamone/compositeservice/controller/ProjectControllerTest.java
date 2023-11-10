@@ -188,6 +188,7 @@ class ProjectControllerTest {
                         .queryParam("skills", List.of(SkillType.Jira.name(), SkillType.Github.name()))
                         .queryParam("states", List.of(ProjectState.PROCEEDING.name(), ProjectState.RECRUITING.name()))
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
+                        .queryParam("search", "내가 검색하고자 하는 문장")
                         .build()
                 )
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
@@ -209,7 +210,8 @@ class ProjectControllerTest {
                                 parameterWithName("part").optional().description("프로젝트 직무 (Optional)"),
                                 parameterWithName("skills").optional().description("프로젝트 기술 (Optional)"),
                                 parameterWithName("states").optional().description("프로젝트 상태 (Optional)"),
-                                parameterWithName("category").optional().description("프로젝트 카테고리 (Optional)")
+                                parameterWithName("category").optional().description("프로젝트 카테고리 (Optional)"),
+                                parameterWithName("search").optional().description("프로젝트 검색어 (Optional)")
                         ),
                         responseFields(
                                 fieldWithPath("[].id").type("Number").description("프로젝트 ID"),

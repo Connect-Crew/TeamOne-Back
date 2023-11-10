@@ -12,8 +12,9 @@ public record ProjectCustomFindOption(
         List<Region> region,
         Boolean online,
         MemberPart part,
-        List<SkillType> skills,
+        List<String> skills,
         List<ProjectState> states,
-        List<ProjectCategory> category
+        List<ProjectCategory> category,
+        String search
 ) {
 }
