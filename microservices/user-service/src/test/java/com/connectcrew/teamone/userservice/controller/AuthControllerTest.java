@@ -63,7 +63,6 @@ class AuthControllerTest {
                 .build();
 
         ProfileEntity profile = ProfileEntity.builder()
-                .profileId(1L)
                 .userId(user.getId())
                 .nickname("testNick")
                 .profile("testProfile")
@@ -129,8 +128,8 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
-        when(userRepository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
+        when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(profileRepository.existsByNickname("dupNick")).thenReturn(Mono.just(true));
         when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
         when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
         when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
@@ -163,7 +162,7 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
         when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(true));
         when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
         when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
@@ -195,7 +194,7 @@ class AuthControllerTest {
                 .modifiedDate(LocalDateTime.now())
                 .build();
 
-        when(userRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
+        when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
         when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
         when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
         when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));

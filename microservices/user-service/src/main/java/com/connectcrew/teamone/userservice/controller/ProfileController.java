@@ -24,11 +24,11 @@ public class ProfileController {
 
     @GetMapping("/")
     Mono<Profile> getProfile(Long id) {
-        return profileRepository.findByProfileId(id)
+        return profileRepository.findByUserId(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("프로필을 찾지 못했습니다.")))
                 .flatMap(profileEntity -> partRepository.findAllByProfileId(id).collectList().map(partEntity -> Tuples.of(profileEntity, partEntity)))
                 .map(tuple -> Profile.builder()
-                        .id(tuple.getT1().getProfileId())
+                        .id(tuple.getT1().getUserId())
                         .nickname(tuple.getT1().getNickname())
                         .profile(tuple.getT1().getProfile())
                         .introduction(tuple.getT1().getIntroduction())

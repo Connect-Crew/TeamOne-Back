@@ -21,6 +21,15 @@ services:
       - TZ=Asia/Seoul
       - DB_PW=${DB_PASSWORD}
 
+  project:
+    container_name: teamone-project
+    build: microservices/project-service
+
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+      - DB_PW=${DB_PASSWORD}
+
   user-mysql:
     container_name: teamone-user-mysql
     image: mysql:8.0
@@ -30,6 +39,22 @@ services:
 
     volumes:
       - ${ROOT_PATH}/user:/var/lib/mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+
+  project-mysql:
+    container_name: teamone-project-mysql
+    image: mysql:8.0
+
+    ports:
+      - "4305:3306"
+
+    volumes:
+      - ${ROOT_PATH}/project:/var/lib/mysql
 
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}

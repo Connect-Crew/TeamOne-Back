@@ -1,5 +1,6 @@
 include ':microservices:composite-service'
 include ':microservices:user-service'
+include ':microservices:project-service'
 
 include ':modules:api'
 include ':modules:common'

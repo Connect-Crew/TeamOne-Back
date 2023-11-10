@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.exception;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
+import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,13 @@ public class ControllerExceptionHandler {
     })
     public Mono<ResponseEntity<ErrorInfo>> handleUnauthorized(ServerWebExchange exchange, Exception ex) {
         return createHttpErrorInfo(HttpStatus.UNAUTHORIZED, exchange, ex);
+    }
+
+    @ExceptionHandler(value = {
+            InvalidOwnerException.class,
+    })
+    public Mono<ResponseEntity<ErrorInfo>> handleInvalidOwner(ServerWebExchange exchange, Exception ex) {
+        return createHttpErrorInfo(HttpStatus.NOT_ACCEPTABLE, exchange, ex);
     }
 
     @ExceptionHandler(value = {

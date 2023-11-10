@@ -50,7 +50,7 @@ public class SecurityConfig {
                     spec.authenticationEntryPoint(((exchange, authException) -> handleTokenExpired(exchange)));
                 })
                 .authorizeExchange(spec -> {
-                    spec.pathMatchers("/auth/login", "/auth/register", "/actuator/**").permitAll();
+                    spec.pathMatchers("/auth/login", "/auth/register", "/actuator/**", "/project/", "/project/list").permitAll();
                     spec.pathMatchers("/api/**").permitAll();
                     spec.anyExchange().denyAll();
                 })

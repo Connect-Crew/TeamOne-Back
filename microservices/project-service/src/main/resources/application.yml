@@ -1,0 +1,23 @@
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  application:
+    name: project-service
+
+server:
+  port: 8084
+
+logging:
+  level:
+    com.connectcrew.teamone: trace
+
+db:
+  host: Mysql Host 주소
+  port: 3306
+  id: Mysql ID
+  pw: Mysql Password
+  database: project

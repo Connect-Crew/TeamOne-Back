@@ -1,0 +1,31 @@
+= 프로젝트 모집글 작성 - /project/ (POST)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트 모집글을 작성하는 요청입니다.
+
+== Request
+
+include::{snippets}/project/create-success/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/create-success/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/project/create-success/request-fields.adoc[]
+
+== Response
+
+=== response (성공)
+
+Project 모집글 작성에 성공하면 Project ID를 반환합니다.
+
+include::{snippets}/project/create-success/http-response.adoc[]
+
+=== response (실패)
+
+include::{snippets}/project/create-failure/http-response.adoc[]
+
+include::{snippets}/project/create-failure/response-fields.adoc[]

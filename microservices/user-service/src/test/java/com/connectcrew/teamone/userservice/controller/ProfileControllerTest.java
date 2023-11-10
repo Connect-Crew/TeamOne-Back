@@ -1,7 +1,6 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.userservice.entity.PartEntity;
 import com.connectcrew.teamone.userservice.entity.ProfileEntity;
@@ -21,7 +20,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +44,6 @@ class ProfileControllerTest {
     @Test
     void getProfile() {
         ProfileEntity profile = ProfileEntity.builder()
-                .profileId(1L)
                 .userId(1L)
                 .nickname("testNick")
                 .profile("testProfile")
@@ -61,7 +58,7 @@ class ProfileControllerTest {
                 new PartEntity(1L, 1L, "testPart2")
         );
 
-        when(profileRepository.findByProfileId(anyLong())).thenReturn(Mono.just(profile));
+        when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.just(profile));
         when(partRepository.findAllByProfileId(anyLong())).thenReturn(Flux.fromIterable(parts));
 
         webTestClient.get()
@@ -76,7 +73,7 @@ class ProfileControllerTest {
 
     @Test
     void notFoundProfile() {
-        when(profileRepository.findByProfileId(anyLong())).thenReturn(Mono.empty());
+        when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.empty());
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
