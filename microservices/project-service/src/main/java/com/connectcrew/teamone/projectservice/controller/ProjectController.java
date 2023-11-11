@@ -355,7 +355,7 @@ public class ProjectController {
     }
 
     @PostMapping("/apply")
-    public Mono<Boolean> applyProject(ApplyInput input) {
+    public Mono<Boolean> applyProject(@RequestBody ApplyInput input) {
         return projectRepository.existsById(input.projectId())
                 .flatMap(exists -> {
                     if (!exists)
@@ -363,6 +363,7 @@ public class ProjectController {
 
                     return partRepository.findByProjectAndPart(input.projectId(), input.part().name());
                 })
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
                 .flatMap(part -> {
                     if (part.getCollected() >= part.getTargetCollect())
                         return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString()));
@@ -402,7 +403,7 @@ public class ProjectController {
     }
 
     @PostMapping("/report")
-    public Mono<Boolean> reportProject(ReportInput input) {
+    public Mono<Boolean> reportProject(@RequestBody ReportInput input) {
         return projectRepository.existsById(input.projectId())
                 .flatMap(exists -> {
                     if (!exists)

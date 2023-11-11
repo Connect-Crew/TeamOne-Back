@@ -25,6 +25,7 @@ public enum ProjectExceptionMessage {
     ALREADY_APPLY("이미 해당 파트에 지원했습니다."),
     COLLECTED_PART("이미 모집이 완료된 파트입니다."),
     ALREADY_REPORT("이미 신고한 프로젝트입니다."),
+    NOT_FOUND_PART("해당 직무를 찾을 수 없습니다."),
     ;
 
     private final String message;
