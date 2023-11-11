@@ -1,9 +1,6 @@
 package com.connectcrew.teamone.compositeservice.request;
 
-import com.connectcrew.teamone.api.project.ProjectDetail;
-import com.connectcrew.teamone.api.project.ProjectFilterOption;
-import com.connectcrew.teamone.api.project.ProjectInput;
-import com.connectcrew.teamone.api.project.ProjectItem;
+import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -67,6 +64,26 @@ public class ProjectRequestImpl implements ProjectRequest {
                 .bodyValue(input)
                 .retrieve()
                 .bodyToMono(Long.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Boolean> applyProject(ApplyInput input) {
+        return webClient.post()
+                .uri(String.format("%s/apply", host))
+                .bodyValue(input)
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Boolean> reportProject(ReportInput input) {
+        return webClient.post()
+                .uri(String.format("%s/report", host))
+                .bodyValue(input)
+                .retrieve()
+                .bodyToMono(Boolean.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

@@ -13,7 +13,7 @@ import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
-import com.connectcrew.teamone.compositeservice.resposne.FavoriteRes;
+import com.connectcrew.teamone.compositeservice.resposne.BooleanValueRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
 import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
@@ -525,7 +525,7 @@ class ProjectControllerTest {
                 .bodyValue(new ProjectFavoriteParam(1L))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FavoriteRes.class)
+                .expectBody(BooleanValueRes.class)
                 .consumeWith(document("project/favorite",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
