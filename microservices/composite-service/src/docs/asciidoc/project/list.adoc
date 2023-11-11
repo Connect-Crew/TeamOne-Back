@@ -1,4 +1,4 @@
-= 프로젝트 모집 목록 - /project/list (GET)
+= 프로젝트 모집 목록 가져오기 - /project/list (GET)
 
 link:../index.html[home으로 돌아가기]
 

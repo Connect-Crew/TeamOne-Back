@@ -15,7 +15,7 @@ public class Apply {
 
     private Long project;
 
-    private String part;
+    private Long partId;
 
     private Long user;
 

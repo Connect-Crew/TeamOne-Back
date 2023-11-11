@@ -79,9 +79,9 @@ public class CustomRepositoryImpl implements CustomRepository {
 
         if (option.part() != null) {
             if (option.part().name().startsWith("TOTAL_")) {
-                optionSql.add(String.format("p.part_category = '%s'", option.part().getCategory().name()));
+                optionSql.add(String.format("pt.part_category = '%s'", option.part().getCategory().name()));
             } else {
-                optionSql.add(String.format("p.part = '%s'", option.part().name()));
+                optionSql.add(String.format("pt.part = '%s'", option.part().name()));
             }
 
         }

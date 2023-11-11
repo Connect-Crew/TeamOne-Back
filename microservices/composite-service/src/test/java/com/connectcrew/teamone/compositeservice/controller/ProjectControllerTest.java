@@ -9,14 +9,13 @@ import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
+import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
+import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
-import com.connectcrew.teamone.compositeservice.resposne.FavoriteRes;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
+import com.connectcrew.teamone.compositeservice.resposne.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -415,7 +414,7 @@ class ProjectControllerTest {
                 .bodyValue(param)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Long.class)
+                .expectBody(LongValueRes.class)
                 .consumeWith(document("project/create-success",
                                 requestHeaders(
                                         headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -436,6 +435,9 @@ class ProjectControllerTest {
                                         fieldWithPath("recruits[].comment").description("프로젝트 모집 코멘트"),
                                         fieldWithPath("recruits[].max").description("프로젝트 모집 최대 인원"),
                                         fieldWithPath("skills[]").description("프로젝트 스킬 정보")
+                                ),
+                                responseFields(
+                                        fieldWithPath("value").type("Long").description("생성된 프로젝트 ID")
                                 )
                         )
                 );
@@ -525,7 +527,7 @@ class ProjectControllerTest {
                 .bodyValue(new ProjectFavoriteParam(1L))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FavoriteRes.class)
+                .expectBody(BooleanValueRes.class)
                 .consumeWith(document("project/favorite",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -539,6 +541,156 @@ class ProjectControllerTest {
                 ));
     }
 
+    @Test
+    void applyTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.just(true));
+
+        webTestClient.post()
+                .uri("/project/apply")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BooleanValueRes.class)
+                .consumeWith(document("project/apply",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("part").type("String").description("지원 직군"),
+                                fieldWithPath("message").type("String").description("지원 메시지")
+                        ),
+                        responseFields(
+                                fieldWithPath("value").type("Boolean").description("지원 여부")
+                        )
+                ));
+    }
+
+    @Test
+    void notfoundApplyTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
+
+        webTestClient.post()
+                .uri("/project/apply")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorInfo.class)
+                .consumeWith(document("project/apply-notfound",
+                        responseFields(
+                                fieldWithPath("path").type("String").description("요청 경로"),
+                                fieldWithPath("status").type("Integer").description("응답 코드"),
+                                fieldWithPath("error").type("String").description("에러 유형"),
+                                fieldWithPath("message").type("String").description("실패 메시지"),
+                                fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void invalidApplyTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
+
+        webTestClient.post()
+                .uri("/project/apply")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorInfo.class)
+                .consumeWith(document("project/apply-invalid",
+                        responseFields(
+                                fieldWithPath("path").type("String").description("요청 경로"),
+                                fieldWithPath("status").type("Integer").description("응답 코드"),
+                                fieldWithPath("error").type("String").description("에러 유형"),
+                                fieldWithPath("message").type("String").description("실패 메시지"),
+                                fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void reportTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.just(true));
+
+        webTestClient.post()
+                .uri("/project/report")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BooleanValueRes.class)
+                .consumeWith(document("project/report",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("reason").type("String").description("신고 사유")
+                        ),
+                        responseFields(
+                                fieldWithPath("value").type("Boolean").description("신고 여부")
+                        )
+                ));
+    }
+
+    @Test
+    void notfoundReportTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+
+        webTestClient.post()
+                .uri("/project/report")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorInfo.class)
+                .consumeWith(document("project/report-notfound",
+                        responseFields(
+                                fieldWithPath("path").type("String").description("요청 경로"),
+                                fieldWithPath("status").type("Integer").description("응답 코드"),
+                                fieldWithPath("error").type("String").description("에러 유형"),
+                                fieldWithPath("message").type("String").description("실패 메시지"),
+                                fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void invalidReportTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
+
+        webTestClient.post()
+                .uri("/project/report")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorInfo.class)
+                .consumeWith(document("project/report-invalid",
+                        responseFields(
+                                fieldWithPath("path").type("String").description("요청 경로"),
+                                fieldWithPath("status").type("Integer").description("응답 코드"),
+                                fieldWithPath("error").type("String").description("에러 유형"),
+                                fieldWithPath("message").type("String").description("실패 메시지"),
+                                fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
 }
 
 

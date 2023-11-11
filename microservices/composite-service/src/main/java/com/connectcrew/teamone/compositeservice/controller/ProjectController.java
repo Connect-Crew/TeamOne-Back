@@ -4,15 +4,14 @@ import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
+import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.resposne.FavoriteRes;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectBasicInfo;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectDetailRes;
-import com.connectcrew.teamone.compositeservice.resposne.ProjectItemRes;
+import com.connectcrew.teamone.compositeservice.resposne.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -102,7 +101,7 @@ public class ProjectController {
     }
 
     @PostMapping("/")
-    private Mono<Long> createProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectInputParam param) {
+    private Mono<LongValueRes> createProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectInputParam param) {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
@@ -125,14 +124,31 @@ public class ProjectController {
                 param.skills()
         );
 
-        return projectRequest.saveProject(input);
+        return projectRequest.saveProject(input)
+                .map(LongValueRes::new);
     }
 
     @PostMapping("/favorite")
-    private Mono<FavoriteRes> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteParam param) {
+    private Mono<BooleanValueRes> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteParam param) {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return favoriteRequest.setFavorite(id, FavoriteType.PROJECT, param.projectId()).map(FavoriteRes::new);
+        return favoriteRequest.setFavorite(id, FavoriteType.PROJECT, param.projectId()).map(BooleanValueRes::new);
+    }
+
+    @PostMapping("/apply")
+    private Mono<BooleanValueRes> applyProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ApplyParam param) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
+        return projectRequest.applyProject(param.toInput(id)).map(BooleanValueRes::new);
+    }
+
+    @PostMapping("/report")
+    private Mono<BooleanValueRes> reportProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ReportParam param) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
+        Long id = jwtProvider.getId(removedPrefix);
+
+        return projectRequest.reportProject(param.toInput(id)).map(BooleanValueRes::new);
     }
 }
