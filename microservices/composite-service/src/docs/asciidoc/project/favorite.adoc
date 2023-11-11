@@ -1,4 +1,4 @@
-= 프로젝트 좋아요 설정 및 해지 - /project/favorite (POST)
+= 프로젝트 좋아요 설정 및 해지하기 - /project/favorite (POST)
 
 link:../index.html[home으로 돌아가기]
 
