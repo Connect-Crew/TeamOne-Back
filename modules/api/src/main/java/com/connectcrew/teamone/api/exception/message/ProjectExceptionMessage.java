@@ -21,6 +21,10 @@ public enum ProjectExceptionMessage {
     RECRUIT_MAX_SUM_10_UNDER("최대 10명까지 모집 가능합니다."),
     CREATE_PROJECT_FAILED("프로젝트 생성에 실패했습니다."),
     LOAD_PROJECT_FAILED("프로젝트 조회에 실패했습니다."),
+    ALREADY_PART_MEMBER("이미 해당 파트의 멤버입니다."),
+    ALREADY_APPLY("이미 해당 파트에 지원했습니다."),
+    COLLECTED_PART("이미 모집이 완료된 파트입니다."),
+    ALREADY_REPORT("이미 신고한 프로젝트입니다."),
     ;
 
     private final String message;

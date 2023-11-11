@@ -31,14 +31,12 @@ public class ProjectController {
 
     private final ProjectRepository projectRepository;
     private final BannerRepository bannerRepository;
-
     private final PartRepository partRepository;
-
+    private final ApplyRepository applyRepository;
     private final SkillRepository skillRepository;
-
     private final CategoryRepository categoryRepository;
-
     private final MemberRepository memberRepository;
+    private final ReportRepository reportRepository;
     private final CustomRepository customRepository;
 
     private ProjectCustomFindOption paramToOption(ProjectFilterOption option) {
@@ -251,7 +249,7 @@ public class ProjectController {
             if (!leaderParts.contains(part.getPart())) continue;
 
             Member member = Member.builder()
-                    .part_id(part.getId())
+                    .partId(part.getId())
                     .user(input.leader())
                     .build();
             members.add(member);
@@ -310,7 +308,7 @@ public class ProjectController {
                                         .map(Category::getName).map(ProjectCategory::valueOf).toList();
 
                                 List<ProjectMember> projectMembers = tuple.getT5().stream()
-                                        .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPart_id()), Collectors.toList())))
+                                        .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
                                         .entrySet()
                                         .stream().map(e -> new ProjectMember(e.getKey(), e.getValue()))
                                         .toList();
@@ -354,5 +352,75 @@ public class ProjectController {
 
                     return projectRepository.delete(project).thenReturn(project.getId());
                 });
+    }
+
+    @PostMapping("/apply")
+    public Mono<Boolean> applyProject(ApplyInput input) {
+        return projectRepository.existsById(input.projectId())
+                .flatMap(exists -> {
+                    if (!exists)
+                        return Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString()));
+
+                    return partRepository.findByProjectAndPart(input.projectId(), input.part().name());
+                })
+                .flatMap(part -> {
+                    if (part.getCollected() >= part.getTargetCollect())
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString()));
+                    return Mono.just(part);
+                })
+                .flatMap(part -> checkAlreadyPartMember(part, input.userId()))
+                .flatMap(part -> checkAlreadyApply(part, input.userId()))
+                .flatMap(part -> applyRepository.save(Apply.builder()
+                        .project(part.getProject())
+                        .partId(part.getId())
+                        .user(input.userId())
+                        .message(input.message())
+                        .build())
+                )
+                .map(apply -> true);
+    }
+
+    /**
+     * 이미 해당 part의 member인지 확인
+     */
+    private Mono<Part> checkAlreadyPartMember(Part part, Long userId) {
+        return memberRepository.existsByPartIdAndUser(part.getId(), userId)
+                .flatMap(exists -> {
+                    if (exists)
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_PART_MEMBER.toString()));
+                    return Mono.just(part);
+                });
+    }
+
+    private Mono<Part> checkAlreadyApply(Part part, Long userId) {
+        return applyRepository.existsByPartIdAndUser(part.getId(), userId)
+                .flatMap(exists -> {
+                    if (exists)
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_APPLY.toString()));
+                    return Mono.just(part);
+                });
+    }
+
+    @PostMapping("/report")
+    public Mono<Boolean> reportProject(ReportInput input) {
+        return projectRepository.existsById(input.projectId())
+                .flatMap(exists -> {
+                    if (!exists)
+                        return Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString()));
+
+                    return reportRepository.existsByProjectAndUser(input.projectId(), input.userId());
+                })
+                .flatMap(exists -> {
+                    if (exists)
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString()));
+
+                    return reportRepository.save(Report.builder()
+                            .project(input.projectId())
+                            .user(input.userId())
+                            .reason(input.reason())
+                            .build()
+                    );
+                })
+                .thenReturn(true);
     }
 }

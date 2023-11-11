@@ -13,6 +13,6 @@ public class Member {
 
     @Id
     private Long id;
-    private Long part_id;
+    private Long partId;
     private Long user;
 }
