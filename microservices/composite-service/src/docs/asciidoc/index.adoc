@@ -8,6 +8,10 @@
 - link:auth/register.html[회원가입 - /auth/register]
 - link:auth/refresh.html[토큰 갱신 - /auth/refresh]
 
+== 사용자 관련 요청
+
+- link:user/profile.html[최신 프로필 정보 요청 - /user/myprofile]
+
 == 프로젝트 모집 관련 요청
 
 - link:project/basicinfo.html[프로젝트 기본 정보 불러오기 - /project/]

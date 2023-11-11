@@ -1,0 +1,21 @@
+= 최신 프로필 정보 요청 - /user/myprofile (GET)
+
+link:../index.html[home으로 돌아가기]
+
+사용자의 최신 프로필 정보를 조회하는 요청입니다.
+
+== Request
+
+include::{snippets}/user/getMyProfile/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/user/getMyProfile/request-headers.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/user/getMyProfile/http-response.adoc[]
+
+include::{snippets}/user/getMyProfile/response-fields.adoc[]
