@@ -2,7 +2,7 @@ package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
-import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
+import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +18,14 @@ import reactor.core.publisher.Mono;
 public class UserController {
     private final JwtProvider jwtProvider;
 
-    private final ProfileRequest profileRequest;
+    private final UserRequest userRequest;
 
     @GetMapping("/myprofile")
     public Mono<Profile> getMyProfile(@RequestHeader(JwtProvider.AUTH_HEADER) String token) {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return profileRequest.getProfile(id);
+        return userRequest.getProfile(id);
     }
 
 }

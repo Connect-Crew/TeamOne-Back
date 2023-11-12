@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-public class UserRequestImpl implements UserRequest, ProfileRequest, FavoriteRequest {
+public class UserRequestImpl implements UserRequest, FavoriteRequest {
 
     public final String host;
 

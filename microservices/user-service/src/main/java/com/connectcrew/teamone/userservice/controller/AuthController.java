@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
@@ -38,8 +37,7 @@ public class AuthController {
         log.trace("find socialId={}, provider={}", socialId, provider);
         return userRepository.findBySocialIdAndProvider(socialId, provider.name())
                 .switchIfEmpty(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")))
-                .flatMap(user -> profileRepository.findByUserId(user.getId()).map(profile -> Tuples.of(user, profile)))
-                .map(tuple -> entityToResponse(tuple.getT1(), tuple.getT2()));
+                .map(this::entityToResponse);
     }
 
     @PostMapping("/")
@@ -55,8 +53,8 @@ public class AuthController {
                 })
                 .map(exists -> inputToUserEntity(input))
                 .flatMap(userRepository::save)
-                .flatMap(user -> profileRepository.save(inputToProfileEntity(user.getId(), input)).map(profile -> Tuples.of(user, profile)))
-                .map(tuple -> entityToResponse(tuple.getT1(), tuple.getT2()));
+                .flatMap(user -> profileRepository.save(inputToProfileEntity(user.getId(), input)).thenReturn(user))
+                .map(this::entityToResponse);
     }
 
     private Mono<Boolean> checkAgreement(UserInputParam input) {
@@ -111,19 +109,16 @@ public class AuthController {
     }
 
     @NotNull
-    private User entityToResponse(UserEntity user, ProfileEntity profile) {
+    private User entityToResponse(UserEntity user) {
         return User.builder()
                 .id(user.getId())
                 .socialId(user.getSocialId())
                 .provider(Social.valueOf(user.getProvider()))
                 .username(user.getUsername())
-                .nickname(profile.getNickname())
-                .profile(profile.getProfile())
                 .email(user.getEmail())
                 .role(Role.valueOf(user.getRole()))
                 .createdDate(user.getCreatedDate().toString())
                 .modifiedDate(user.getModifiedDate().toString())
                 .build();
     }
-
 }
