@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authorizeExchange(spec -> {
                     spec.pathMatchers("/auth/login", "/auth/register", "/actuator/**", "/project/").permitAll();
                     spec.pathMatchers("/api/**").permitAll();
-                    spec.pathMatchers("/user/myprofile", "/project/**").authenticated();
+                    spec.pathMatchers("/auth/refresh", "/user/myprofile", "/project/**").authenticated();
                     spec.anyExchange().denyAll();
                 })
                 .build();
