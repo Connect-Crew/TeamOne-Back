@@ -24,7 +24,7 @@ public record ProjectDetail(
         Integer favorite,
         List<RecruitStatus> recruitStatuses,
         List<ProjectMember> members,
-        List<SkillType> skills
+        List<String> skills
 ) {
 
 }
