@@ -18,6 +18,6 @@ public record ProjectInput(
         ProjectGoal goal,
         String introduction,
         List<RecruitInput> recruits,
-        List<SkillType> skills
+        List<String> skills
 ) {
 }

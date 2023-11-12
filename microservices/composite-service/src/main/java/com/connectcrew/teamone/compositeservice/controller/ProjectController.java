@@ -50,7 +50,7 @@ public class ProjectController {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        System.out.println(option);
+        log.trace("getProjectList: {}", option);
         return projectRequest.getProjectList(option)
                 .collectList()
                 .flatMap(projects -> {

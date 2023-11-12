@@ -212,10 +212,10 @@ public class ProjectController {
     @NotNull
     private Mono<Long> saveSkills(ProjectInput input, Long id) {
         List<Skill> skills = new ArrayList<>();
-        for (SkillType skill : input.skills()) {
+        for (String skill : input.skills()) {
             skills.add(Skill.builder()
                     .project(id)
-                    .name(skill.name())
+                    .name(skill)
                     .build());
         }
 
@@ -302,7 +302,7 @@ public class ProjectController {
                                     recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect()));
                                 }
 
-                                List<SkillType> skillNames = tuple.getT3().stream().map(Skill::getName).map(SkillType::valueOf).toList();
+                                List<String> skillNames = tuple.getT3().stream().map(Skill::getName).toList();
 
                                 List<ProjectCategory> categoryNames = tuple.getT4().stream()
                                         .map(Category::getName).map(ProjectCategory::valueOf).toList();

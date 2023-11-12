@@ -2,7 +2,6 @@ package com.connectcrew.teamone.compositeservice.resposne;
 
 import com.connectcrew.teamone.api.project.ProjectDetail;
 import com.connectcrew.teamone.api.project.values.ProjectCategory;
-import com.connectcrew.teamone.api.project.values.SkillType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 
 import java.time.LocalDateTime;
@@ -49,7 +48,7 @@ public record ProjectDetailRes(
                 myFavorite,
                 detail.recruitStatuses().stream().map(RecruitStatusRes::new).toList(),
                 detail.members().stream().map(m -> new ProjectMemberRes(m, profileMap.get(m.memberId()))).toList(),
-                detail.skills().stream().map(SkillType::name).toList()
+                detail.skills()
         );
     }
 }

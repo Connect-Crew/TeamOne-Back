@@ -259,7 +259,7 @@ class ProjectControllerTest {
                         new ProjectMember(2L, List.of(MemberPart.IOS)),
                         new ProjectMember(3L, List.of(MemberPart.BACKEND))
                 ),
-                List.of(SkillType.Swift, SkillType.Kotlin, SkillType.Spring)
+                List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
         when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.just(project));
@@ -404,7 +404,7 @@ class ProjectControllerTest {
                         new RecruitInput(MemberPart.IOS, "코멘트", 2),
                         new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
                 ),
-                List.of(SkillType.Swift, SkillType.Kotlin, SkillType.Spring)
+                List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
         webTestClient.post()
@@ -467,7 +467,7 @@ class ProjectControllerTest {
                         new RecruitInput(MemberPart.IOS, "코멘트", 2),
                         new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
                 ),
-                List.of(SkillType.Swift, SkillType.Kotlin, SkillType.Spring)
+                List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
         webTestClient.post()
