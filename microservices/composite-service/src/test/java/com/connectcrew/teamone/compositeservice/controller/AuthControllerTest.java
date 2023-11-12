@@ -2,10 +2,12 @@ package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.exception.NotFoundException;
+import com.connectcrew.teamone.api.project.values.MemberPart;
 import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
@@ -33,6 +35,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -77,10 +80,12 @@ class AuthControllerTest {
 
     @Test
     void loginTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
+        when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
@@ -96,24 +101,20 @@ class AuthControllerTest {
                                 fieldWithPath("social").type("String").description(String.format("Social 타입 %s", Arrays.toString(Social.values())))
                         ),
                         responseFields(
+                                fieldWithPath("id").type("Number").description("사용자 고유 ID"),
+                                fieldWithPath("nickname").type("String").description("사용자 닉네임"),
+                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
+                                fieldWithPath("introduction").type("String (Optional)").optional().description("사용자 소개"),
+                                fieldWithPath("temperature").type("Number").optional().description("사용자 온도"),
+                                fieldWithPath("responseRate").type("Number").optional().description("사용자 응답률"),
+                                fieldWithPath("parts").type("String[] (Optional)").optional().description("사용자 직무"),
+                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
-                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간"),
-                                fieldWithPath("nickname").type("String").description("사용자 닉네임"),
-                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
-                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
+                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간")
                         )
-                ))
-                .consumeWith(response -> {
-                    LoginResult result = response.getResponseBody();
-                    assert result != null;
-                    assertThat(result.token()).isEqualTo("accessToken");
-                    assertThat(result.refreshToken()).isEqualTo("refreshToken");
-                    assertThat(result.nickname()).isEqualTo(user.nickname());
-                    assertThat(result.profile()).isEqualTo(user.profile());
-                    assertThat(result.email()).isEqualTo(user.email());
-                });
+                ));
     }
 
     @Test
@@ -181,10 +182,12 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "testUser", null, "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
+        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
+        when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
@@ -206,24 +209,20 @@ class AuthControllerTest {
                                 fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부")
                         ),
                         responseFields(
+                                fieldWithPath("id").type("Number").description("사용자 고유 ID"),
+                                fieldWithPath("nickname").type("String").description("사용자 닉네임"),
+                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
+                                fieldWithPath("introduction").type("String (Optional)").optional().description("사용자 소개"),
+                                fieldWithPath("temperature").type("Number").optional().description("사용자 온도"),
+                                fieldWithPath("responseRate").type("Number").optional().description("사용자 응답률"),
+                                fieldWithPath("parts").type("String[] (Optional)").optional().description("사용자 직무"),
+                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
                                 fieldWithPath("refreshToken").type("String").description("Refresh Token"),
-                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간"),
-                                fieldWithPath("nickname").type("String").description("사용자 닉네임"),
-                                fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
-                                fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일")
+                                fieldWithPath("refreshExp").type("Datetime").description("Refresh Token 만료 시간")
                         )
-                ))
-                .consumeWith(response -> {
-                    LoginResult result = response.getResponseBody();
-                    assert result != null;
-                    assertThat(result.token()).isEqualTo("accessToken");
-                    assertThat(result.refreshToken()).isEqualTo("refreshToken");
-                    assertThat(result.nickname()).isEqualTo(user.nickname());
-                    assertThat(result.profile()).isEqualTo(user.profile());
-                    assertThat(result.email()).isEqualTo(user.email());
-                });
+                ));
     }
 
     @Test

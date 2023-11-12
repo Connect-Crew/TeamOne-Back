@@ -8,8 +8,6 @@ public record User(
         String socialId,
         Social provider,
         String username,
-        String nickname,
-        String profile,
         String email,
         Role role,
         String createdDate,

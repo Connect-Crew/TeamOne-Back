@@ -2,6 +2,7 @@ package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.User;
+import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +37,8 @@ public class AuthController {
                 .onErrorResume(ex -> Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.", ex)))
                 .doOnError(ex -> log.debug("login error: {}", ex.getMessage(), ex))
                 .flatMap(socialId -> userRequest.getUser(socialId, param.social()))
-                .map(this::generateLoginResult);
+                .flatMap(user -> userRequest.getProfile(user.id()).map(profile -> Tuples.of(user, profile)))
+                .map(tuple -> generateLoginResult(tuple.getT1(), tuple.getT2()));
     }
 
     @PostMapping("/register")
@@ -45,11 +48,12 @@ public class AuthController {
                 .onErrorResume(ex -> Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.", ex)))
                 .doOnError(ex -> log.debug("register error: {}", ex.getMessage(), ex))
                 .flatMap(socialId -> userRequest.saveUser(param.toUserInputParam(socialId)))
-                .map(this::generateLoginResult);
+                .flatMap(user -> userRequest.getProfile(user.id()).map(profile -> Tuples.of(user, profile)))
+                .map(tuple -> generateLoginResult(tuple.getT1(), tuple.getT2()));
 
     }
 
-    private LoginResult generateLoginResult(User user) {
+    private LoginResult generateLoginResult(User user, Profile profile) {
         LocalDateTime now = LocalDateTime.now();
         String accessToken = jwtProvider.createAccessToken(user.socialId(), user.id(), user.role());
         LocalDateTime accessExp = now.plusSeconds(JwtProvider.accessExp / 1000);
@@ -62,9 +66,14 @@ public class AuthController {
                 .exp(accessExp)
                 .refreshToken(refreshToken)
                 .refreshExp(refreshExp)
-                .nickname(user.nickname())
+                .id(user.id())
+                .nickname(profile.nickname())
+                .profile(profile.profile())
+                .introduction(profile.introduction())
+                .temperature(profile.temperature())
+                .responseRate(profile.responseRate())
+                .parts(profile.parts())
                 .email(user.email())
-                .profile(user.profile())
                 .build();
     }
 

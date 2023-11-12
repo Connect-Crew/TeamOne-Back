@@ -9,8 +9,8 @@ import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
-import com.connectcrew.teamone.compositeservice.request.ProfileRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
+import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -25,16 +25,16 @@ import java.util.*;
 @RequestMapping("/project")
 public class ProjectController {
     private final JwtProvider jwtProvider;
-    private final ProfileRequest profileRequest;
+    private final UserRequest userRequest;
     private final ProjectRequest projectRequest;
 
     private final FavoriteRequest favoriteRequest;
 
     private final ProjectBasicInfo projectBasicInfo;
 
-    public ProjectController(JwtProvider provider, ProfileRequest profileRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest) {
+    public ProjectController(JwtProvider provider, UserRequest userRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest) {
         this.jwtProvider = provider;
-        this.profileRequest = profileRequest;
+        this.userRequest = userRequest;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
@@ -86,7 +86,7 @@ public class ProjectController {
                     profileIds.addAll(project.members().stream().map(ProjectMember::memberId).toList());
 
                     return Flux.fromIterable(profileIds)
-                            .flatMap(profileRequest::getProfile)
+                            .flatMap(userRequest::getProfile)
                             .collectMap(Profile::id, p -> p)
                             .map(profileMap -> Tuples.of(project, profileMap));
                 })

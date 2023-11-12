@@ -73,7 +73,6 @@ class AuthControllerTest {
                 .build();
 
         when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
-        when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.just(profile));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
