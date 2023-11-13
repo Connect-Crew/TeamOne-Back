@@ -16,24 +16,34 @@ import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
 import com.connectcrew.teamone.compositeservice.resposne.*;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +78,17 @@ class ProjectControllerTest {
     @MockBean
     private ProjectRequest projectRequest;
 
+
+    private static String BANNER_PATH;
+
+    public ProjectControllerTest(@Value("${resource.banner}") String bannerPath) {
+        BANNER_PATH = bannerPath;
+
+        File file = new File(BANNER_PATH);
+        if (!file.exists() && file.mkdir()) {
+            System.out.println("banner 폴더 생성");
+        }
+    }
 
     @BeforeEach
     void setup(RestDocumentationContextProvider restDocumentation) {
@@ -407,11 +428,16 @@ class ProjectControllerTest {
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
+        MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+        multipartData.add("param", param);
+        multipartData.add("banner", new ClassPathResource("banner1.png"));
+        multipartData.add("banner", new ClassPathResource("banner2.png"));
+
         webTestClient.post()
                 .uri("/project/")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(param)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(multipartData)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LongValueRes.class)
@@ -419,29 +445,19 @@ class ProjectControllerTest {
                                 requestHeaders(
                                         headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
                                 ),
-                                requestFields(
-                                        fieldWithPath("title").type("String").description("프로젝트 제목"),
-                                        fieldWithPath("region").description("프로젝트 지역"),
-                                        fieldWithPath("online").description("온라인 여부"),
-                                        fieldWithPath("state").description("프로젝트 상태"),
-                                        fieldWithPath("careerMin").description("최소 프로젝트 경력"),
-                                        fieldWithPath("careerMax").description("최대 프로젝트 경력"),
-                                        fieldWithPath("leaderParts[]").description("리더의 직군"),
-                                        fieldWithPath("category[]").description("프로젝트 분야"),
-                                        fieldWithPath("goal").description("프로젝트 목표"),
-                                        fieldWithPath("introduction").description("프로젝트 소개"),
-                                        fieldWithPath("recruits[]").description("프로젝트 모집 파트"),
-                                        fieldWithPath("recruits[].part").description("프로젝트 모집 직군"),
-                                        fieldWithPath("recruits[].comment").description("프로젝트 모집 코멘트"),
-                                        fieldWithPath("recruits[].max").description("프로젝트 모집 최대 인원"),
-                                        fieldWithPath("skills[]").description("프로젝트 스킬 정보")
+                                requestParts(
+                                        partWithName("banner").optional().description("프로젝트 배너 이미지 최대 3개로 .jpg, .png, .jpeg 확장자만 허용합니다."),
+                                        partWithName("param").description("프로젝트 생성 정보")
                                 ),
                                 responseFields(
                                         fieldWithPath("value").type("Long").description("생성된 프로젝트 ID")
                                 )
                         )
                 );
+
+        clearBannerForTest();
     }
+
 
     @Test
     void createFailureTest() {
@@ -470,11 +486,16 @@ class ProjectControllerTest {
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
+        MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+        multipartData.add("param", param);
+        multipartData.add("banner", new ClassPathResource("banner1.png"));
+        multipartData.add("banner", new ClassPathResource("banner2.png"));
+
         webTestClient.post()
                 .uri("/project/")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(param)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(multipartData)
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
@@ -690,6 +711,29 @@ class ProjectControllerTest {
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
                         )
                 ));
+    }
+
+    @AfterAll
+    static void clearBannerForTest() {
+        try (var pathStream = Files.walk(Paths.get(BANNER_PATH), Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)) {
+            pathStream.forEach(path -> {
+                if (path.toFile().isFile()) {
+                    try {
+                        Files.delete(path);
+                        System.out.println("delete file : " + path);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            File file = new File(BANNER_PATH);
+            if (file.exists() && file.delete()) {
+                System.out.println("delete directory : " + file);
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // 디렉토리 탐색 중 예외 처리
+        }
     }
 }
 

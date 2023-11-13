@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 public class ProjectController {
-
-    private static final String RESOURCE_PATH = "/projects";
     private static final String UUID_PATTERNS = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
 
     private final ProjectRepository projectRepository;
@@ -129,11 +127,7 @@ public class ProjectController {
 
         if (input.banners() != null) {
             for (String banner : input.banners()) {
-                if (!banner.startsWith(RESOURCE_PATH))
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_PATH.toString()));
-
-                String[] split = banner.split("/");
-                String[] fileNameAndExtensions = split[split.length - 1].split("\\.");
+                String[] fileNameAndExtensions = banner.split("\\.");
                 String filename = fileNameAndExtensions[0];
                 String extension = fileNameAndExtensions[1];
                 if (!Pattern.matches(UUID_PATTERNS, filename)) {

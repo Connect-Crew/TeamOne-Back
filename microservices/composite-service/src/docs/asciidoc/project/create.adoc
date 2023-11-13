@@ -4,9 +4,12 @@ link:../index.html[home으로 돌아가기]
 
 프로젝트 모집글을 작성하는 요청입니다.
 
+이때, Contents-Type은 *multipart/form-data* 로 설정해야 합니다.
+
 == Request
 
-include::{snippets}/project/create-success/http-request.adoc[]
+// include::{snippets}/project/create-success/httpie-request.adoc[]
+바이너리 파일이 포함되어 예시 요청을 보여드릴 수 없습니다.
 
 === request header
 
@@ -14,7 +17,11 @@ include::{snippets}/project/create-success/request-headers.adoc[]
 
 === request body
 
-include::{snippets}/project/create-success/request-fields.adoc[]
+include::{snippets}/project/create-success/request-parts.adoc[]
+
+==== Pram description
+
+include::{snippets}/../../src/docs/asciidoc/project/projectinputparam.adoc[]
 
 == Response
 
