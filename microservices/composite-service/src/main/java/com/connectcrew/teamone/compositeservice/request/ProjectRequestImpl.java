@@ -86,4 +86,14 @@ public class ProjectRequestImpl implements ProjectRequest {
                 .bodyToMono(Boolean.class)
                 .onErrorResume(exHandler::handleException);
     }
+
+    @Override
+    public Mono<Integer> updateFavorite(FavoriteUpdateInput input) {
+        return webClient.post()
+                .uri(String.format("%s/favorite", host))
+                .bodyValue(input)
+                .retrieve()
+                .bodyToMono(Integer.class)
+                .onErrorResume(exHandler::handleException);
+    }
 }

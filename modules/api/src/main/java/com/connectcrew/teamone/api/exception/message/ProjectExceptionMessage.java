@@ -27,6 +27,7 @@ public enum ProjectExceptionMessage {
     ALREADY_REPORT("이미 신고한 프로젝트입니다."),
     NOT_FOUND_PART("해당 직무를 찾을 수 없습니다."),
     BANNER_NOT_FOUND("프로젝트 배너를 찾을 수 없습니다."),
+    INVALID_FAVORITE("프로젝트 좋아요 값이 올바르지 않습니다."),
     ;
 
     private final String message;
