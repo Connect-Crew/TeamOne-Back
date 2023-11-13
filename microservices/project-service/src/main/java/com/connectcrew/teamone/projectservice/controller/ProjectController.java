@@ -418,4 +418,17 @@ public class ProjectController {
                 })
                 .thenReturn(true);
     }
+
+    @PostMapping("/favorite")
+    public Mono<Integer> updateFavorite(@RequestBody FavoriteUpdateInput input) {
+        if (input.favorite() != -1 && input.favorite() != 1)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.INVALID_FAVORITE.toString()));
+
+        return projectRepository.findById(input.project())
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
+                .flatMap(project -> {
+                    project.setFavorite(project.getFavorite() + input.favorite());
+                    return projectRepository.save(project).thenReturn(project.getFavorite());
+                });
+    }
 }

@@ -14,4 +14,6 @@ public interface ProjectRequest {
     Mono<Boolean> applyProject(ApplyInput input);
 
     Mono<Boolean> reportProject(ReportInput input);
+
+    Mono<Integer> updateFavorite(FavoriteUpdateInput input);
 }

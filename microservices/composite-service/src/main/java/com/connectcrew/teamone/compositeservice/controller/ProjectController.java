@@ -221,11 +221,14 @@ public class ProjectController {
 
 
     @PostMapping("/favorite")
-    private Mono<BooleanValueRes> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteParam param) {
+    private Mono<FavoriteRes> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteParam param) {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return favoriteRequest.setFavorite(id, FavoriteType.PROJECT, param.projectId()).map(BooleanValueRes::new);
+        return favoriteRequest.setFavorite(id, FavoriteType.PROJECT, param.projectId())
+                .flatMap(newFavorite -> projectRequest.updateFavorite(new FavoriteUpdateInput(param.projectId(), newFavorite ? 1 : -1))
+                        .map(favorite -> new FavoriteRes(param.projectId(), newFavorite, favorite))
+                );
     }
 
     @PostMapping("/apply")

@@ -541,6 +541,7 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getId(anyString())).thenReturn(0L);
         when(userRequest.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
+        when(projectRequest.updateFavorite(any(FavoriteUpdateInput.class))).thenReturn(Mono.just(10));
 
         webTestClient.post()
                 .uri("/project/favorite")
@@ -548,7 +549,7 @@ class ProjectControllerTest {
                 .bodyValue(new ProjectFavoriteParam(1L))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BooleanValueRes.class)
+                .expectBody(FavoriteRes.class)
                 .consumeWith(document("project/favorite",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -557,7 +558,9 @@ class ProjectControllerTest {
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디")
                         ),
                         responseFields(
-                                fieldWithPath("value").type("Boolean").description("좋아요 여부")
+                                fieldWithPath("project").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("myFavorite").type("Boolean").description("좋아요 여부"),
+                                fieldWithPath("favorite").type("Number").description("좋아요 수")
                         )
                 ));
     }
@@ -729,7 +732,7 @@ class ProjectControllerTest {
 
             File file = new File(BANNER_PATH);
             if (file.exists() && file.delete()) {
-                System.out.println("delete directory : " + file);
+                System.out.println("banner 폴더 제거");
             }
         } catch (IOException e) {
             e.printStackTrace(); // 디렉토리 탐색 중 예외 처리
