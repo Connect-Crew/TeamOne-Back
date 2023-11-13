@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
@@ -14,19 +15,27 @@ import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
+    private static final String UUID_PATTERNS = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     private final String BANNER_PATH;
     private final JwtProvider jwtProvider;
     private final UserRequest userRequest;
@@ -50,6 +59,41 @@ public class ProjectController {
         return projectBasicInfo;
     }
 
+    @GetMapping("/banner/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) throws MalformedURLException {
+        String[] fileNameAndExtensions = filename.split("\\.");
+        String name = fileNameAndExtensions[0];
+        String extension = fileNameAndExtensions[1];
+
+        if (!Pattern.matches(UUID_PATTERNS, name)) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString());
+        }
+
+        MediaType mediaType = switch (extension) {
+            case "jpg", "jpeg" -> MediaType.IMAGE_JPEG;
+            case "png" -> MediaType.IMAGE_PNG;
+            default -> null;
+        };
+
+        if (mediaType == null) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString());
+        }
+
+        // 이미지 파일 경로 설정
+        Path imagePath = Paths.get(BANNER_PATH).resolve(String.format("%s.%s", name, extension));
+        Resource resource = new UrlResource(imagePath.toUri());
+
+        // 이미지 응답 생성
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.BANNER_NOT_FOUND.toString());
+        }
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
+    }
+
+
     @GetMapping("/list")
     private Mono<List<ProjectItemRes>> getProjectList(@RequestHeader(JwtProvider.AUTH_HEADER) String token, ProjectFilterOption option) {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
@@ -72,8 +116,8 @@ public class ProjectController {
                     return tuple.getT1().stream()
                             .map(project -> {
                                 Boolean isFavorite = favoriteMap.getOrDefault(project.id(), false);
-
-                                return new ProjectItemRes(project, isFavorite);
+                                String thumbnail = project.thumbnail() != null ? String.format("/project/banner/%s", project.thumbnail()) : null;
+                                return new ProjectItemRes(project, isFavorite, thumbnail);
                             })
                             .toList();
                 });
@@ -102,7 +146,10 @@ public class ProjectController {
                     return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
                             .map(favorite -> Tuples.of(project, favorite, profileMap));
                 })
-                .map(tuple -> new ProjectDetailRes(tuple.getT1(), tuple.getT2(), tuple.getT3()));
+                .map(tuple -> {
+                    List<String> banners = tuple.getT1().banners().stream().map(banner -> String.format("/project/banner/%s", banner)).toList();
+                    return new ProjectDetailRes(tuple.getT1(), banners, tuple.getT2(), tuple.getT3());
+                });
     }
 
     @PostMapping("/")

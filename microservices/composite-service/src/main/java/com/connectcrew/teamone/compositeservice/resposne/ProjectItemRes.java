@@ -22,11 +22,11 @@ public record ProjectItemRes(
         String goal,
         List<RecruitStatusRes> recruitStatus
 ) {
-    public ProjectItemRes(ProjectItem item, Boolean myFavorite) {
+    public ProjectItemRes(ProjectItem item, Boolean myFavorite, String thumbnail) {
         this(
                 item.id(),
                 item.title(),
-                item.thumbnail(),
+                thumbnail,
                 item.region().getDescription(),
                 item.online(),
                 item.careerMin().getDescription(),

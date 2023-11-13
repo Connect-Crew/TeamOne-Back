@@ -26,6 +26,7 @@ public enum ProjectExceptionMessage {
     COLLECTED_PART("이미 모집이 완료된 파트입니다."),
     ALREADY_REPORT("이미 신고한 프로젝트입니다."),
     NOT_FOUND_PART("해당 직무를 찾을 수 없습니다."),
+    BANNER_NOT_FOUND("프로젝트 배너를 찾을 수 없습니다."),
     ;
 
     private final String message;

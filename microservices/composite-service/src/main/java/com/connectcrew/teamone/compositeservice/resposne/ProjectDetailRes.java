@@ -29,11 +29,11 @@ public record ProjectDetailRes(
         List<String> skills
 ) {
 
-    public ProjectDetailRes(ProjectDetail detail, Boolean myFavorite, Map<Long, Profile> profileMap) {
+    public ProjectDetailRes(ProjectDetail detail, List<String> banners, Boolean myFavorite, Map<Long, Profile> profileMap) {
         this(
                 detail.id(),
                 detail.title(),
-                detail.banners(),
+                banners,
                 detail.region().getDescription(),
                 detail.online(),
                 detail.createdAt(),
