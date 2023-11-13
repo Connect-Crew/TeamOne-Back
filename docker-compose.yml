@@ -9,6 +9,9 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
 
+    volumes:
+      - ${ROOT_PATH}/banner:/resources/banner
+
     ports:
       - "9080:8080"
 
