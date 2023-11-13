@@ -19,3 +19,6 @@ app:
 logging:
   level:
     com.connectcrew.teamone: trace
+
+resource:
+  banner: /path/to/banner
