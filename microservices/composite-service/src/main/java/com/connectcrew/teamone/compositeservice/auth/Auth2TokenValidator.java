@@ -117,8 +117,10 @@ public class Auth2TokenValidator {
         }
     }
 
-    private Mono<PublicKey> getApplePublicKey(String kid) {
+    public Mono<PublicKey> getApplePublicKey(String kid) {
+        log.trace("getApplePublicKey kid={}", kid);
         return webClient.get()
+                .uri("https://appleid.apple.com/auth/keys")
                 .retrieve()
                 .bodyToMono(Map.class)
                 .flatMap(response -> {
