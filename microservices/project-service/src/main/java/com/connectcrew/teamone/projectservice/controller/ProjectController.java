@@ -327,7 +327,8 @@ public class ProjectController {
     @GetMapping("/members")
     public Mono<List<ProjectMember>> getProjectMembers(Long id) {
         log.trace("getProjectMembers - projectId: {}", id);
-        Mono<Map<Long, MemberPart>> parts = partRepository.findAllByProject(id).collectMap(Part::getId, p -> MemberPart.valueOf(p.getPart()));
+        Mono<Map<Long, MemberPart>> parts = partRepository.findAllByProject(id)
+                .collectMap(Part::getId, p -> MemberPart.valueOf(p.getPart()));
         Mono<List<Member>> members = memberRepository.findAllByProject(id).collectList();
 
         return Mono.zip(parts, members)
@@ -337,9 +338,7 @@ public class ProjectController {
 
                     return memberList.stream()
                             .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
-                            .entrySet()
-                            .stream().map(e -> new ProjectMember(e.getKey(), e.getValue()))
-                            .toList();
+                            .entrySet().stream().map(e -> new ProjectMember(e.getKey(), e.getValue())).toList();
                 });
 
     }

@@ -263,7 +263,7 @@ class ProjectControllerTest {
         ProjectDetail project = new ProjectDetail(
                 0L,
                 "프로젝트 제목",
-                List.of("Image URL 1", "Image URL 2"),
+                List.of(String.format("%s.jpg", UUID.randomUUID()), String.format("%s.jpg", UUID.randomUUID())),
                 Region.SEOUL,
                 true,
                 LocalDateTime.now(),
@@ -362,6 +362,85 @@ class ProjectControllerTest {
                                 fieldWithPath("error").type("String").description("에러 유형"),
                                 fieldWithPath("message").type("String").description("실패 메시지"),
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void memberTest() {
+        List<ProjectMember> members = List.of(
+                new ProjectMember(0L, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(1L, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(2L, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(3L, List.of(MemberPart.IOS, MemberPart.AOS))
+        );
+        when(projectRequest.getProjectMembers(anyLong())).thenReturn(Mono.just(members));
+        when(projectRequest.getProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+        when(userRequest.getProfile(0L)).thenReturn(Mono.just(new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
+        )));
+        when(userRequest.getProfile(1L)).thenReturn(Mono.just(new Profile(
+                1L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
+        )));
+        when(userRequest.getProfile(2L)).thenReturn(Mono.just(new Profile(
+                2L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
+        )));
+        when(userRequest.getProfile(3L)).thenReturn(Mono.just(new Profile(
+                3L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
+        )));
+
+        ParameterizedTypeReference<List<ProjectMemberRes>> resType = new ParameterizedTypeReference<>() {};
+
+        webTestClient.get()
+                .uri("/project/members/{projectId}", 0L)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(resType)
+                .consumeWith(document("project/member-success",
+                        pathParameters(
+                                parameterWithName("projectId").description("Project Id")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].profile").type("Profile").description("프로필 정보"),
+                                fieldWithPath("[].profile.id").type("Number").description("프로필 ID"),
+                                fieldWithPath("[].profile.nickname").type("String").description("프로필 이름"),
+                                fieldWithPath("[].profile.profile").type("String").description("프로필 이미지"),
+                                fieldWithPath("[].profile.introduction").type("String").description("프로필 소개"),
+                                fieldWithPath("[].profile.temperature").type("Number").description("온도"),
+                                fieldWithPath("[].profile.responseRate").type("Number").description("응답률"),
+                                fieldWithPath("[].profile.parts").type("String[]").description("프로필 직무"),
+                                fieldWithPath("[].profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
+                                fieldWithPath("[].profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
+                                fieldWithPath("[].profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
+                                fieldWithPath("[].parts").type("String[]").description("프로젝트 직무")
                         )
                 ));
     }

@@ -1,0 +1,21 @@
+= 프로젝트 멤버 불러오기 - /project/members/\{projectId\} (GET)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트의 멤버 정보를 불러오는 요청입니다.
+
+== Request
+
+include::{snippets}/project/member-success/http-request.adoc[]
+
+=== path param
+
+include::{snippets}/project/member-success/path-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/member-success/http-response.adoc[]
+
+include::{snippets}/project/member-success/response-fields.adoc[]
