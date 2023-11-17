@@ -419,4 +419,10 @@ public class ProjectController {
                     return projectRepository.save(project).thenReturn(project.getFavorite());
                 });
     }
+
+    @GetMapping("/thumbnail")
+    public Mono<String> getProjectThumbnail(Long id) {
+        return bannerRepository.findByProjectOrderByIdx(id)
+                .map(Banner::getPath);
+    }
 }

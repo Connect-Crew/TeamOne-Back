@@ -16,4 +16,6 @@ public interface ProjectRequest {
     Mono<Boolean> reportProject(ReportInput input);
 
     Mono<Integer> updateFavorite(FavoriteUpdateInput input);
+
+    Mono<String> getProjectThumbnail(Long projectId);
 }

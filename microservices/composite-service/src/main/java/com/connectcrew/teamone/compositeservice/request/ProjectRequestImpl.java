@@ -96,4 +96,13 @@ public class ProjectRequestImpl implements ProjectRequest {
                 .bodyToMono(Integer.class)
                 .onErrorResume(exHandler::handleException);
     }
+
+    @Override
+    public Mono<String> getProjectThumbnail(Long projectId) {
+        return webClient.get()
+                .uri(String.format("%s/thumbnail?id=%d", host, projectId))
+                .retrieve()
+                .bodyToMono(String.class)
+                .onErrorResume(exHandler::handleException);
+    }
 }

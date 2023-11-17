@@ -2,7 +2,6 @@ package com.connectcrew.teamone.compositeservice.resposne;
 
 import com.connectcrew.teamone.api.project.ProjectDetail;
 import com.connectcrew.teamone.api.project.values.ProjectCategory;
-import com.connectcrew.teamone.api.user.profile.Profile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +18,7 @@ public record ProjectDetailRes(
         String careerMax,
         List<String> category,
         String goal,
-        Profile leader,
+        ProfileRes leader,
         String introduction,
         Integer favorite,
         Boolean myFavorite,
@@ -27,7 +26,7 @@ public record ProjectDetailRes(
         List<String> skills
 ) {
 
-    public ProjectDetailRes(ProjectDetail detail, List<String> banners, Boolean myFavorite, Profile loader) {
+    public ProjectDetailRes(ProjectDetail detail, List<String> banners, Boolean myFavorite, ProfileRes loader) {
         this(
                 detail.id(),
                 detail.title(),

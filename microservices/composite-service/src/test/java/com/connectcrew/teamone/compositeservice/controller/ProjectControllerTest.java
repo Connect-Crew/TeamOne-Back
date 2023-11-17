@@ -47,6 +47,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -279,44 +280,19 @@ class ProjectControllerTest {
         );
 
         when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.just(project));
-        when(userRequest.getProfile(0L)).thenReturn(Mono.just(new Profile(
+        when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
                 0L,
                 "이름",
                 "profile image url",
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
-        )));
-        when(userRequest.getProfile(1L)).thenReturn(Mono.just(new Profile(
-                1L,
-                "이름",
-                "profile image url",
-                "소개 글",
-                36.5,
-                40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
-        )));
-        when(userRequest.getProfile(2L)).thenReturn(Mono.just(new Profile(
-                2L,
-                "이름",
-                "profile image url",
-                "소개 글",
-                36.5,
-                40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
-        )));
-        when(userRequest.getProfile(3L)).thenReturn(Mono.just(new Profile(
-                3L,
-                "이름",
-                "profile image url",
-                "소개 글",
-                36.5,
-                40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
         )));
         when(jwtProvider.getId(anyString())).thenReturn(1L);
         when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
+        when(projectRequest.getProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
@@ -354,6 +330,9 @@ class ProjectControllerTest {
                                 fieldWithPath("leader.temperature").type("String").description("프로젝트 리더 온도"),
                                 fieldWithPath("leader.responseRate").type("Number").description("프로젝트 리더 응답률"),
                                 fieldWithPath("leader.parts[]").type("String[]").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.representProjects[]").type("RepresentProject[]").description("프로젝트 리더 대표 프로젝트"),
+                                fieldWithPath("leader.representProjects[].id").type("Number").description("프로젝트 리더 대표 프로젝트 ID"),
+                                fieldWithPath("leader.representProjects[].thumbnail").type("String").description("프로젝트 리더 대표 프로젝트 썸네일"),
                                 fieldWithPath("recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
                                 fieldWithPath("recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
                                 fieldWithPath("recruitStatus[].part").type("String").description("프로젝트 모집 직무"),

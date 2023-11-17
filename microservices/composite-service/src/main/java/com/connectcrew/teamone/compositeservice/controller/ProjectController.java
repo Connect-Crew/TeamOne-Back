@@ -15,6 +15,8 @@ import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
+import com.connectcrew.teamone.compositeservice.service.BannerService;
+import com.connectcrew.teamone.compositeservice.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -49,14 +51,18 @@ public class ProjectController {
     private final FavoriteRequest favoriteRequest;
 
     private final ProjectBasicInfo projectBasicInfo;
+    private final ProfileService profileService;
+    private final BannerService bannerService;
 
-    public ProjectController(JwtProvider provider, UserRequest userRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, @Value("${resource.banner}") String bannerPath) {
+    public ProjectController(JwtProvider provider, UserRequest userRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService, @Value("${resource.banner}") String bannerPath) {
         this.jwtProvider = provider;
         this.userRequest = userRequest;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
         this.BANNER_PATH = bannerPath;
         this.projectBasicInfo = new ProjectBasicInfo();
+        this.profileService = profileService;
+        this.bannerService = bannerService;
     }
 
     @GetMapping("/")
@@ -121,7 +127,7 @@ public class ProjectController {
                     return tuple.getT1().stream()
                             .map(project -> {
                                 Boolean isFavorite = favoriteMap.getOrDefault(project.id(), false);
-                                String thumbnail = project.thumbnail() != null ? String.format("/project/banner/%s", project.thumbnail()) : null;
+                                String thumbnail = bannerService.getBannerUrlPath(project.thumbnail());
                                 return new ProjectItemRes(project, isFavorite, thumbnail);
                             })
                             .toList();
@@ -134,15 +140,17 @@ public class ProjectController {
         Long id = jwtProvider.getId(removedPrefix);
 
         return projectRequest.getProjectDetail(projectId)
-                .flatMap(project -> userRequest.getProfile(project.leader())
-                        .map(leaderProfile -> Tuples.of(project, leaderProfile)))
+                .flatMap(project -> profileService.getProfileRes(project.leader())
+                        .map(leaderProfile -> Tuples.of(project, leaderProfile))
+                )
                 .flatMap(tuple -> favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
                         .map(favorite -> Tuples.of(tuple.getT1(), favorite, tuple.getT2())))
                 .map(tuple -> {
-                    List<String> banners = tuple.getT1().banners().stream().map(banner -> String.format("/project/banner/%s", banner)).toList();
+                    List<String> banners = tuple.getT1().banners().stream().map(bannerService::getBannerUrlPath).toList();
                     return new ProjectDetailRes(tuple.getT1(), banners, tuple.getT2(), tuple.getT3());
                 });
     }
+
 
     @PostMapping("/")
     private Mono<LongValueRes> createProject(

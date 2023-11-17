@@ -4,10 +4,8 @@ import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.userservice.entity.PartEntity;
 import com.connectcrew.teamone.userservice.entity.ProfileEntity;
-import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
-import com.connectcrew.teamone.userservice.repository.PartRepository;
-import com.connectcrew.teamone.userservice.repository.ProfileRepository;
-import com.connectcrew.teamone.userservice.repository.UserRepository;
+import com.connectcrew.teamone.userservice.entity.RepresentProjectEntity;
+import com.connectcrew.teamone.userservice.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,9 @@ class ProfileControllerTest {
     @MockBean
     private PartRepository partRepository;
 
+    @MockBean
+    private RepresentProjectRepository representProjectRepository;
+
     @Test
     void getProfile() {
         ProfileEntity profile = ProfileEntity.builder()
@@ -58,8 +59,14 @@ class ProfileControllerTest {
                 new PartEntity(1L, 1L, "testPart2")
         );
 
+        List<RepresentProjectEntity> representProjects = List.of(
+                new RepresentProjectEntity(0L, 0L, 1L),
+                new RepresentProjectEntity(1L, 0L, 2L)
+        );
+
         when(profileRepository.findByUserId(anyLong())).thenReturn(Mono.just(profile));
         when(partRepository.findAllByProfileId(anyLong())).thenReturn(Flux.fromIterable(parts));
+        when(representProjectRepository.findAllByProfileId(anyLong())).thenReturn(Flux.fromIterable(representProjects));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
