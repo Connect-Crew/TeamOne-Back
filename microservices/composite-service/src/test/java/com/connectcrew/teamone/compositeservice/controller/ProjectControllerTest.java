@@ -275,12 +275,6 @@ class ProjectControllerTest {
                 "프로젝트 설명",
                 14,
                 initRecruits(),
-                List.of(
-                        new ProjectMember(0L, List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER)),
-                        new ProjectMember(1L, List.of(MemberPart.AOS)),
-                        new ProjectMember(2L, List.of(MemberPart.IOS)),
-                        new ProjectMember(3L, List.of(MemberPart.BACKEND))
-                ),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
@@ -366,16 +360,6 @@ class ProjectControllerTest {
                                 fieldWithPath("recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
                                 fieldWithPath("recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
-                                fieldWithPath("members[]").type("String").description("프로젝트 멤버 정보"),
-                                fieldWithPath("members[].profile").type("Profile").description("프로젝트 멤버 프로필 정보"),
-                                fieldWithPath("members[].profile.id").type("Number").description("프로젝트 멤버 ID"),
-                                fieldWithPath("members[].profile.nickname").type("String").description("프로젝트 멤버 이름"),
-                                fieldWithPath("members[].profile.profile").type("String").description("프로젝트 멤버 프로필 이미지"),
-                                fieldWithPath("members[].profile.introduction").type("String").description("프로젝트 멤버 소개"),
-                                fieldWithPath("members[].profile.temperature").type("String").description("프로젝트 멤버 온도"),
-                                fieldWithPath("members[].profile.responseRate").type("Number").description("프로젝트 멤버 응답률"),
-                                fieldWithPath("members[].profile.parts[]").type("String[]").description("프로젝트 멤버 분야 (프로필)"),
-                                fieldWithPath("members[].parts[]").type("String[]").description("프로젝트 멤버 분야 (팀)"),
                                 fieldWithPath("skills[]").type("String[]").description("프로젝트 스킬 정보")
                         )
                 ));

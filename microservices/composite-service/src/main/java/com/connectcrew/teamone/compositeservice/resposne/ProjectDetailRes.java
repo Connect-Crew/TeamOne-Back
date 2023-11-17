@@ -6,7 +6,6 @@ import com.connectcrew.teamone.api.user.profile.Profile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public record ProjectDetailRes(
         Long id,
@@ -25,11 +24,10 @@ public record ProjectDetailRes(
         Integer favorite,
         Boolean myFavorite,
         List<RecruitStatusRes> recruitStatus,
-        List<ProjectMemberRes> members,
         List<String> skills
 ) {
 
-    public ProjectDetailRes(ProjectDetail detail, List<String> banners, Boolean myFavorite, Map<Long, Profile> profileMap) {
+    public ProjectDetailRes(ProjectDetail detail, List<String> banners, Boolean myFavorite, Profile loader) {
         this(
                 detail.id(),
                 detail.title(),
@@ -42,12 +40,11 @@ public record ProjectDetailRes(
                 detail.careerMax().getDescription(),
                 detail.category().stream().map(ProjectCategory::getDescription).toList(),
                 detail.goal().getDescription(),
-                profileMap.get(detail.leader()),
+                loader,
                 detail.introduction(),
                 detail.favorite(),
                 myFavorite,
                 detail.recruitStatuses().stream().map(RecruitStatusRes::new).toList(),
-                detail.members().stream().map(m -> new ProjectMemberRes(m, profileMap.get(m.memberId()))).toList(),
                 detail.skills()
         );
     }

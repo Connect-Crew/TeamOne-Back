@@ -19,7 +19,6 @@ import reactor.util.function.Tuples;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -280,19 +279,16 @@ public class ProjectController {
                     Mono<List<Part>> parts = partRepository.findAllByProject(id).collectList();
                     Mono<List<Skill>> skills = skillRepository.findAllByProject(id).collectList();
                     Mono<List<Category>> categories = categoryRepository.findAllByProject(id).collectList();
-                    Mono<List<Member>> members = memberRepository.findAllByProject(id).collectList();
 
-                    return Mono.zip(banners, parts, skills, categories, members)
+                    return Mono.zip(banners, parts, skills, categories)
                             .map(tuple -> {
                                 List<String> bannerPaths = tuple.getT1().stream()
                                         .sorted(Comparator.comparingInt(Banner::getIdx))
                                         .map(Banner::getPath).toList();
 
                                 List<RecruitStatus> recruits = new ArrayList<>();
-                                Map<Long, MemberPart> partMap = new HashMap<>();
                                 for (Part p : tuple.getT2()) {
                                     MemberPart part = MemberPart.valueOf(p.getPart());
-                                    partMap.put(p.getId(), part);
                                     recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect()));
                                 }
 
@@ -300,13 +296,6 @@ public class ProjectController {
 
                                 List<ProjectCategory> categoryNames = tuple.getT4().stream()
                                         .map(Category::getName).map(ProjectCategory::valueOf).toList();
-
-                                List<ProjectMember> projectMembers = tuple.getT5().stream()
-                                        .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
-                                        .entrySet()
-                                        .stream().map(e -> new ProjectMember(e.getKey(), e.getValue()))
-                                        .toList();
-
 
                                 return ProjectDetail.builder()
                                         .id(project.getId())
@@ -324,7 +313,6 @@ public class ProjectController {
                                         .introduction(project.getIntroduction())
                                         .favorite(project.getFavorite())
                                         .recruitStatuses(recruits)
-                                        .members(projectMembers)
                                         .skills(skillNames)
                                         .build();
                             })

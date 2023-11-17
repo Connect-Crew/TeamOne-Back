@@ -1,9 +1,11 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.project.*;
+import com.connectcrew.teamone.api.project.FavoriteUpdateInput;
+import com.connectcrew.teamone.api.project.ProjectFilterOption;
+import com.connectcrew.teamone.api.project.ProjectInput;
+import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
@@ -28,7 +30,10 @@ import reactor.util.function.Tuples;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -129,23 +134,10 @@ public class ProjectController {
         Long id = jwtProvider.getId(removedPrefix);
 
         return projectRequest.getProjectDetail(projectId)
-                .flatMap(project -> {
-                    Set<Long> profileIds = new HashSet<>();
-                    profileIds.add(project.leader());
-                    profileIds.addAll(project.members().stream().map(ProjectMember::memberId).toList());
-
-                    return Flux.fromIterable(profileIds)
-                            .flatMap(userRequest::getProfile)
-                            .collectMap(Profile::id, p -> p)
-                            .map(profileMap -> Tuples.of(project, profileMap));
-                })
-                .flatMap(tuple -> {
-                    ProjectDetail project = tuple.getT1();
-                    Map<Long, Profile> profileMap = tuple.getT2();
-
-                    return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
-                            .map(favorite -> Tuples.of(project, favorite, profileMap));
-                })
+                .flatMap(project -> userRequest.getProfile(project.leader())
+                        .map(leaderProfile -> Tuples.of(project, leaderProfile)))
+                .flatMap(tuple -> favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
+                        .map(favorite -> Tuples.of(tuple.getT1(), favorite, tuple.getT2())))
                 .map(tuple -> {
                     List<String> banners = tuple.getT1().banners().stream().map(banner -> String.format("/project/banner/%s", banner)).toList();
                     return new ProjectDetailRes(tuple.getT1(), banners, tuple.getT2(), tuple.getT3());
