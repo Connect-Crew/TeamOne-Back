@@ -38,6 +38,7 @@ public class ProfileService {
         return Flux.fromIterable(ids)
                 .flatMap(id -> projectRequest.getProjectThumbnail(id)
                         .map(thumbnail -> new RepresentProjectRes(id, bannerService.getBannerUrlPath(thumbnail)))
+                        .defaultIfEmpty(new RepresentProjectRes(id, null))
                 )
                 .collectList();
     }

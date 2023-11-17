@@ -125,6 +125,15 @@ public class ProjectController {
                 });
     }
 
+    @GetMapping("/members/{projectId}")
+    private Mono<List<ProjectMemberRes>> getProjectMembers(@PathVariable Long projectId) {
+        return projectRequest.getProjectMembers(projectId)
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(member -> profileService.getProfileRes(member.memberId())
+                        .map(profileRes -> new ProjectMemberRes(member, profileRes)))
+                .collectList();
+    }
+
 
     @PostMapping("/")
     private Mono<LongValueRes> createProject(

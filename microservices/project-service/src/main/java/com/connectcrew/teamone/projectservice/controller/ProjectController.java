@@ -19,6 +19,7 @@ import reactor.util.function.Tuples;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -321,6 +322,26 @@ public class ProjectController {
                                 return Mono.error(new RuntimeException(ProjectExceptionMessage.LOAD_PROJECT_FAILED.toString()));
                             });
                 });
+    }
+
+    @GetMapping("/members")
+    public Mono<List<ProjectMember>> getProjectMembers(Long id) {
+        log.trace("getProjectMembers - projectId: {}", id);
+        Mono<Map<Long, MemberPart>> parts = partRepository.findAllByProject(id).collectMap(Part::getId, p -> MemberPart.valueOf(p.getPart()));
+        Mono<List<Member>> members = memberRepository.findAllByProject(id).collectList();
+
+        return Mono.zip(parts, members)
+                .map(tuple -> {
+                    Map<Long, MemberPart> partMap = tuple.getT1();
+                    List<Member> memberList = tuple.getT2();
+
+                    return memberList.stream()
+                            .collect(Collectors.groupingBy(Member::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
+                            .entrySet()
+                            .stream().map(e -> new ProjectMember(e.getKey(), e.getValue()))
+                            .toList();
+                });
+
     }
 
     @DeleteMapping("/")
