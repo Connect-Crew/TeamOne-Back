@@ -13,14 +13,11 @@ import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
 import com.connectcrew.teamone.compositeservice.service.BannerService;
 import com.connectcrew.teamone.compositeservice.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -29,23 +26,16 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
-    private static final String UUID_PATTERNS = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
-    private final String BANNER_PATH;
     private final JwtProvider jwtProvider;
-    private final UserRequest userRequest;
     private final ProjectRequest projectRequest;
 
     private final FavoriteRequest favoriteRequest;
@@ -54,12 +44,10 @@ public class ProjectController {
     private final ProfileService profileService;
     private final BannerService bannerService;
 
-    public ProjectController(JwtProvider provider, UserRequest userRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService, @Value("${resource.banner}") String bannerPath) {
+    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
         this.jwtProvider = provider;
-        this.userRequest = userRequest;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
-        this.BANNER_PATH = bannerPath;
         this.projectBasicInfo = new ProjectBasicInfo();
         this.profileService = profileService;
         this.bannerService = bannerService;
@@ -71,36 +59,20 @@ public class ProjectController {
     }
 
     @GetMapping("/banner/{filename}")
-    public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) throws MalformedURLException {
+    public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) {
         String[] fileNameAndExtensions = filename.split("\\.");
         String name = fileNameAndExtensions[0];
         String extension = fileNameAndExtensions[1];
 
-        if (!Pattern.matches(UUID_PATTERNS, name)) {
-            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString());
-        }
-
-        MediaType mediaType = switch (extension) {
-            case "jpg", "jpeg" -> MediaType.IMAGE_JPEG;
-            case "png" -> MediaType.IMAGE_PNG;
-            default -> null;
-        };
-
-        if (mediaType == null) {
+        Optional<MediaType> mediaType = bannerService.getMediaType(extension);
+        if (mediaType.isEmpty()) {
             throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString());
         }
 
-        // 이미지 파일 경로 설정
-        Path imagePath = Paths.get(BANNER_PATH).resolve(String.format("%s.%s", name, extension));
-        Resource resource = new UrlResource(imagePath.toUri());
-
-        // 이미지 응답 생성
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new IllegalArgumentException(ProjectExceptionMessage.BANNER_NOT_FOUND.toString());
-        }
+        Resource resource = bannerService.getBanner(name, extension);
 
         return ResponseEntity.ok()
-                .contentType(mediaType)
+                .contentType(mediaType.get())
                 .body(resource);
     }
 
@@ -113,25 +85,27 @@ public class ProjectController {
         log.trace("getProjectList: {}", option);
         return projectRequest.getProjectList(option)
                 .collectList()
-                .flatMap(projects -> {
-                    if (projects.size() == 0) {
-                        return Mono.just(Tuples.of(projects, new HashMap<Long, Boolean>()));
-                    }
-                    List<Long> profileIds = projects.stream().map(ProjectItem::id).toList();
+                .flatMap(projects -> getFavoriteMap(id, projects).map(favoriteMap -> Tuples.of(projects, favoriteMap)))
+                .map(tuple -> itemToRes(tuple.getT1(), tuple.getT2()));
+    }
 
-                    return favoriteRequest.isFavorite(id, FavoriteType.PROJECT, profileIds)
-                            .map(favoriteMap -> Tuples.of(projects, favoriteMap));
-                })
-                .map(tuple -> {
-                    Map<Long, Boolean> favoriteMap = tuple.getT2();
-                    return tuple.getT1().stream()
-                            .map(project -> {
-                                Boolean isFavorite = favoriteMap.getOrDefault(project.id(), false);
-                                String thumbnail = bannerService.getBannerUrlPath(project.thumbnail());
-                                return new ProjectItemRes(project, isFavorite, thumbnail);
-                            })
-                            .toList();
-                });
+    private Mono<Map<Long, Boolean>> getFavoriteMap(Long userId, List<ProjectItem> projects) {
+        if (projects.size() == 0) {
+            return Mono.just(new HashMap<>());
+        }
+        List<Long> profileIds = projects.stream().map(ProjectItem::id).toList();
+
+        return favoriteRequest.isFavorite(userId, FavoriteType.PROJECT, profileIds);
+    }
+
+    private List<ProjectItemRes> itemToRes(List<ProjectItem> items, Map<Long, Boolean> favoriteMap) {
+        return items.stream()
+                .map(item -> new ProjectItemRes(
+                        item,
+                        favoriteMap.getOrDefault(item.id(), false),
+                        bannerService.getBannerUrlPath(item.thumbnail())
+                ))
+                .toList();
     }
 
     @GetMapping("/{projectId}")
@@ -161,62 +135,32 @@ public class ProjectController {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return saveBanners(banner)
+        return bannerService.saveBanners(banner)
                 .collectList()
-                .flatMap(paths -> {
-                    ProjectInput input = new ProjectInput(
-                            param.title(),
-                            paths,
-                            param.region(),
-                            param.online(),
-                            param.state(),
-                            param.careerMin(),
-                            param.careerMax(),
-                            id,
-                            param.leaderParts(),
-                            param.category(),
-                            param.goal(),
-                            param.introduction(),
-                            param.recruits(),
-                            param.skills()
-                    );
-
-                    return projectRequest.saveProject(input)
-                            .onErrorResume(ex -> deleteBanners(paths).then(Mono.error(ex))); // 프로젝트 글 작성 실패시 저장된 배너 삭제
-                })
+                .flatMap(paths ->
+                        projectRequest.saveProject(getProjectInput(param, id, paths))
+                                .onErrorResume(ex -> bannerService.deleteBanners(paths).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+                )
                 .map(LongValueRes::new);
     }
 
-    /**
-     * 프로젝트 배너를 저장하는 함수
-     * <p>
-     * 이때, jpg, jpeg, png 확장자의 파일만 저장하고, 저장된 파일 이름을 반환한다.
-     */
-    private Flux<String> saveBanners(Flux<FilePart> banner) {
-        return banner
-                .filter(file -> List.of(".jpg", ".jpeg", ".png").contains(getFileExtension(file.filename())))
-                .flatMap(file -> {
-                    String uuidFileName = UUID.randomUUID() + getFileExtension(file.filename());
-                    Path filePath = Path.of(BANNER_PATH + "/" + uuidFileName);
-                    return file.transferTo(filePath).thenReturn(uuidFileName);
-                });
-    }
-
-    private Mono<Boolean> deleteBanners(List<String> bannerFileNames) {
-        return Flux.fromIterable(bannerFileNames)
-                .flatMap(fileName -> {
-                    Path filePath = Path.of(BANNER_PATH + "/" + fileName);
-                    if (filePath.toFile().exists())
-                        return Mono.just(filePath.toFile().delete());
-                    else
-                        return Mono.just(true);
-                })
-                .all(Boolean::booleanValue);
-    }
-
-    private String getFileExtension(String fileName) {
-        int lastDotIndex = fileName.lastIndexOf('.');
-        return (lastDotIndex != -1) ? fileName.substring(lastDotIndex) : "";
+    private ProjectInput getProjectInput(ProjectInputParam param, Long id, List<String> paths) {
+        return new ProjectInput(
+                param.title(),
+                paths,
+                param.region(),
+                param.online(),
+                param.state(),
+                param.careerMin(),
+                param.careerMax(),
+                id,
+                param.leaderParts(),
+                param.category(),
+                param.goal(),
+                param.introduction(),
+                param.recruits(),
+                param.skills()
+        );
     }
 
 
