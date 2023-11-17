@@ -6,6 +6,7 @@ import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.resposne.ProfileRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +23,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -79,17 +80,19 @@ class UserControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name())
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(1L, 2L)
         );
         when(jwtProvider.getId(anyString())).thenReturn(1L);
         when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(projectRequest.getProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         webTestClient.get()
                 .uri("/user/myprofile")
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Profile.class)
+                .expectBody(ProfileRes.class)
                 .consumeWith(document("user/getMyProfile",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -101,7 +104,10 @@ class UserControllerTest {
                                 fieldWithPath("introduction").type("String").description("소개글"),
                                 fieldWithPath("temperature").type("String").description("온도"),
                                 fieldWithPath("responseRate").type("Number").description("응답률"),
-                                fieldWithPath("parts[]").type("String[]").description("직무 분야")
+                                fieldWithPath("parts[]").type("String[]").description("직무 분야"),
+                                fieldWithPath("representProjects[]").type("RepresentProject[]").description("대표 프로젝트"),
+                                fieldWithPath("representProjects[].id").type("Number").description("대표 프로젝트 ID"),
+                                fieldWithPath("representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일")
                         )
                 ));
     }

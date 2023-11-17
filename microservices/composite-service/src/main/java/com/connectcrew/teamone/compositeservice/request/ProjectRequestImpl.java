@@ -2,9 +2,12 @@ package com.connectcrew.teamone.compositeservice.request;
 
 import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class ProjectRequestImpl implements ProjectRequest {
 
@@ -51,9 +54,21 @@ public class ProjectRequestImpl implements ProjectRequest {
     @Override
     public Mono<ProjectDetail> getProjectDetail(Long projectId) {
         return webClient.get()
-                .uri(String.format("%s/", host))
+                .uri(String.format("%s/?id=%d", host, projectId))
                 .retrieve()
                 .bodyToMono(ProjectDetail.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<List<ProjectMember>> getProjectMembers(Long projectId) {
+        ParameterizedTypeReference<List<ProjectMember>> type = new ParameterizedTypeReference<>() {
+        };
+
+        return webClient.get()
+                .uri(String.format("%s/members?id=%d", host, projectId))
+                .retrieve()
+                .bodyToMono(type)
                 .onErrorResume(exHandler::handleException);
     }
 
@@ -94,6 +109,15 @@ public class ProjectRequestImpl implements ProjectRequest {
                 .bodyValue(input)
                 .retrieve()
                 .bodyToMono(Integer.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<String> getProjectThumbnail(Long projectId) {
+        return webClient.get()
+                .uri(String.format("%s/thumbnail?id=%d", host, projectId))
+                .retrieve()
+                .bodyToMono(String.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

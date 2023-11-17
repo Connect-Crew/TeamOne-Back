@@ -1,11 +1,11 @@
-package com.connectcrew.teamone.api.user.profile;
+package com.connectcrew.teamone.compositeservice.resposne;
 
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record Profile(
+public record ProfileRes(
         Long id,
         String nickname,
         String profile,
@@ -13,6 +13,7 @@ public record Profile(
         Double temperature,
         Integer responseRate,
         List<String> parts,
-        List<Long> representProjects
+        List<RepresentProjectRes> representProjects
 ) {
+
 }

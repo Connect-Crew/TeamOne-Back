@@ -23,7 +23,6 @@ public record ProjectDetail(
         String introduction,
         Integer favorite,
         List<RecruitStatus> recruitStatuses,
-        List<ProjectMember> members,
         List<String> skills
 ) {
 
