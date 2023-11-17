@@ -2,10 +2,7 @@ package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.userservice.entity.FavoriteEntity;
-import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
-import com.connectcrew.teamone.userservice.repository.PartRepository;
-import com.connectcrew.teamone.userservice.repository.ProfileRepository;
-import com.connectcrew.teamone.userservice.repository.UserRepository;
+import com.connectcrew.teamone.userservice.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +37,9 @@ class FavoriteControllerTest {
 
     @MockBean
     private PartRepository partRepository;
+
+    @MockBean
+    private RepresentProjectRepository representProjectRepository;
 
     @Test
     void getFavorites() {
