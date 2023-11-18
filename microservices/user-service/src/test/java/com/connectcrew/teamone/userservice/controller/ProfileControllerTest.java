@@ -6,6 +6,7 @@ import com.connectcrew.teamone.userservice.entity.PartEntity;
 import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.RepresentProjectEntity;
 import com.connectcrew.teamone.userservice.repository.*;
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,12 @@ class ProfileControllerTest {
 
     @MockBean
     private RepresentProjectRepository representProjectRepository;
+
+    @MockBean
+    private FcmRepository fcmRepository;
+
+    @MockBean
+    private FirebaseMessaging firebaseMessaging;
 
     @Test
     void getProfile() {
