@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.service;
 
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
+import com.connectcrew.teamone.userservice.entity.FcmEntity;
 import com.connectcrew.teamone.userservice.repository.FcmRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -44,6 +45,13 @@ public class FcmNotificationService {
                     }
                 })
                 .then()
+                .thenReturn(true);
+    }
+
+    public Mono<Boolean> saveToken(Long id, String fcm) {
+        return fcmRepository.findByUserIdAndToken(id, fcm)
+                .defaultIfEmpty(FcmEntity.builder().userId(id).token(fcm).build())
+                .flatMap(fcmRepository::save)
                 .thenReturn(true);
     }
 }

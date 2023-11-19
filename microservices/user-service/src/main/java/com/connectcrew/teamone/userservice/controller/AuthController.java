@@ -9,6 +9,7 @@ import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
 import com.connectcrew.teamone.userservice.repository.ProfileRepository;
 import com.connectcrew.teamone.userservice.repository.UserRepository;
+import com.connectcrew.teamone.userservice.service.FcmNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,15 @@ import java.util.regex.Pattern;
 @RequestMapping("/user")
 public class AuthController {
 
+    private final FcmNotificationService fcmService;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final Pattern nicknamePattern = Pattern.compile("^[a-zA-Z0-9가-힣]{2,10}$");
 
-    public AuthController(UserRepository userRepository, ProfileRepository profileRepository) {
+    public AuthController(FcmNotificationService fcmService, UserRepository userRepository, ProfileRepository profileRepository) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
+        this.fcmService = fcmService;
     }
 
     @GetMapping("/")
@@ -54,6 +57,7 @@ public class AuthController {
                 .map(exists -> inputToUserEntity(input))
                 .flatMap(userRepository::save)
                 .flatMap(user -> profileRepository.save(inputToProfileEntity(user.getId(), input)).thenReturn(user))
+                .flatMap(user -> fcmService.saveToken(user.getId(), input.fcm()).thenReturn(user))
                 .map(this::entityToResponse);
     }
 

@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
+import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
 import org.springframework.core.ParameterizedTypeReference;
@@ -98,6 +99,16 @@ public class UserRequestImpl implements UserRequest, FavoriteRequest, Notificati
         return webClient.post()
                 .uri(String.format("%s/notification", host))
                 .bodyValue(notification)
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Boolean> saveFcm(Long id, String fcm) {
+        return webClient.post()
+                .uri(String.format("%s/notification/token", host))
+                .bodyValue(new FcmToken(id, fcm))
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .onErrorResume(exHandler::handleException);

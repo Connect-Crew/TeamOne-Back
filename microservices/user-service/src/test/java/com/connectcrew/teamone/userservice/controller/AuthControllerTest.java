@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
+import com.connectcrew.teamone.userservice.entity.FcmEntity;
 import com.connectcrew.teamone.userservice.entity.ProfileEntity;
 import com.connectcrew.teamone.userservice.entity.UserEntity;
 import com.connectcrew.teamone.userservice.repository.*;
@@ -109,12 +110,12 @@ class AuthControllerTest {
 
     static Stream<Arguments> registerFailArgs() {
         return Stream.of(
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true), "서비스 이용약관에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false), "개인정보 처리방침에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true), "최소 2글자 이상 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true), "최대 10글자 이하로 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true), "공백과 특수문자는 들어갈 수 없어요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true), "이미 존재하는 닉네임입니다.")
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, "fcm"), "서비스 이용약관에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, "fcm"), "개인정보 처리방침에 동의해주세요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, "fcm"), "최소 2글자 이상 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, "fcm"), "최대 10글자 이하로 입력해주세요!"),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, "fcm"), "공백과 특수문자는 들어갈 수 없어요."),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, "fcm"), "이미 존재하는 닉네임입니다.")
         );
     }
 
@@ -154,7 +155,7 @@ class AuthControllerTest {
     // 중복 회원가입 테스트
     @Test
     void duplicateRegisterTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -186,7 +187,7 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true);
+        UserInputParam param = new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -204,6 +205,8 @@ class AuthControllerTest {
         when(userRepository.existsBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(false));
         when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(user));
         when(profileRepository.save(any(ProfileEntity.class))).thenReturn(Mono.just(ProfileEntity.builder().build()));
+        when(fcmRepository.save(any(FcmEntity.class))).thenReturn(Mono.just(FcmEntity.builder().build()));
+        when(fcmRepository.findByUserIdAndToken(anyLong(), anyString())).thenReturn(Mono.just(new FcmEntity(0L, 1L, "fcm")));
 
         webTestClient.post()
                 .uri("/user/")

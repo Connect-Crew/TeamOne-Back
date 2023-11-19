@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
+import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.userservice.service.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,5 +20,10 @@ public class NotificationController {
     @PostMapping
     public Mono<Boolean> sendNotification(@RequestBody FcmNotification notification) {
         return fcmService.sendNotification(notification);
+    }
+
+    @PostMapping("/token")
+    public Mono<Boolean> saveToken(@RequestBody FcmToken token) {
+        return fcmService.saveToken(token.id(), token.fcm());
     }
 }

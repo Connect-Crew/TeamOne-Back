@@ -4,6 +4,7 @@ import com.connectcrew.teamone.api.user.auth.Social;
 
 public record LoginParam (
         String token,
-        Social social
+        Social social,
+        String fcm
 ){
 }

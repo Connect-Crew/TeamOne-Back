@@ -86,19 +86,21 @@ class AuthControllerTest {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
         when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(userRequest.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
         when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
-                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
                 .consumeWith(document("auth/login-success",
                         requestFields(
                                 fieldWithPath("token").type("String").description("Social 로그인 후 발급받은 토큰"),
-                                fieldWithPath("social").type("String").description(String.format("Social 타입 %s", Arrays.toString(Social.values())))
+                                fieldWithPath("social").type("String").description(String.format("Social 타입 %s", Arrays.toString(Social.values()))),
+                                fieldWithPath("fcm").type("String").description("FCM 토큰")
                         ),
                         responseFields(
                                 fieldWithPath("id").type("Number").description("사용자 고유 ID"),
@@ -121,12 +123,13 @@ class AuthControllerTest {
     void notRegisterLogin() {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
+        when(userRequest.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
         when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
-                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE, "fcm"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorInfo.class)
@@ -156,7 +159,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/login")
-                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE))
+                .bodyValue(new LoginParam("sampleToken", Social.GOOGLE, "fcm"))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorInfo.class)
@@ -193,7 +196,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(LoginResult.class)
@@ -206,7 +209,8 @@ class AuthControllerTest {
                                 fieldWithPath("profile").type("String (Optional)").optional().description("사용자 프로필 사진 URL"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("termsAgreement").type("Boolean").description("이용약관 동의 여부"),
-                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부")
+                                fieldWithPath("privacyAgreement").type("Boolean").description("개인정보 처리방침 동의 여부"),
+                                fieldWithPath("fcm").type("String").description("FCM 토큰")
                         ),
                         responseFields(
                                 fieldWithPath("id").type("Number").description("사용자 고유 ID"),
@@ -231,7 +235,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorInfo.class)
@@ -262,7 +266,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/auth/register")
-                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true))
+                .bodyValue(new RegisterParam("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)

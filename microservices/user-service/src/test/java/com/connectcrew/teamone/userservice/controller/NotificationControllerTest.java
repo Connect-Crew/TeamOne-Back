@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
+import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.userservice.entity.FcmEntity;
 import com.connectcrew.teamone.userservice.repository.*;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -12,10 +13,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -53,6 +55,19 @@ class NotificationControllerTest {
         webTestClient.post()
                 .uri("/notification")
                 .bodyValue(new FcmNotification(0L, "title", "body"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class);
+    }
+
+    @Test
+    void saveFcmToken() {
+        when(fcmRepository.save(any(FcmEntity.class))).thenReturn(Mono.just(FcmEntity.builder().build()));
+        when(fcmRepository.findByUserIdAndToken(anyLong(), anyString())).thenReturn(Mono.just(new FcmEntity(0L, 1L, "fcm")));
+
+        webTestClient.post()
+                .uri("/notification/token")
+                .bodyValue(new FcmToken(0L, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Boolean.class);

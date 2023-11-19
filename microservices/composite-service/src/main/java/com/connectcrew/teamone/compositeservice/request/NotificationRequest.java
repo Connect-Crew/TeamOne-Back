@@ -5,4 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface NotificationRequest {
     Mono<Boolean> sendNotification(FcmNotification notification);
+
+    Mono<Boolean> saveFcm(Long id, String fcm);
 }
