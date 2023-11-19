@@ -1,7 +1,5 @@
 package com.connectcrew.teamone.userservice.service;
 
-import com.connectcrew.teamone.api.exception.NotFoundException;
-import com.connectcrew.teamone.api.exception.message.UserExceptionMessage;
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
 import com.connectcrew.teamone.userservice.repository.FcmRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -23,7 +21,6 @@ public class FcmNotificationService {
     public Mono<Boolean> sendNotification(FcmNotification notification) {
         log.trace("sendNotification: {}", notification);
         return fcmRepository.findAllByUserId(notification.getUserId())
-                .switchIfEmpty(Mono.error(new NotFoundException(UserExceptionMessage.NOT_FOUND_USER_FCM_TOKEN.toString())))
                 .flatMap(entity -> {
                     try {
                         Notification noti = Notification.builder()
@@ -41,14 +38,12 @@ public class FcmNotificationService {
                         firebaseMessaging.send(msg);
                         return Mono.just(true);
                     } catch (FirebaseMessagingException e) {
-                        return Mono.error(e);
+                        log.trace("sendNotification - error: {}", e.getMessage(), e);
+                        return fcmRepository.delete(entity)
+                                .thenReturn(false);
                     }
                 })
                 .then()
-                .onErrorResume(e -> {
-                    log.error("sendNotification - error: {}", e.getMessage(), e);
-                    return Mono.error(new RuntimeException(e));
-                })
                 .thenReturn(true);
     }
 }

@@ -16,7 +16,7 @@ public class NotificationController {
 
     private final FcmNotificationService fcmService;
 
-    @PostMapping()
+    @PostMapping
     public Mono<Boolean> sendNotification(@RequestBody FcmNotification notification) {
         return fcmService.sendNotification(notification);
     }
