@@ -1,0 +1,25 @@
+= Push 테스트 알림 보내기 - /notification (POST)
+
+link:../index.html[home으로 돌아가기]
+
+테스트용 Push Notificaiton을 전송하는 요청입니다.
+
+== Request
+
+include::{snippets}/notification/test-notification/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/notification/test-notification/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/notification/test-notification/request-fields.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/notification/test-notification/http-response.adoc[]
+
+include::{snippets}/notification/test-notification/response-fields.adoc[]
