@@ -3,6 +3,7 @@ package com.connectcrew.teamone.userservice.controller;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.userservice.entity.FavoriteEntity;
 import com.connectcrew.teamone.userservice.repository.*;
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ class FavoriteControllerTest {
 
     @MockBean
     private RepresentProjectRepository representProjectRepository;
+
+    @MockBean
+    private FcmRepository fcmRepository;
+
+    @MockBean
+    private FirebaseMessaging firebaseMessaging;
 
     @Test
     void getFavorites() {

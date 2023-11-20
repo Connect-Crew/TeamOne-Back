@@ -12,6 +12,7 @@ public record UserInputParam(
         String profile,
         String email,
         boolean termsAgreement,
-        boolean privacyAgreement
+        boolean privacyAgreement,
+        String fcm
 ) {
 }

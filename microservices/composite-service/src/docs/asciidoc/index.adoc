@@ -22,3 +22,6 @@
 - link:project/favorite.html[프로젝트 좋아요 설정 및 해지하기 - /project/favorite ]
 - link:project/apply.html[프로젝트 지원하기 - /project/apply]
 - link:project/report.html[프로젝트 신고하기 - /project/report]
+
+== Push Notification 테스트 요청
+- link:notification/notification.html[Push 테스트 알림 보내기 - /notification]

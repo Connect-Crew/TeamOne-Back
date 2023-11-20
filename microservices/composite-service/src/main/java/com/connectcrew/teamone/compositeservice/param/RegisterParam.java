@@ -11,7 +11,8 @@ public record RegisterParam(
         String profile,
         String email,
         boolean termsAgreement,
-        boolean privacyAgreement
+        boolean privacyAgreement,
+        String fcm
 ) {
     public UserInputParam toUserInputParam(String socialId) {
         return new UserInputParam(
@@ -22,7 +23,8 @@ public record RegisterParam(
                 profile,
                 email,
                 termsAgreement,
-                privacyAgreement
+                privacyAgreement,
+                fcm
         );
     }
 }

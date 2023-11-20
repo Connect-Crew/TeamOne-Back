@@ -8,6 +8,7 @@ import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
 import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
 import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.param.RegisterParam;
+import com.connectcrew.teamone.compositeservice.request.NotificationRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import com.connectcrew.teamone.compositeservice.resposne.RefreshResult;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 public class AuthController {
 
     private final Auth2TokenValidator auth2TokenValidator;
+    private final NotificationRequest notificationRequest;
     private final UserRequest userRequest;
 
     private final JwtProvider jwtProvider;
@@ -37,6 +39,7 @@ public class AuthController {
                 .onErrorResume(ex -> Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.", ex)))
                 .doOnError(ex -> log.debug("login error: {}", ex.getMessage(), ex))
                 .flatMap(socialId -> userRequest.getUser(socialId, param.social()))
+                .flatMap(user -> notificationRequest.saveFcm(user.id(), param.fcm()).thenReturn(user))
                 .flatMap(user -> userRequest.getProfile(user.id()).map(profile -> Tuples.of(user, profile)))
                 .map(tuple -> generateLoginResult(tuple.getT1(), tuple.getT2()));
     }

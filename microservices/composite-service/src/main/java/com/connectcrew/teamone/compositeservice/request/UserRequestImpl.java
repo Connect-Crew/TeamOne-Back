@@ -4,6 +4,8 @@ import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
+import com.connectcrew.teamone.api.user.notification.FcmNotification;
+import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
 import org.springframework.core.ParameterizedTypeReference;
@@ -13,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-public class UserRequestImpl implements UserRequest, FavoriteRequest {
+public class UserRequestImpl implements UserRequest, FavoriteRequest, NotificationRequest {
 
     public final String host;
 
@@ -87,6 +89,26 @@ public class UserRequestImpl implements UserRequest, FavoriteRequest {
     public Mono<Boolean> setFavorite(Long userId, FavoriteType type, Long target) {
         return webClient.post()
                 .uri(String.format("%s/favorite/?userId=%d&type=%s&target=%d", host, userId, type.name(), target))
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Boolean> sendNotification(FcmNotification notification) {
+        return webClient.post()
+                .uri(String.format("%s/notification", host))
+                .bodyValue(notification)
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Boolean> saveFcm(Long id, String fcm) {
+        return webClient.post()
+                .uri(String.format("%s/notification/token", host))
+                .bodyValue(new FcmToken(id, fcm))
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .onErrorResume(exHandler::handleException);
