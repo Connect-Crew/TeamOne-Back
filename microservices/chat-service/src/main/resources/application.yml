@@ -1,0 +1,12 @@
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  application:
+    name: chat-service
+
+service:
+  port: 8086
