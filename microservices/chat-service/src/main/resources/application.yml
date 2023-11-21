@@ -8,5 +8,5 @@ spring:
   application:
     name: chat-service
 
-service:
+server:
   port: 8086
