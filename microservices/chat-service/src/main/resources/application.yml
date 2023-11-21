@@ -8,5 +8,9 @@ spring:
   application:
     name: chat-service
 
+logging:
+  level:
+    com.connectcrew.teamone: trace
+
 server:
   port: 8086
