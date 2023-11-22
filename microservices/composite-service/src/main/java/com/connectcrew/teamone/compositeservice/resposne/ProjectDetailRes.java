@@ -22,6 +22,7 @@ public record ProjectDetailRes(
         String introduction,
         Integer favorite,
         Boolean myFavorite,
+        String chatRoomId,
         List<RecruitStatusRes> recruitStatus,
         List<String> skills
 ) {
@@ -43,6 +44,7 @@ public record ProjectDetailRes(
                 detail.introduction(),
                 detail.favorite(),
                 myFavorite,
+                detail.chatRoomId(),
                 detail.recruitStatuses().stream().map(RecruitStatusRes::new).toList(),
                 detail.skills()
         );

@@ -11,6 +11,7 @@ import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
+import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
@@ -39,15 +40,17 @@ public class ProjectController {
     private final ProjectRequest projectRequest;
 
     private final FavoriteRequest favoriteRequest;
-
+    private final ChatRequest chatRequest;
     private final ProjectBasicInfo projectBasicInfo;
     private final ProfileService profileService;
     private final BannerService bannerService;
 
-    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
+
+    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ChatRequest chatRequest, ProfileService profileService, BannerService bannerService) {
         this.jwtProvider = provider;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
+        this.chatRequest = chatRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
         this.profileService = profileService;
         this.bannerService = bannerService;
@@ -144,22 +147,30 @@ public class ProjectController {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return bannerService.saveBanners(banner)
-                .collectList()
-                .flatMap(paths ->
-                        projectRequest.saveProject(getProjectInput(param, id, paths))
-                                .onErrorResume(ex -> bannerService.deleteBanners(paths).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+        Mono<List<String>> bannerMono = saveBanners(banner);
+        Mono<String> chatRoomIdMono = chatRequest.createRoom();
+
+        return Mono.zip(bannerMono, chatRoomIdMono)
+                .flatMap(tuple2 ->
+                        projectRequest.saveProject(getProjectInput(param, id, tuple2.getT2(), tuple2.getT1()))
+                                .onErrorResume(ex -> bannerService.deleteBanners(tuple2.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                 )
                 .map(LongValueRes::new);
     }
 
-    private ProjectInput getProjectInput(ProjectInputParam param, Long id, List<String> paths) {
+    private Mono<List<String>> saveBanners(Flux<FilePart> banner) {
+        return bannerService.saveBanners(banner)
+                .collectList();
+    }
+
+    private ProjectInput getProjectInput(ProjectInputParam param, Long id, String chatRoomId, List<String> paths) {
         return new ProjectInput(
                 param.title(),
                 paths,
                 param.region(),
                 param.online(),
                 param.state(),
+                chatRoomId,
                 param.careerMin(),
                 param.careerMax(),
                 id,

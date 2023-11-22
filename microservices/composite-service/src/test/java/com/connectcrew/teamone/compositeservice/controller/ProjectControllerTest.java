@@ -13,6 +13,7 @@ import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
+import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
 import com.connectcrew.teamone.compositeservice.resposne.*;
@@ -78,6 +79,9 @@ class ProjectControllerTest {
 
     @MockBean
     private ProjectRequest projectRequest;
+
+    @MockBean
+    private ChatRequest chatRequest;
 
 
     private static String BANNER_PATH;
@@ -270,6 +274,7 @@ class ProjectControllerTest {
                 ProjectState.PROCEEDING,
                 Career.SEEKER,
                 Career.YEAR_1,
+                UUID.randomUUID().toString(),
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 0L,
@@ -322,6 +327,7 @@ class ProjectControllerTest {
                                 fieldWithPath("myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트인지 여부"),
                                 fieldWithPath("category").type("String[]").description("프로젝트 분야"),
                                 fieldWithPath("goal").type("String").description("프로젝트 목표"),
+                                fieldWithPath("chatRoomId").type("String").description("프로젝트 채팅방 ID"),
                                 fieldWithPath("leader").type("Profile").description("프로젝트 리더 정보"),
                                 fieldWithPath("leader.id").type("Number").description("프로젝트 리더 ID"),
                                 fieldWithPath("leader.nickname").type("String").description("프로젝트 리더 이름"),
@@ -449,6 +455,7 @@ class ProjectControllerTest {
     void createProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(chatRequest.createRoom()).thenReturn(Mono.just(UUID.randomUUID().toString()));
         when(projectRequest.saveProject(any(ProjectInput.class))).thenReturn(Mono.just(0L));
 
         ProjectInputParam param = new ProjectInputParam(
@@ -507,6 +514,7 @@ class ProjectControllerTest {
     void createFailureTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getId(anyString())).thenReturn(0L);
+        when(chatRequest.createRoom()).thenReturn(Mono.just(UUID.randomUUID().toString()));
         when(projectRequest.saveProject(any(ProjectInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
 
         ProjectInputParam param = new ProjectInputParam(
