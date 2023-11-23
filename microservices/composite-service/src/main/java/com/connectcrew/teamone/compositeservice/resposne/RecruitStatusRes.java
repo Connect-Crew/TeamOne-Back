@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.project.RecruitStatus;
 public record RecruitStatusRes(
         String category,
         String part,
+        String partKey,
         String comment,
         Integer current,
         Integer max
@@ -13,6 +14,7 @@ public record RecruitStatusRes(
         this(
                 recruitStatus.part().getCategory().getDescription(),
                 recruitStatus.part().getDescription(),
+                recruitStatus.part().name(),
                 recruitStatus.comment(),
                 recruitStatus.current(),
                 recruitStatus.max()
