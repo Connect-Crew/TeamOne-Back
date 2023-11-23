@@ -251,6 +251,7 @@ class ProjectControllerTest {
                                 fieldWithPath("[].recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
                                 fieldWithPath("[].recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
                                 fieldWithPath("[].recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
+                                fieldWithPath("[].recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
                                 fieldWithPath("[].recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("[].recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
                                 fieldWithPath("[].recruitStatus[].max").type("Number").description("프로젝트 최대 인원")
@@ -336,6 +337,7 @@ class ProjectControllerTest {
                                 fieldWithPath("recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
                                 fieldWithPath("recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
                                 fieldWithPath("recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
+                                fieldWithPath("recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
                                 fieldWithPath("recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
                                 fieldWithPath("recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
