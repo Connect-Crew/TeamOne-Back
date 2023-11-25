@@ -11,7 +11,6 @@ import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
-import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
@@ -27,10 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -40,17 +36,15 @@ public class ProjectController {
     private final ProjectRequest projectRequest;
 
     private final FavoriteRequest favoriteRequest;
-    private final ChatRequest chatRequest;
     private final ProjectBasicInfo projectBasicInfo;
     private final ProfileService profileService;
     private final BannerService bannerService;
 
 
-    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ChatRequest chatRequest, ProfileService profileService, BannerService bannerService) {
+    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
         this.jwtProvider = provider;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
-        this.chatRequest = chatRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
         this.profileService = profileService;
         this.bannerService = bannerService;
@@ -147,13 +141,10 @@ public class ProjectController {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        Mono<List<String>> bannerMono = saveBanners(banner);
-        Mono<String> chatRoomIdMono = chatRequest.createRoom();
-
-        return Mono.zip(bannerMono, chatRoomIdMono)
-                .flatMap(tuple2 ->
-                        projectRequest.saveProject(getProjectInput(param, id, tuple2.getT2(), tuple2.getT1()))
-                                .onErrorResume(ex -> bannerService.deleteBanners(tuple2.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+        return saveBanners(banner)
+                .flatMap(bannerPaths ->
+                        projectRequest.saveProject(getProjectInput(param, id, UUID.randomUUID().toString(), bannerPaths))
+                                .onErrorResume(ex -> bannerService.deleteBanners(bannerPaths).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                 )
                 .map(LongValueRes::new);
     }

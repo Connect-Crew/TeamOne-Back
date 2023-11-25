@@ -1,50 +1,27 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatRoom;
+import com.connectcrew.teamone.chatservice.model.ChatMessage;
+import com.connectcrew.teamone.chatservice.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class ChatService {
 
     private final ObjectMapper objectMapper;
-    private Map<String, ChatRoom> chatRooms;
+    private final Map<String, User> chatRooms;
 
-    @PostConstruct
-    private void init() {
-        chatRooms = new LinkedHashMap<>();
+    public ChatService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        this.chatRooms = new HashMap<>();
     }
 
-    public List<ChatRoom> findAllRoom() {
-        return new ArrayList<>(chatRooms.values());
-    }
+    public void broadcastMessage(ChatMessage message) {
 
-    public ChatRoom findRoomById(String roomId) {
-        return chatRooms.get(roomId);
-    }
-
-    public ChatRoom createRoom() {
-        String randomId = UUID.randomUUID().toString();
-        ChatRoom chatRoom = new ChatRoom(randomId);
-        chatRooms.put(randomId, chatRoom);
-        return chatRoom;
-    }
-
-    public <T> void sendMessage(WebSocketSession session, T message) {
-        try {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
     }
 }
