@@ -8,6 +8,10 @@ spring:
   application:
     name: chat-service
 
+  redis:
+      host: Redis Host
+      port: Redis Port
+
 logging:
   level:
     com.connectcrew.teamone: trace
