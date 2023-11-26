@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatMessage;
+import com.connectcrew.teamone.chatservice.model.ChatMessageInput;
+import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
 import com.connectcrew.teamone.chatservice.model.MessageType;
 import com.connectcrew.teamone.chatservice.model.User;
 import com.connectcrew.teamone.chatservice.request.ProjectRequest;
@@ -34,11 +35,11 @@ public class WebSockChatHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         log.trace("chat payload: {}", payload);
 
-        ChatMessage chatMessage = objectMapper.readValue(payload, ChatMessage.class);
+        ChatMessageInput chatMessage = objectMapper.readValue(payload, ChatMessageInput.class);
 
         String token = chatMessage.token();
         if (!jwtValidator.validateToken(token)) {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(new ChatMessage(MessageType.ERROR, "", chatMessage.roomId(), "토큰이 유효하지 않습니다."))));
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(new ChatMessageOutput(MessageType.ERROR, 0L, "", chatMessage.roomId(), "토큰이 유효하지 않습니다."))));
             return;
         }
         Long userId = jwtValidator.getId(token);
@@ -54,13 +55,15 @@ public class WebSockChatHandler extends TextWebSocketHandler {
         }
 
         if (!chatService.isJoinedChatRoom(userId, chatMessage.roomId())) {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(new ChatMessage(MessageType.ERROR, "", chatMessage.roomId(), "참여한 채팅방이 아닙니다."))));
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(new ChatMessageOutput(MessageType.ERROR, 0L, "", chatMessage.roomId(), "참여한 채팅방이 아닙니다."))));
             return;
         }
 
+        ChatMessageOutput output = new ChatMessageOutput(chatMessage.type(), userId, nickname, chatMessage.roomId(), chatMessage.message());
+
         // TODO 영속성 저장
 
-        redisMessagePublisher.publish(chatMessage);
+        redisMessagePublisher.publish(output);
 
         // TODO push notification
     }

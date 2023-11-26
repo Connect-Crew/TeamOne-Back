@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatMessage;
+import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class RedisMessageSubscriber implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            ChatMessage chatMessage = objectMapper.readValue(message.getBody(), ChatMessage.class);
+            ChatMessageOutput chatMessage = objectMapper.readValue(message.getBody(), ChatMessageOutput.class);
 
             chatService.broadcastMessage(chatMessage);
         } catch (IOException e) {

@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatMessage;
+import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
 import com.connectcrew.teamone.chatservice.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class ChatService {
         this.users = new HashMap<>();
     }
 
-    public void broadcastMessage(ChatMessage message) {
+    public void broadcastMessage(ChatMessageOutput message) {
 
     }
 

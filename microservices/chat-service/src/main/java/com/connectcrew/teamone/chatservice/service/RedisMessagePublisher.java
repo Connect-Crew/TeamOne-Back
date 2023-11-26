@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatMessage;
+import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -20,7 +20,7 @@ public class RedisMessagePublisher {
         this.channelTopic = channelTopic;
     }
 
-    public void publish(ChatMessage message) {
+    public void publish(ChatMessageOutput message) {
         redisTemplate.convertAndSend(channelTopic.getTopic(), message);
     }
 }

@@ -1,9 +1,11 @@
 package com.connectcrew.teamone.chatservice.model;
 
-public record ChatMessage(
+public record ChatMessageOutput(
         MessageType type,
-        String token,
+        Long userId,
+        String nickname,
         String roomId,
         String message
 ) {
+
 }
