@@ -12,6 +12,10 @@ spring:
       host: Redis Host
       port: Redis Port
 
+  data:
+    mongodb:
+      uri: mongodb://mongo host:27017/chat
+
 logging:
   level:
     com.connectcrew.teamone: trace

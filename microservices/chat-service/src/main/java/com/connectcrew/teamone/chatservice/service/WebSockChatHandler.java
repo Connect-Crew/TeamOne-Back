@@ -1,9 +1,7 @@
 package com.connectcrew.teamone.chatservice.service;
 
-import com.connectcrew.teamone.chatservice.model.ChatMessageInput;
-import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
-import com.connectcrew.teamone.chatservice.model.MessageType;
-import com.connectcrew.teamone.chatservice.model.User;
+import com.connectcrew.teamone.chatservice.model.*;
+import com.connectcrew.teamone.chatservice.repository.ChatRepository;
 import com.connectcrew.teamone.chatservice.request.ProjectRequest;
 import com.connectcrew.teamone.chatservice.request.UserRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +27,7 @@ public class WebSockChatHandler extends TextWebSocketHandler {
     private final UserRequest userRequest;
     private final ProjectRequest projectRequest;
     private final JwtValidator jwtValidator;
+    private final ChatRepository chatRepository;
 
     @Override
     protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) throws Exception {
@@ -61,11 +60,9 @@ public class WebSockChatHandler extends TextWebSocketHandler {
 
         ChatMessageOutput output = new ChatMessageOutput(chatMessage.type(), userId, nickname, chatMessage.roomId(), chatMessage.message());
 
-        // TODO 영속성 저장
+        chatRepository.save(ChatEntity.toEntity(output));
 
         redisMessagePublisher.publish(output);
-
-        // TODO push notification
     }
 
     @Override
