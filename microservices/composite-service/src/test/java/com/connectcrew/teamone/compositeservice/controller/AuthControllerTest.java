@@ -87,8 +87,8 @@ class AuthControllerTest {
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
         when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(userRequest.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
-        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -124,8 +124,8 @@ class AuthControllerTest {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
         when(userRequest.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
-        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -186,13 +186,13 @@ class AuthControllerTest {
     @Test
     void registerTest() {
         User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now().toString(), LocalDateTime.now().toString());
-        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),  List.of(1L, 2L));
+        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userRequest.saveUser(any(UserInputParam.class))).thenReturn(Mono.just(user));
         when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(profile));
-        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
-        when(jwtProvider.createRefreshToken(anyString(), anyLong(), any(Role.class))).thenReturn("refreshToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createRefreshToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("refreshToken");
 
         webTestClient.post()
                 .uri("/auth/register")
@@ -294,7 +294,7 @@ class AuthControllerTest {
     void refreshTest() {
         when(jwtProvider.getAccount(anyString())).thenReturn("socialId");
         when(jwtProvider.getRole(anyString())).thenReturn(Role.USER);
-        when(jwtProvider.createAccessToken(anyString(), anyLong(), any(Role.class))).thenReturn("accessToken");
+        when(jwtProvider.createAccessToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn("accessToken");
         when(jwtProvider.validateToken(anyString())).thenReturn(true);
 
         webTestClient.post()

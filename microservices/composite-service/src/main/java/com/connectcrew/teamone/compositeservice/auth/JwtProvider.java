@@ -37,18 +37,19 @@ public class JwtProvider {
     }
 
     // 토큰 생성
-    public String createAccessToken(String account, Long id, Role role) {
-        return createToken(account, id, role, accessExp);
+    public String createAccessToken(String account, Long id, String nickname, Role role) {
+        return createToken(account, id, nickname, role, accessExp);
     }
 
-    public String createRefreshToken(String account, Long id, Role role) {
-        return createToken(account, id, role, refreshExp);
+    public String createRefreshToken(String account, Long id, String nickname, Role role) {
+        return createToken(account, id, nickname, role, refreshExp);
     }
 
-    private String createToken(String account, Long id, Role role, long expiration) {
+    private String createToken(String account, Long id, String nickname, Role role, long expiration) {
         Claims claims = Jwts.claims().setSubject(account);
         claims.put("role", role);
         claims.put("id", id);
+        claims.put("nickname", nickname);
 
         Date now = new Date();
         Date exp = new Date(now.getTime() + expiration);
@@ -113,6 +114,12 @@ public class JwtProvider {
         Claims claims = parseClaims(token);
 
         return Long.parseLong(claims.get("id").toString());
+    }
+
+    public String getNickname(String token) {
+        Claims claims = parseClaims(token);
+
+        return claims.get("nickname").toString();
     }
 
     // Authorization Header를 통해 인증을 한다.
