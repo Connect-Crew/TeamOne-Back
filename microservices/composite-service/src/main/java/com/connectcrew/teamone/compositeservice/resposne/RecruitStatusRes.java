@@ -8,7 +8,8 @@ public record RecruitStatusRes(
         String partKey,
         String comment,
         Integer current,
-        Integer max
+        Integer max,
+        Boolean applied
 ) {
     public RecruitStatusRes(RecruitStatus recruitStatus) {
         this(
@@ -17,7 +18,8 @@ public record RecruitStatusRes(
                 recruitStatus.part().name(),
                 recruitStatus.comment(),
                 recruitStatus.current(),
-                recruitStatus.max()
+                recruitStatus.max(),
+                recruitStatus.applied()
         );
     }
 }

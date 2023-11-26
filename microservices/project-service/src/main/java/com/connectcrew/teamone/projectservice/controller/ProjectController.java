@@ -271,7 +271,7 @@ public class ProjectController {
     }
 
     @GetMapping("/")
-    public Mono<ProjectDetail> getProject(Long id) {
+    public Mono<ProjectDetail> getProject(Long id, Long userId) {
         log.trace("getProject - id: {}", id);
         return projectRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
@@ -280,17 +280,23 @@ public class ProjectController {
                     Mono<List<Part>> parts = partRepository.findAllByProject(id).collectList();
                     Mono<List<Skill>> skills = skillRepository.findAllByProject(id).collectList();
                     Mono<List<Category>> categories = categoryRepository.findAllByProject(id).collectList();
+                    Mono<List<Apply>> applies = applyRepository.findAllByProjectAndUser(id, userId).collectList();
 
-                    return Mono.zip(banners, parts, skills, categories)
+
+                    return Mono.zip(banners, parts, skills, categories, applies)
                             .map(tuple -> {
                                 List<String> bannerPaths = tuple.getT1().stream()
                                         .sorted(Comparator.comparingInt(Banner::getIdx))
                                         .map(Banner::getPath).toList();
 
+                                Set<Long> myApplies = tuple.getT5().stream().map(Apply::getPartId).collect(Collectors.toSet());
+
                                 List<RecruitStatus> recruits = new ArrayList<>();
                                 for (Part p : tuple.getT2()) {
                                     MemberPart part = MemberPart.valueOf(p.getPart());
-                                    recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect()));
+                                    boolean applied = myApplies.contains(p.getId());
+
+                                    recruits.add(new RecruitStatus(part, p.getComment(), p.getCollected(), p.getTargetCollect(), applied));
                                 }
 
                                 List<String> skillNames = tuple.getT3().stream().map(Skill::getName).toList();

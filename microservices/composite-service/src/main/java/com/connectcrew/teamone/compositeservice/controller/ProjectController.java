@@ -113,7 +113,7 @@ public class ProjectController {
         String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
         Long id = jwtProvider.getId(removedPrefix);
 
-        return projectRequest.getProjectDetail(projectId)
+        return projectRequest.getProjectDetail(projectId, id)
                 .flatMap(project -> profileService.getProfileRes(project.leader())
                         .map(leaderProfile -> Tuples.of(project, leaderProfile))
                 )

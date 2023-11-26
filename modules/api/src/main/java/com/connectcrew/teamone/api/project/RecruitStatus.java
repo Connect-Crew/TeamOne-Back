@@ -8,6 +8,7 @@ public record RecruitStatus(
         MemberPart part,
         String comment,
         Integer current,
-        Integer max
+        Integer max,
+        Boolean applied
 ) {
 }
