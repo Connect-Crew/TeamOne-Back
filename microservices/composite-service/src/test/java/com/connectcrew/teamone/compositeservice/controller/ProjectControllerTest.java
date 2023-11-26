@@ -104,42 +104,42 @@ class ProjectControllerTest {
                 .build();
     }
 
-    private List<RecruitStatus> initRecruits() {
+    private List<RecruitStatus> initRecruits(boolean appliedIsNull) {
         return List.of(
                 new RecruitStatus(
                         MemberPart.PL_PM_PO,
                         "프로토타입 기획자를 모집합니다.",
                         1,
                         2,
-                        null
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.UI_UX_DESIGNER,
                         "프로토타입 디자이너를 모집합니다.",
                         1,
                         2,
-                        null
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.AOS,
                         "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                         1,
                         2,
-                        null
+                        appliedIsNull ? null : true
                 ),
                 new RecruitStatus(
                         MemberPart.IOS,
                         "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
                         1,
                         2,
-                        null
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.BACKEND,
                         "Spring 백엔드 개발자를 모집합니다.",
                         1,
                         2,
-                        null
+                        appliedIsNull ? null : false
                 )
         );
     }
@@ -159,7 +159,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
-                        initRecruits()
+                        initRecruits(true)
                 ),
                 new ProjectItem(
                         1L,
@@ -174,7 +174,7 @@ class ProjectControllerTest {
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
-                        initRecruits()
+                        initRecruits(true)
                 ),
                 new ProjectItem(
                         2L,
@@ -189,7 +189,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
-                        initRecruits()
+                        initRecruits(true)
                 )
         );
     }
@@ -282,7 +282,7 @@ class ProjectControllerTest {
                 0L,
                 "프로젝트 설명",
                 14,
-                initRecruits(),
+                initRecruits(false),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
