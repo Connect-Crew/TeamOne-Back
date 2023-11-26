@@ -52,9 +52,9 @@ public class ProjectRequestImpl implements ProjectRequest {
     }
 
     @Override
-    public Mono<ProjectDetail> getProjectDetail(Long projectId) {
+    public Mono<ProjectDetail> getProjectDetail(Long projectId, Long userId) {
         return webClient.get()
-                .uri(String.format("%s/?id=%d", host, projectId))
+                .uri(String.format("%s/?id=%d&userId=%d", host, projectId, userId))
                 .retrieve()
                 .bodyToMono(ProjectDetail.class)
                 .onErrorResume(exHandler::handleException);

@@ -104,37 +104,42 @@ class ProjectControllerTest {
                 .build();
     }
 
-    private List<RecruitStatus> initRecruits() {
+    private List<RecruitStatus> initRecruits(boolean appliedIsNull) {
         return List.of(
                 new RecruitStatus(
                         MemberPart.PL_PM_PO,
                         "프로토타입 기획자를 모집합니다.",
                         1,
-                        2
+                        2,
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.UI_UX_DESIGNER,
                         "프로토타입 디자이너를 모집합니다.",
                         1,
-                        2
+                        2,
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.AOS,
                         "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
                         1,
-                        2
+                        2,
+                        appliedIsNull ? null : true
                 ),
                 new RecruitStatus(
                         MemberPart.IOS,
                         "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
                         1,
-                        2
+                        2,
+                        appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.BACKEND,
                         "Spring 백엔드 개발자를 모집합니다.",
                         1,
-                        2
+                        2,
+                        appliedIsNull ? null : false
                 )
         );
     }
@@ -154,7 +159,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
-                        initRecruits()
+                        initRecruits(true)
                 ),
                 new ProjectItem(
                         1L,
@@ -169,7 +174,7 @@ class ProjectControllerTest {
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
-                        initRecruits()
+                        initRecruits(true)
                 ),
                 new ProjectItem(
                         2L,
@@ -184,7 +189,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
-                        initRecruits()
+                        initRecruits(true)
                 )
         );
     }
@@ -254,7 +259,8 @@ class ProjectControllerTest {
                                 fieldWithPath("[].recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
                                 fieldWithPath("[].recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("[].recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
-                                fieldWithPath("[].recruitStatus[].max").type("Number").description("프로젝트 최대 인원")
+                                fieldWithPath("[].recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
+                                fieldWithPath("[].recruitStatus[].applied").type("Boolean").description("프로젝트 지원 여부 (해당 요청에서는 무조건 null입니다. 사용X)")
                         )
                 ));
     }
@@ -276,11 +282,11 @@ class ProjectControllerTest {
                 0L,
                 "프로젝트 설명",
                 14,
-                initRecruits(),
+                initRecruits(false),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
-        when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.just(project));
+        when(projectRequest.getProjectDetail(anyLong(), anyLong())).thenReturn(Mono.just(project));
         when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
                 0L,
                 "이름",
@@ -341,6 +347,7 @@ class ProjectControllerTest {
                                 fieldWithPath("recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
                                 fieldWithPath("recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
                                 fieldWithPath("recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
+                                fieldWithPath("recruitStatus[].applied").type("Boolean").description("프로젝트 지원 여부"),
                                 fieldWithPath("skills[]").type("String[]").description("프로젝트 스킬 정보")
                         )
                 ));
@@ -348,7 +355,7 @@ class ProjectControllerTest {
 
     @Test
     void notFoundTest() {
-        when(projectRequest.getProjectDetail(anyLong())).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(projectRequest.getProjectDetail(anyLong(), anyLong())).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
         when(jwtProvider.getId(anyString())).thenReturn(1L);
 
         webTestClient.get()
@@ -419,7 +426,8 @@ class ProjectControllerTest {
                 List.of(1L, 2L)
         )));
 
-        ParameterizedTypeReference<List<ProjectMemberRes>> resType = new ParameterizedTypeReference<>() {};
+        ParameterizedTypeReference<List<ProjectMemberRes>> resType = new ParameterizedTypeReference<>() {
+        };
 
         webTestClient.get()
                 .uri("/project/members/{projectId}", 0L)

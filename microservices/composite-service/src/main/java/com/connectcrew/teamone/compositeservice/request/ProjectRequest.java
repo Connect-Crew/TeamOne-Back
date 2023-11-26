@@ -9,7 +9,7 @@ import java.util.List;
 public interface ProjectRequest {
     Flux<ProjectItem> getProjectList(ProjectFilterOption option);
 
-    Mono<ProjectDetail> getProjectDetail(Long projectId);
+    Mono<ProjectDetail> getProjectDetail(Long projectId, Long userId);
 
     Mono<List<ProjectMember>> getProjectMembers(Long projectId);
 
