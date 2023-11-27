@@ -100,7 +100,7 @@ class UserControllerTest {
                         responseFields(
                                 fieldWithPath("id").type("Number").description("사용자 ID"),
                                 fieldWithPath("nickname").type("String").description("닉네임"),
-                                fieldWithPath("profile").type("String").description("프로필 이미지"),
+                                fieldWithPath("profile").type("String (Optional)").description("프로필 이미지"),
                                 fieldWithPath("introduction").type("String").description("소개글"),
                                 fieldWithPath("temperature").type("String").description("온도"),
                                 fieldWithPath("responseRate").type("Number").description("응답률"),
