@@ -35,7 +35,7 @@ public record ProjectItemRes(
                 item.state().getDescription(),
                 item.favorite(),
                 myFavorite,
-                item.category().stream().map(ProjectCategory::name).toList(),
+                item.category().stream().map(ProjectCategory::getDescription).toList(),
                 item.goal().getDescription(),
                 item.recruitStatus().stream().map(RecruitStatusRes::new).toList()
         );
