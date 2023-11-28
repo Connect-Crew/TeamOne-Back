@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.projectservice.controller;
 
+import com.connectcrew.teamone.api.chat.ChatInfo;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
@@ -328,6 +329,16 @@ public class ProjectController {
                                 return Mono.error(new RuntimeException(ProjectExceptionMessage.LOAD_PROJECT_FAILED.toString()));
                             });
                 });
+    }
+
+    @GetMapping("/chat")
+    public Mono<Set<ChatInfo>> getChatRooms(Long userId) {
+        log.trace("getChatRooms - userId: {}", userId);
+        return customRepository.findAllProjectIdAndChatIdByUserId(userId)
+                .flatMap(tuple2 -> customRepository.findAllMemberIdByUserId(tuple2.getT1())
+                        .collect(Collectors.toSet())
+                        .map(members -> new ChatInfo(tuple2.getT2(), members)))
+                        .collect(Collectors.toSet());
     }
 
     @GetMapping("/members")

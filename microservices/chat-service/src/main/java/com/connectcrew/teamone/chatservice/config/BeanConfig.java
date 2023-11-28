@@ -6,8 +6,10 @@ import com.connectcrew.teamone.chatservice.request.UserRequest;
 import com.connectcrew.teamone.chatservice.request.UserRequestImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class BeanConfig {
@@ -20,12 +22,17 @@ public class BeanConfig {
     }
 
     @Bean
-    public UserRequest userRequest() {
-        return new UserRequestImpl();
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
     @Bean
-    public ProjectRequest projectRequest() {
-        return new ProjectRequestImpl();
+    public UserRequest userRequest(@Value("${app.user}") String host, RestTemplate restTemplate) {
+        return new UserRequestImpl(host, restTemplate);
+    }
+
+    @Bean
+    public ProjectRequest projectRequest(@Value("${app.project}") String host, RestTemplate restTemplate) {
+        return new ProjectRequestImpl(host, restTemplate);
     }
 }

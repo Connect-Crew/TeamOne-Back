@@ -45,11 +45,11 @@ public class WebSockChatHandler extends TextWebSocketHandler {
         String nickname = jwtValidator.getNickname(token);
 
         if (!chatService.existsUser(userId)) {
-            Set<String> chatRooms = new HashSet<>();
+            Set<ChatRoom> chatRooms = new HashSet<>();
             chatRooms.addAll(userRequest.getChatRooms(userId));
             chatRooms.addAll(projectRequest.getChatRooms(userId));
 
-            User user = new User(userId, nickname, chatRooms, session);
+            User user = new User(userId, nickname, chatMessage.roomId(), chatRooms, session);
             chatService.addUser(user);
         }
 

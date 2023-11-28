@@ -22,3 +22,7 @@ logging:
 
 server:
   port: 8086
+
+app:
+  user: http://localhost:8085
+  project: http://localhost:8084

@@ -1,2 +1,6 @@
 server:
   port: 8080
+
+app:
+  user: http://user:8080
+  project: http://project:8080

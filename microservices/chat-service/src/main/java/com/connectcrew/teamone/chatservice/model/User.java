@@ -7,7 +7,8 @@ import java.util.Set;
 public record User(
         Long id,
         String username,
-        Set<String> chatRooms,
+        String currentChatRoomId,
+        Set<ChatRoom> chatRooms,
         WebSocketSession session
 ) {
 

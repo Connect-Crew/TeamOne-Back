@@ -36,7 +36,7 @@ public class ChatService {
 
     public boolean isJoinedChatRoom(Long userId, String chatRoomId) {
         User user = users.get(userId);
-        return user.chatRooms().contains(chatRoomId);
+        return user.chatRooms().stream().anyMatch(c -> c.id().equals(chatRoomId));
     }
 
     public void removeUser(WebSocketSession session) {
