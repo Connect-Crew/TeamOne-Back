@@ -73,3 +73,12 @@ services:
 
     volumes:
       - ${ROOT_PATH}/Redis:/data
+
+  chat-mongo:
+    container_name: teamone-chat-mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - ${ROOT_PATH}/Mongo:/data/db

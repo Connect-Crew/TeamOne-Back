@@ -19,7 +19,7 @@ public class ChatService {
     }
 
     public void broadcastMessage(ChatMessageOutput message) {
-        String chatRoomId = message.roomId();
+        String chatRoomId = message.getRoomId();
 
         users.values().stream()
                 .filter(u -> u.isJoinedChatRoom(chatRoomId))

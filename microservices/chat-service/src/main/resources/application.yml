@@ -26,3 +26,6 @@ server:
 app:
   user: http://localhost:8085
   project: http://localhost:8084
+
+jwt:
+  secret: b82e3ae4-539d-43c4-b695-f5a7f0bddb30 # 임의의 Secret Key

@@ -5,8 +5,6 @@ import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-
 @Builder
 @Document(collection = "chat")
 public class ChatEntity {
@@ -23,16 +21,16 @@ public class ChatEntity {
 
     private String message;
 
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     public static ChatEntity toEntity(ChatMessageOutput message) {
         return ChatEntity.builder()
-                .type(message.type().name())
-                .userId(message.userId())
-                .nickname(message.nickname())
-                .roomId(message.roomId())
-                .message(message.message())
-                .timestamp(message.timestamp())
+                .type(message.getType().name())
+                .userId(message.getUserId())
+                .nickname(message.getNickname())
+                .roomId(message.getRoomId())
+                .message(message.getMessage())
+                .timestamp(message.getTimestamp())
                 .build();
     }
 }

@@ -58,7 +58,7 @@ public class WebSockChatHandler extends TextWebSocketHandler {
             return;
         }
 
-        ChatMessageOutput output = new ChatMessageOutput(chatMessage.type(), userId, nickname, chatMessage.roomId(), chatMessage.message());
+        ChatMessageOutput output = new ChatMessageOutput(MessageType.TALK, userId, nickname, chatMessage.roomId(), chatMessage.message());
 
         chatRepository.save(ChatEntity.toEntity(output));
 
