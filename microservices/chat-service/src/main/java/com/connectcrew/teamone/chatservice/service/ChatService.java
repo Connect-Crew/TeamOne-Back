@@ -2,7 +2,6 @@ package com.connectcrew.teamone.chatservice.service;
 
 import com.connectcrew.teamone.chatservice.model.ChatMessageOutput;
 import com.connectcrew.teamone.chatservice.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
@@ -13,17 +12,18 @@ import java.util.Map;
 @Slf4j
 @Service
 public class ChatService {
-
-    private final ObjectMapper objectMapper;
     private final Map<Long, User> users;
 
-    public ChatService(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public ChatService() {
         this.users = new HashMap<>();
     }
 
     public void broadcastMessage(ChatMessageOutput message) {
+        String chatRoomId = message.roomId();
 
+        users.values().stream()
+                .filter(u -> u.isJoinedChatRoom(chatRoomId))
+                .forEach(u -> u.sendMessage(message));
     }
 
     public void addUser(User user) {
@@ -36,7 +36,7 @@ public class ChatService {
 
     public boolean isJoinedChatRoom(Long userId, String chatRoomId) {
         User user = users.get(userId);
-        return user.chatRooms().stream().anyMatch(c -> c.id().equals(chatRoomId));
+        return user.isJoinedChatRoom(chatRoomId);
     }
 
     public void removeUser(WebSocketSession session) {

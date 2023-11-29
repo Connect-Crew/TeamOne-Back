@@ -27,12 +27,16 @@ public class JwtValidator {
     // 토큰 검증
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = getClaimsJws(token);
+            Jws<Claims> claims = getClaimsJws(removeBearerPrefix(token));
             // 만료되었을 시 false
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private String removeBearerPrefix(String token) {
+        return token.replace(BEARER_PREFIX, "");
     }
 
     public Jws<Claims> getClaimsJws(String token) {
