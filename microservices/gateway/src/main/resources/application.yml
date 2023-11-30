@@ -1,0 +1,23 @@
+logging:
+  level:
+    root: INFO
+
+server:
+  port: 9080
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: ws_route
+          uri: ws://localhost:8086
+          predicates:
+            - Path=/ws/**
+
+        - id: composite
+          uri: http://localhost:9081
+          predicates:
+            - Path=/**
