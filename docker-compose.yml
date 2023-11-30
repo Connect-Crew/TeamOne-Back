@@ -1,6 +1,17 @@
 version: "3.7"
 
 services:
+  gateway:
+      container_name: teamone-gateway
+      build: microservices/gateway-service
+
+      environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+
+      ports:
+      - "9080:8080"
+
   composite:
     container_name: teamone-composite
     build: microservices/composite-service
@@ -13,11 +24,20 @@ services:
       - ${ROOT_PATH}/banner:/resources/banner
 
     ports:
-      - "9080:8080"
+      - "9081:8080"
 
   user:
     container_name: teamone-user
     build: microservices/user-service
+
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+      - DB_PW=${DB_PASSWORD}
+
+  chat:
+    container_name: teamone-chat
+    build: microservices/chat-service
 
     environment:
       - SPRING_PROFILES_ACTIVE=docker

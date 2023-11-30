@@ -22,3 +22,6 @@ logging:
 
 resource:
   banner: /path/to/banner
+
+server:
+  port: 9081
