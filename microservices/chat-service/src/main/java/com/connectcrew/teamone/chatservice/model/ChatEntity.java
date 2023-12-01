@@ -33,4 +33,15 @@ public class ChatEntity {
                 .timestamp(message.getTimestamp())
                 .build();
     }
+
+    public ChatMessageOutput toOutput() {
+        return ChatMessageOutput.builder()
+                .type(MessageType.valueOf(type))
+                .userId(userId)
+                .nickname(nickname)
+                .roomId(roomId)
+                .message(message)
+                .timestamp(timestamp)
+                .build();
+    }
 }
