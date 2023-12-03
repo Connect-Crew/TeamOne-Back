@@ -2,6 +2,8 @@ package com.connectcrew.teamone.chatservice.global.config;
 
 import com.connectcrew.teamone.chatservice.chat.adapter.in.web.response.ChatResponse;
 import com.connectcrew.teamone.chatservice.chat.adapter.in.event.RedisMessageSubscriber;
+import com.connectcrew.teamone.chatservice.global.constants.RedisTopic;
+import com.connectcrew.teamone.chatservice.user.adapter.in.event.UserSessionUpdateEventListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,17 +33,14 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic channelTopic() {
-        return new ChannelTopic("chatting");
-    }
-
-    @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
                                                                        RedisMessageSubscriber redisMessageSubscriber,
-                                                                       ChannelTopic channelTopic) {
+                                                                       UserSessionUpdateEventListener userSessionUpdateEventListener
+    ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(redisMessageSubscriber, channelTopic);
+        container.addMessageListener(redisMessageSubscriber, new ChannelTopic(RedisTopic.CHAT.getTopic()));
+        container.addMessageListener(userSessionUpdateEventListener, new ChannelTopic(RedisTopic.CHAT_ROOM_CREATED.getTopic()));
         return container;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,13 +51,43 @@ public class UserAplService implements UpdateUserUseCase, QueryUserUseCase, Dele
     }
 
     @Override
-    public void updateAll(List<User> users) {
+    public void addUsersChatRoomJoin(List<User> users) {
         users = saveUserOutput.saveAll(users);
 
         for (User user : users) {
             if (!userSessions.containsKey(user.id())) continue;
             userSessions.put(user.id(), new UserSession(user, userSessions.get(user.id()).session()));
         }
+    }
+
+    @Override
+    public void addUsersChatRoomJoin(UUID id, Set<Long> userIds) {
+        List<User> users = getUsersIfNotExistCreateUser(userIds);
+        users.forEach(user -> user.addChatRoom(id));
+        saveUserOutput.saveAll(users);
+    }
+
+    @Override
+    public void addUsersChatRoomJoinOnSession(UUID id, Set<Long> users) {
+        for(Long userId : users) {
+            if (!userSessions.containsKey(userId)) continue;
+            userSessions.get(userId).user().addChatRoom(id);
+        }
+    }
+
+    /**
+     * 주어진 ID의 User들을 불러오는 함수.
+     * 이때, User가 DB에 존재하지 않으면 새로 생성한다.
+     */
+    private List<User> getUsersIfNotExistCreateUser(Set<Long> userIds) {
+        List<User> users = findUserOutput.findAllByIds(userIds);
+        HashSet<Long> userIdsSet = users.stream().map(User::id).collect(Collectors.toCollection(HashSet::new));
+        for (Long userId : userIds) {
+            if (userIdsSet.contains(userId)) continue;
+
+            users.add(new User(userId, new HashSet<>()));
+        }
+        return users;
     }
 
     @Override
