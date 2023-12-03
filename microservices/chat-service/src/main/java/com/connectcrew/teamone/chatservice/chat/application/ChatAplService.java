@@ -4,12 +4,11 @@ import com.connectcrew.teamone.chatservice.chat.application.port.in.CreateChatUs
 import com.connectcrew.teamone.chatservice.chat.application.port.in.QueryChatUseCase;
 import com.connectcrew.teamone.chatservice.chat.application.port.in.SendChatUseCase;
 import com.connectcrew.teamone.chatservice.chat.application.port.in.query.SearchChatPageQuery;
-import com.connectcrew.teamone.chatservice.chat.application.port.out.FindChatOutput;
-import com.connectcrew.teamone.chatservice.chat.application.port.out.PublishChatOutput;
-import com.connectcrew.teamone.chatservice.chat.application.port.out.SaveChatOutput;
-import com.connectcrew.teamone.chatservice.chat.application.port.out.SendChatOutput;
+import com.connectcrew.teamone.chatservice.chat.application.port.out.*;
 import com.connectcrew.teamone.chatservice.chat.domain.Chat;
 import com.connectcrew.teamone.chatservice.chat.domain.enums.MessageType;
+import com.connectcrew.teamone.chatservice.chatroom.application.port.in.QueryChatRoomUseCase;
+import com.connectcrew.teamone.chatservice.chatroom.domain.ChatRoom;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.ChatRoomExceptionMessage;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
 import com.connectcrew.teamone.chatservice.chatroom.domain.exception.NotRegisteredChatRoomException;
@@ -36,6 +35,8 @@ public class ChatAplService implements QueryChatUseCase, CreateChatUseCase, Send
     private final SaveChatOutput saveChatOutput;
     private final PublishChatOutput publishChatOutput;
     private final SendChatOutput sendChatOutput;
+    private final QueryChatRoomUseCase queryChatRoomUseCase;
+    private final FcmOutput fcmOutput;
 
     @Override
     public List<Chat> searchChatPage(SearchChatPageQuery query) {
@@ -58,6 +59,10 @@ public class ChatAplService implements QueryChatUseCase, CreateChatUseCase, Send
         chat = saveChatOutput.save(chat);
 
         publishChatOutput.publish(chat);
+
+        ChatRoom room = queryChatRoomUseCase.findByRoomId(roomId);
+
+        fcmOutput.publish(chat, room.members());
     }
 
     @Override
