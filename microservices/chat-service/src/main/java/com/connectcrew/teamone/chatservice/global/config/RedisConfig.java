@@ -1,8 +1,10 @@
 package com.connectcrew.teamone.chatservice.global.config;
 
+import com.connectcrew.teamone.chatservice.chat.adapter.in.event.MemberModifiedEventChatListener;
+import com.connectcrew.teamone.chatservice.chat.adapter.in.event.ChatMessageListener;
 import com.connectcrew.teamone.chatservice.chat.adapter.in.web.response.ChatResponse;
-import com.connectcrew.teamone.chatservice.chat.adapter.in.event.RedisMessageSubscriber;
 import com.connectcrew.teamone.chatservice.global.constants.RedisTopic;
+import com.connectcrew.teamone.chatservice.user.adapter.in.event.ChatRoomMemberModifiedEventListener;
 import com.connectcrew.teamone.chatservice.user.adapter.in.event.UserSessionUpdateEventListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,13 +36,17 @@ public class RedisConfig {
 
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
-                                                                       RedisMessageSubscriber redisMessageSubscriber,
-                                                                       UserSessionUpdateEventListener userSessionUpdateEventListener
+                                                                       ChatMessageListener chatMessageListener,
+                                                                       UserSessionUpdateEventListener userSessionUpdateEventListener,
+                                                                       ChatRoomMemberModifiedEventListener chatRoomMemberModifiedEventListener,
+                                                                       MemberModifiedEventChatListener memberModifiedEventChatListener
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(redisMessageSubscriber, new ChannelTopic(RedisTopic.CHAT.getTopic()));
+        container.addMessageListener(chatMessageListener, new ChannelTopic(RedisTopic.CHAT.getTopic()));
         container.addMessageListener(userSessionUpdateEventListener, new ChannelTopic(RedisTopic.CHAT_ROOM_CREATED.getTopic()));
+        container.addMessageListener(chatRoomMemberModifiedEventListener, new ChannelTopic(RedisTopic.MEMBER_MODIFIED.getTopic()));
+        container.addMessageListener(memberModifiedEventChatListener, new ChannelTopic(RedisTopic.MEMBER_MODIFIED.getTopic()));
         return container;
     }
 }

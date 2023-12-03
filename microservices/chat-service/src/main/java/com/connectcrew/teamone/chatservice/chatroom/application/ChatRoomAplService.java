@@ -3,13 +3,11 @@ package com.connectcrew.teamone.chatservice.chatroom.application;
 import com.connectcrew.teamone.chatservice.chatroom.application.port.in.CreateChatRoomUseCase;
 import com.connectcrew.teamone.chatservice.chatroom.application.port.in.QueryChatRoomUseCase;
 import com.connectcrew.teamone.chatservice.chatroom.application.port.in.UpdateChatRoomUseCase;
-import com.connectcrew.teamone.chatservice.chatroom.application.port.out.CreateChatRoomEventOutput;
-import com.connectcrew.teamone.chatservice.chatroom.application.port.out.DeleteChatRoomOutput;
-import com.connectcrew.teamone.chatservice.chatroom.application.port.out.FindChatRoomOutput;
-import com.connectcrew.teamone.chatservice.chatroom.application.port.out.SaveChatRoomOutput;
+import com.connectcrew.teamone.chatservice.chatroom.application.port.out.*;
 import com.connectcrew.teamone.chatservice.chatroom.domain.ChatRoom;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.ChatRoomExceptionMessage;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.ChatRoomType;
+import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
 import com.connectcrew.teamone.chatservice.chatroom.domain.exception.NotFoundChatRoomException;
 import com.connectcrew.teamone.chatservice.chatroom.domain.factory.ChatRoomFactory;
 import com.connectcrew.teamone.chatservice.user.application.port.in.UpdateUserUseCase;
@@ -42,6 +40,7 @@ public class ChatRoomAplService implements CreateChatRoomUseCase, QueryChatRoomU
     private final UpdateUserUseCase updateUserUseCase;
 
     private final CreateChatRoomEventOutput createChatRoomEventOutput;
+    private final ModifiedMemberChatRoomEventOutput modifiedMemberChatRoomEventOutput;
 
     @Override
     @Transactional
@@ -70,22 +69,17 @@ public class ChatRoomAplService implements CreateChatRoomUseCase, QueryChatRoomU
     @Transactional
     public ChatRoom addMember(UUID roomId, Long userId) {
         ChatRoom chatRoom = findChatRoomOutput.findById(roomId).orElseThrow(() -> new NotFoundChatRoomException(ChatRoomExceptionMessage.CHAT_ROOM_NOT_FOUND.getMessage()));
-        User user = findUserOutput.findById(userId).orElse(new User(userId, new HashSet<>())); // TODO : usecase로 수정하기
-
         chatRoom.addMember(userId);
+
+        User user = findUserOutput.findById(userId).orElse(new User(userId, new HashSet<>()));
         user.addChatRoom(roomId);
 
         chatRoom = saveChatRoomOutput.saveChatRoom(chatRoom);
-        saveUserOutput.save(user); // TODO : usecase로 수정하기
+        saveUserOutput.save(user);
 
-        // TODO : Send Enter Message
+        modifiedMemberChatRoomEventOutput.publishModifiedMember(roomId, MemberModifiedType.JOIN, userId);
 
         return chatRoom;
-    }
-
-    @Override
-    public void updateUserSessionJoinInfo(UUID roomId, Set<Long> userIds) {
-        updateUserUseCase.addUsersChatRoomJoinOnSession(roomId, userIds);
     }
 
     @Override
@@ -98,9 +92,9 @@ public class ChatRoomAplService implements CreateChatRoomUseCase, QueryChatRoomU
         user.removeChatRoom(roomId);
 
         chatRoom = saveChatRoomOutput.saveChatRoom(chatRoom);
-        saveUserOutput.save(user); // TODO : usecase로 수정하기
+        saveUserOutput.save(user);
 
-        // TODO : Send Exit Message
+        modifiedMemberChatRoomEventOutput.publishModifiedMember(roomId, MemberModifiedType.LEAVE, userId);
 
         return chatRoom;
     }

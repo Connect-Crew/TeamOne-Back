@@ -13,6 +13,6 @@ public class ChatPublishAdapter implements CreateChatRoomEventOutput {
     private final ChatRoomCreatedEventPublisher chatRoomCreatedEventPublisher;
     @Override
     public void publish(ChatRoom chatRoom) {
-        chatRoomCreatedEventPublisher.publish(chatRoom);
+        chatRoomCreatedEventPublisher.publishChatRoomCreated(chatRoom);
     }
 }

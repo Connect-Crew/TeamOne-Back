@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.chatservice.user.application;
 
+import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
 import com.connectcrew.teamone.chatservice.user.application.port.in.DeleteUserUseCase;
 import com.connectcrew.teamone.chatservice.user.application.port.in.QueryUserUseCase;
 import com.connectcrew.teamone.chatservice.user.application.port.in.UpdateUserUseCase;
@@ -43,6 +44,13 @@ public class UserAplService implements UpdateUserUseCase, QueryUserUseCase, Dele
     }
 
     @Override
+    public List<UserSession> findAllUserSessionByRoomId(UUID roomId) {
+        return userSessions.values().stream()
+                .filter(u -> u.isJoined(roomId))
+                .toList();
+    }
+
+    @Override
     public void updateUser(User user) {
         user = saveUserOutput.save(user);
 
@@ -73,6 +81,14 @@ public class UserAplService implements UpdateUserUseCase, QueryUserUseCase, Dele
             if (!userSessions.containsKey(userId)) continue;
             userSessions.get(userId).user().addChatRoom(id);
         }
+    }
+
+    @Override
+    public void updateUserMemberOnSession(UUID roomId, MemberModifiedType type, Long userId) {
+        if (!userSessions.containsKey(userId)) return;
+        User user = userSessions.get(userId).user();
+        if (type == MemberModifiedType.JOIN) user.addChatRoom(roomId);
+        else user.removeChatRoom(roomId);
     }
 
     /**

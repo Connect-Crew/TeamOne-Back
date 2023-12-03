@@ -3,5 +3,5 @@ package com.connectcrew.teamone.chatservice.chatroom.adapter.out.event.publisher
 import com.connectcrew.teamone.chatservice.chatroom.domain.ChatRoom;
 
 public interface ChatRoomCreatedEventPublisher {
-    void publish(ChatRoom chatRoom);
+    void publishChatRoomCreated(ChatRoom chatRoom);
 }

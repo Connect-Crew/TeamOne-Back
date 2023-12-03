@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RedisTopic {
     CHAT_ROOM_CREATED("chat-room-created"),
+    MEMBER_MODIFIED("member-modified"),
     CHAT("chat")
 
 

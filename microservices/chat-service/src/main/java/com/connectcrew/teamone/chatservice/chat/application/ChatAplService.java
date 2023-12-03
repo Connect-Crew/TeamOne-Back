@@ -2,13 +2,16 @@ package com.connectcrew.teamone.chatservice.chat.application;
 
 import com.connectcrew.teamone.chatservice.chat.application.port.in.CreateChatUseCase;
 import com.connectcrew.teamone.chatservice.chat.application.port.in.QueryChatUseCase;
+import com.connectcrew.teamone.chatservice.chat.application.port.in.SendChatUseCase;
 import com.connectcrew.teamone.chatservice.chat.application.port.in.query.SearchChatPageQuery;
 import com.connectcrew.teamone.chatservice.chat.application.port.out.FindChatOutput;
 import com.connectcrew.teamone.chatservice.chat.application.port.out.PublishChatOutput;
 import com.connectcrew.teamone.chatservice.chat.application.port.out.SaveChatOutput;
+import com.connectcrew.teamone.chatservice.chat.application.port.out.SendChatOutput;
 import com.connectcrew.teamone.chatservice.chat.domain.Chat;
 import com.connectcrew.teamone.chatservice.chat.domain.enums.MessageType;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.ChatRoomExceptionMessage;
+import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
 import com.connectcrew.teamone.chatservice.chatroom.domain.exception.NotRegisteredChatRoomException;
 import com.connectcrew.teamone.chatservice.user.application.port.in.QueryUserUseCase;
 import com.connectcrew.teamone.chatservice.user.application.port.in.UpdateUserUseCase;
@@ -25,13 +28,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChatAplService implements QueryChatUseCase, CreateChatUseCase {
+public class ChatAplService implements QueryChatUseCase, CreateChatUseCase, SendChatUseCase {
 
     private final FindChatOutput findChatOutput;
     private final UpdateUserUseCase updateUserUseCase;
     private final QueryUserUseCase findUserUseCase;
     private final SaveChatOutput saveChatOutput;
     private final PublishChatOutput publishChatOutput;
+    private final SendChatOutput sendChatOutput;
 
     @Override
     public List<Chat> searchChatPage(SearchChatPageQuery query) {
@@ -54,5 +58,25 @@ public class ChatAplService implements QueryChatUseCase, CreateChatUseCase {
         chat = saveChatOutput.save(chat);
 
         publishChatOutput.publish(chat);
+    }
+
+    @Override
+    public void createNotifyMemberModified(UUID roomId, MemberModifiedType type, Long userId) {
+        Chat chat = switch (type) {
+            case JOIN -> new Chat(MessageType.ENTER, userId, roomId, null, LocalDateTime.now());
+            case LEAVE -> new Chat(MessageType.LEAVE, userId, roomId, null, LocalDateTime.now());
+        };
+
+        chat = saveChatOutput.save(chat);
+
+        publishChatOutput.publish(chat);
+    }
+
+    @Override
+    public void sendChat(Chat chat) {
+        UUID roomId = chat.roomId();
+        List<UserSession> sessions = findUserUseCase.findAllUserSessionByRoomId(roomId);
+
+        sessions.forEach(s -> sendChatOutput.sendChat(chat, s));
     }
 }

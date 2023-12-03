@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.chatservice.user.application.port.in;
 
+import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
 import com.connectcrew.teamone.chatservice.user.domain.User;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -20,4 +21,7 @@ public interface UpdateUserUseCase {
     void addUsersChatRoomJoin(UUID id, Set<Long> users);
 
     void addUsersChatRoomJoinOnSession(UUID id, Set<Long> users);
+
+    void updateUserMemberOnSession(UUID roomId, MemberModifiedType type, Long userId);
+
 }
