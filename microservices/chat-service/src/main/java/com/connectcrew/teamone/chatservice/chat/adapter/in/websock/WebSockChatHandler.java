@@ -7,6 +7,7 @@ import com.connectcrew.teamone.chatservice.chat.domain.enums.ChatExceptionMessag
 import com.connectcrew.teamone.chatservice.chat.domain.enums.MessageType;
 import com.connectcrew.teamone.chatservice.chat.domain.exception.UnauthorizedException;
 import com.connectcrew.teamone.chatservice.chat.application.JwtValidator;
+import com.connectcrew.teamone.chatservice.user.application.port.in.DeleteUserUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 public class WebSockChatHandler extends TextWebSocketHandler {
 
     private final CreateChatUseCase createChatUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
     private final ObjectMapper objectMapper;
     private final JwtValidator jwtValidator;
 
@@ -76,6 +78,6 @@ public class WebSockChatHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-// TODO       chatService.removeUser(session);
+        deleteUserUseCase.deleteUserSession(session);
     }
 }
