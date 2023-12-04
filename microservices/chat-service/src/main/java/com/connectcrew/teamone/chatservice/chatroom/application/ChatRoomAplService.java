@@ -66,6 +66,11 @@ public class ChatRoomAplService implements CreateChatRoomUseCase, QueryChatRoomU
     }
 
     @Override
+    public Optional<ChatRoom> findByRoomId(UUID roomId) {
+        return findChatRoomOutput.findById(roomId);
+    }
+
+    @Override
     @Transactional
     public ChatRoom addMember(UUID roomId, Long userId) {
         ChatRoom chatRoom = findChatRoomOutput.findById(roomId).orElseThrow(() -> new NotFoundChatRoomException(ChatRoomExceptionMessage.CHAT_ROOM_NOT_FOUND.getMessage()));

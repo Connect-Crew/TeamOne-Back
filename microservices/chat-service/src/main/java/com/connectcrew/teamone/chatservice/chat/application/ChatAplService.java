@@ -11,6 +11,7 @@ import com.connectcrew.teamone.chatservice.chatroom.application.port.in.QueryCha
 import com.connectcrew.teamone.chatservice.chatroom.domain.ChatRoom;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.ChatRoomExceptionMessage;
 import com.connectcrew.teamone.chatservice.chatroom.domain.enums.MemberModifiedType;
+import com.connectcrew.teamone.chatservice.chatroom.domain.exception.NotFoundChatRoomException;
 import com.connectcrew.teamone.chatservice.chatroom.domain.exception.NotRegisteredChatRoomException;
 import com.connectcrew.teamone.chatservice.user.application.port.in.QueryUserUseCase;
 import com.connectcrew.teamone.chatservice.user.application.port.in.UpdateUserUseCase;
@@ -23,6 +24,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -60,9 +62,10 @@ public class ChatAplService implements QueryChatUseCase, CreateChatUseCase, Send
 
         publishChatOutput.publish(chat);
 
-        ChatRoom room = queryChatRoomUseCase.findByRoomId(roomId);
+        Optional<ChatRoom> room = queryChatRoomUseCase.findByRoomId(roomId);
+        if (room.isEmpty()) throw new NotFoundChatRoomException(ChatRoomExceptionMessage.CHAT_ROOM_NOT_FOUND.getMessage());
 
-        fcmOutput.publish(chat, room.members());
+        fcmOutput.publish(chat, room.get().members());
     }
 
     @Override
