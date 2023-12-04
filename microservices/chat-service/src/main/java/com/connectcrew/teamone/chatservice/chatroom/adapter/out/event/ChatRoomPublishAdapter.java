@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ChatPublishAdapter implements CreateChatRoomEventOutput {
+public class ChatRoomPublishAdapter implements CreateChatRoomEventOutput {
 
     private final ChatRoomCreatedEventPublisher chatRoomCreatedEventPublisher;
     @Override
