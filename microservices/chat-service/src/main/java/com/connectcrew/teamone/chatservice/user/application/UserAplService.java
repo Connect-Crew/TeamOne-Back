@@ -59,16 +59,6 @@ public class UserAplService implements UpdateUserUseCase, QueryUserUseCase, Dele
     }
 
     @Override
-    public void addUsersChatRoomJoin(List<User> users) {
-        users = saveUserOutput.saveAll(users);
-
-        for (User user : users) {
-            if (!userSessions.containsKey(user.id())) continue;
-            userSessions.put(user.id(), new UserSession(user, userSessions.get(user.id()).session()));
-        }
-    }
-
-    @Override
     public void addUsersChatRoomJoin(UUID id, Set<Long> userIds) {
         List<User> users = getUsersIfNotExistCreateUser(userIds);
         users.forEach(user -> user.addChatRoom(id));
