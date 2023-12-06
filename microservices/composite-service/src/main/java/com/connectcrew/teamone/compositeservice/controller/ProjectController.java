@@ -7,10 +7,13 @@ import com.connectcrew.teamone.api.project.ProjectInput;
 import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.model.ChatRoomRequest;
+import com.connectcrew.teamone.compositeservice.model.enums.ChatRoomType;
 import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
+import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
@@ -35,14 +38,16 @@ public class ProjectController {
     private final JwtProvider jwtProvider;
     private final ProjectRequest projectRequest;
 
+    private final ChatRequest chatRequest;
     private final FavoriteRequest favoriteRequest;
     private final ProjectBasicInfo projectBasicInfo;
     private final ProfileService profileService;
     private final BannerService bannerService;
 
 
-    public ProjectController(JwtProvider provider, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
+    public ProjectController(JwtProvider provider, ChatRequest chatRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
         this.jwtProvider = provider;
+        this.chatRequest = chatRequest;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
@@ -142,9 +147,10 @@ public class ProjectController {
         Long id = jwtProvider.getId(removedPrefix);
 
         return saveBanners(banner)
-                .flatMap(bannerPaths ->
-                        projectRequest.saveProject(getProjectInput(param, id, UUID.randomUUID().toString(), bannerPaths))
-                                .onErrorResume(ex -> bannerService.deleteBanners(bannerPaths).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+                .flatMap(bannerPaths -> chatRequest.createChatRoom(new ChatRoomRequest(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
+                .flatMap(tuple ->
+                        projectRequest.saveProject(getProjectInput(param, id, tuple.getT2().id().toString(), tuple.getT1()))
+                                .onErrorResume(ex -> bannerService.deleteBanners(tuple.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                 )
                 .map(LongValueRes::new);
     }
