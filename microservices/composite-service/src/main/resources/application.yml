@@ -15,6 +15,7 @@ jwt:
 app:
   user: http://localhost:8085
   project: http://localhost:8084
+  chat: http://localhost:8086
 
 logging:
   level:

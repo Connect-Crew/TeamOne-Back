@@ -110,21 +110,18 @@ services:
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
 
-    ports:
-      - "2181:2181"
-
   kafka:
     container_name: teamone-kafka
     image: bitnami/kafka:latest
     ports:
-      - "9092:9092"
+      - "9082:9082"
 
     environment:
       KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9082
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9082
       ALLOW_PLAINTEXT_LISTENER: "yes"
       KAFKA_CFG_LOG_RETENTION_MINUTES: 5  # 메시지 보존 기간을 5분으로 설정
 

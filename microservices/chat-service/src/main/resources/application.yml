@@ -16,6 +16,9 @@ spring:
     mongodb:
       uri: mongodb://mongo host:27017/chat
 
+  kafka:
+    bootstrap-servers: 192.168.0.56:9082
+
 logging:
   level:
     com.connectcrew.teamone: trace

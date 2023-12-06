@@ -8,3 +8,6 @@ app:
 spring:
   mongodb:
     uri: mongodb://chat-mongo:27017/chat
+
+  kafka:
+    bootstrap-servers: kafka:9093
