@@ -159,14 +159,6 @@ public class CustomRepositoryImpl implements CustomRepository {
     }
 
     @Override
-    public Flux<Tuple2<Long, String>> findAllProjectIdAndChatIdByUserId(Long userId) {
-        return dc.sql("SELECT p.id FROM member m JOIN part pt ON m.part_id=pt.id JOIN project p ON pt.project=p.id WHERE m.user_id=:userId")
-                .bind("userId", userId)
-                .map((row, meta) -> Tuples.of(Objects.requireNonNull(row.get("id", Long.class)), Objects.requireNonNull(row.get("chat_id", String.class))))
-                .all();
-    }
-
-    @Override
     public Flux<Long> findAllMemberIdByUserId(Long projectId) {
         return dc.sql("SELECT m.user FROM member m JOIN part pt ON m.part_id=pt.id JOIN project p ON pt.project=p.id WHERE p.id=:projectId")
                 .bind("projectId", projectId)
