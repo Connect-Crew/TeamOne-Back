@@ -7,4 +7,5 @@ import reactor.core.publisher.Flux;
 public interface CustomRepository {
 
     Flux<ProjectCustomEntity> findAllByOption(ProjectCustomFindOption option);
+    Flux<Long> findAllMemberIdByUserId(Long projectId);
 }

@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+app:
+  user: http://user:8080
+  project: http://project:8080
+
+spring:
+  mongodb:
+    uri: mongodb://chat-mongo:27017/chat
+
+  kafka:
+    bootstrap-servers: kafka:9093

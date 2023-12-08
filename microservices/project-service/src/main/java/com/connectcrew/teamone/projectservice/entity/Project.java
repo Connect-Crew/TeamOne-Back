@@ -20,6 +20,8 @@ public class Project {
 
     private String introduction;
 
+    private String chatRoomId;
+
     private Integer careerMin;
 
     private Integer careerMax;

@@ -17,6 +17,7 @@ public record ProjectDetail(
         ProjectState state,
         Career careerMin,
         Career careerMax,
+        String chatRoomId,
         List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,

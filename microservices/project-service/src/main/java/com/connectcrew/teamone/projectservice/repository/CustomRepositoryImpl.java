@@ -7,11 +7,14 @@ import io.r2dbc.spi.Row;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Component
@@ -154,4 +157,13 @@ public class CustomRepositoryImpl implements CustomRepository {
 
         return new ProjectCustomEntity(id, title, region, withOnline, careerMin, careerMax, createdAt, state, favorite, categories, goal);
     }
+
+    @Override
+    public Flux<Long> findAllMemberIdByUserId(Long projectId) {
+        return dc.sql("SELECT m.user FROM member m JOIN part pt ON m.part_id=pt.id JOIN project p ON pt.project=p.id WHERE p.id=:projectId")
+                .bind("projectId", projectId)
+                .map((row, meta) -> row.get("user", Long.class))
+                .all();
+    }
+
 }

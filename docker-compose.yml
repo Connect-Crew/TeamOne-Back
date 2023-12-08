@@ -1,6 +1,17 @@
 version: "3.7"
 
 services:
+  gateway:
+      container_name: teamone-gateway
+      build: microservices/gateway-service
+
+      environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+
+      ports:
+      - "9080:8080"
+
   composite:
     container_name: teamone-composite
     build: microservices/composite-service
@@ -13,11 +24,20 @@ services:
       - ${ROOT_PATH}/banner:/resources/banner
 
     ports:
-      - "9080:8080"
+      - "9081:8080"
 
   user:
     container_name: teamone-user
     build: microservices/user-service
+
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+      - DB_PW=${DB_PASSWORD}
+
+  chat:
+    container_name: teamone-chat
+    build: microservices/chat-service
 
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -64,3 +84,49 @@ services:
 
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
+
+  redis:
+    container_name: teamone-redis
+    image: redis:latest
+    ports:
+      - "4379:6379"
+
+    volumes:
+      - ${ROOT_PATH}/Redis:/data
+
+  chat-mongo:
+    container_name: teamone-chat-mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - ${ROOT_PATH}/Mongo:/data/db
+
+  zookeeper:
+    container_name: teamone-zookeeper
+    image: bitnami/zookeeper:latest
+
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+
+  kafka:
+    container_name: teamone-kafka
+    image: bitnami/kafka:latest
+    ports:
+      - "9082:9082"
+
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://192.168.0.56:9082
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9082
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LOG_RETENTION_MINUTES: 5  # 메시지 보존 기간을 5분으로 설정
+
+    volumes:
+      - ${ROOT_PATH}/Kafka:/bitnami/kafka
+
+    depends_on:
+      - zookeeper

@@ -10,6 +10,7 @@ public record ProjectInput(
         Region region,
         Boolean online,
         ProjectState state,
+        String chatRoomId,
         Career careerMin,
         Career careerMax,
         Long leader,

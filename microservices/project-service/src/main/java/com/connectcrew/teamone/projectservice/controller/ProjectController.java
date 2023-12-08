@@ -144,6 +144,10 @@ public class ProjectController {
         if (input.careerMin().getId() > input.careerMax().getId())
             return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CAREER_MIN_BEFORE_MAX.toString()));
 
+        // 5. chatRoomId는 UUID
+        if (!Pattern.matches(UUID_PATTERNS, input.chatRoomId()))
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_CHATROOM_ID.toString()));
+
         // 6. category는 최소 1개 최대 3개
         if (input.category().size() < 1)
             return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MIN_1.toString()));
@@ -178,6 +182,7 @@ public class ProjectController {
                 .introduction(input.introduction())
                 .careerMin(input.careerMin().getId())
                 .careerMax(input.careerMax().getId())
+                .chatRoomId(input.chatRoomId())
                 .leader(input.leader())
                 .withOnline(input.online())
                 .region(input.region().name())
@@ -321,6 +326,7 @@ public class ProjectController {
                                         .favorite(project.getFavorite())
                                         .recruitStatuses(recruits)
                                         .skills(skillNames)
+                                        .chatRoomId(project.getChatRoomId())
                                         .build();
                             })
                             .onErrorResume(e -> {
@@ -329,6 +335,7 @@ public class ProjectController {
                             });
                 });
     }
+
 
     @GetMapping("/members")
     public Mono<List<ProjectMember>> getProjectMembers(Long id) {

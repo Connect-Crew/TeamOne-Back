@@ -4,6 +4,7 @@ server:
 app:
   user: http://user:8080
   project: http://project:8080
+  chat: http://chat:8080
 
 resource:
   banner: /resources/banner

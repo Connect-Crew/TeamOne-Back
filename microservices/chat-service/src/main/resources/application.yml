@@ -1,0 +1,34 @@
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  application:
+    name: chat-service
+
+  redis:
+      host: Redis Host
+      port: Redis Port
+
+  data:
+    mongodb:
+      uri: mongodb://mongo host:27017/chat
+
+  kafka:
+    bootstrap-servers: 192.168.0.56:9082
+
+logging:
+  level:
+    com.connectcrew.teamone: trace
+
+server:
+  port: 8086
+
+app:
+  user: http://localhost:8085
+  project: http://localhost:8084
+
+jwt:
+  secret: b82e3ae4-539d-43c4-b695-f5a7f0bddb30 # 임의의 Secret Key
