@@ -2,16 +2,19 @@ package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.user.profile.Profile;
-import com.connectcrew.teamone.userservice.entity.PartEntity;
-import com.connectcrew.teamone.userservice.entity.ProfileEntity;
-import com.connectcrew.teamone.userservice.entity.RepresentProjectEntity;
-import com.connectcrew.teamone.userservice.repository.*;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.connectcrew.teamone.userservice.config.TestBeanConfig;
+import com.connectcrew.teamone.userservice.profile.adapter.in.web.ProfileController;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.PartEntity;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.ProfileEntity;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.RepresentProjectEntity;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.PartRepository;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.ProfileRepository;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.RepresentProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -22,32 +25,23 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+@Import(TestBeanConfig.class)
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(ProfileController.class)
 class ProfileControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
-    @MockBean
-    private UserRepository userRepository;
 
-    @MockBean
+    @Autowired
     private ProfileRepository profileRepository;
 
-    @MockBean
-    private FavoriteRepository favoriteRepository;
-
-    @MockBean
+    @Autowired
     private PartRepository partRepository;
 
-    @MockBean
+    @Autowired
     private RepresentProjectRepository representProjectRepository;
 
-    @MockBean
-    private FcmRepository fcmRepository;
-
-    @MockBean
-    private FirebaseMessaging firebaseMessaging;
 
     @Test
     void getProfile() {

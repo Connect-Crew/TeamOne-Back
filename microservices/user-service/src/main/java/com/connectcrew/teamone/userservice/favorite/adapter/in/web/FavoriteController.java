@@ -2,7 +2,7 @@ package com.connectcrew.teamone.userservice.favorite.adapter.in.web;
 
 import com.connectcrew.teamone.userservice.favorite.application.port.in.QueryFavoriteUseCase;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.SaveFavoriteUseCase;
-import com.connectcrew.teamone.userservice.favorite.application.port.in.command.SaveFavoriteCommand;
+import com.connectcrew.teamone.userservice.favorite.application.port.in.command.SetFavoriteCommand;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoriteQuery;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoritesQuery;
 import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
@@ -26,8 +26,8 @@ public class FavoriteController {
     private final SaveFavoriteUseCase saveFavoriteUseCase;
 
     @GetMapping("/favorites")
-    Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, Long[] ids) {
-        return queryFavoriteUseCase.findMapByCommand(new FindFavoritesQuery(userId, type, ids));
+    Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, Long[] targets) {
+        return queryFavoriteUseCase.findMapByCommand(new FindFavoritesQuery(userId, type, targets));
     }
 
     @GetMapping("/")
@@ -37,6 +37,6 @@ public class FavoriteController {
 
     @PostMapping("/")
     Mono<Boolean> setFavorite(Long userId, FavoriteType type, Long target) {
-        return saveFavoriteUseCase.saveFavorite(new SaveFavoriteCommand(userId, type, target));
+        return saveFavoriteUseCase.setFavorite(new SetFavoriteCommand(userId, type, target));
     }
 }

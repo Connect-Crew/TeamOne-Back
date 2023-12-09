@@ -11,6 +11,7 @@ public interface FavoriteRepository extends ReactiveCrudRepository<FavoriteEntit
     Flux<FavoriteEntity> findAllByProfileIdAndTypeAndTargetIn(Long profileId, String type, Collection<Long> target);
 
     Mono<FavoriteEntity> findByProfileIdAndTypeAndTarget(Long profileId, String type, Long target);
+    Mono<Boolean> existsByProfileIdAndTypeAndTarget(Long profileId, String type, Long target);
 
     Mono<Boolean> deleteByProfileIdAndTypeAndTarget(Long profileId, String type, Long target);
 }

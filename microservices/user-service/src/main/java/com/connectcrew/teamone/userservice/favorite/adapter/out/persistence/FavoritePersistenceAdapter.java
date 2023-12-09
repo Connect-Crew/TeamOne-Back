@@ -35,6 +35,11 @@ public class FavoritePersistenceAdapter implements SaveFavoriteOutput, FindFavor
     }
 
     @Override
+    public Mono<Boolean> existsByUserIdAndTypeAndTarget(Long userId, FavoriteType type, Long target) {
+        return favoriteRepository.existsByProfileIdAndTypeAndTarget(userId, type.name(), target);
+    }
+
+    @Override
     public Mono<Favorite> save(Favorite favorite) {
         return favoriteRepository.save(FavoriteEntity.fromDomain(favorite))
                 .map(FavoriteEntity::toDomain);

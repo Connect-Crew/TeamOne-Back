@@ -6,7 +6,7 @@ import com.connectcrew.teamone.userservice.notification.domain.MessageBody;
 public record SendMessageCommand(
         Long userId,
         String title,
-        MessageBody body,
+        String body,
         String deepLink
 ) {
 
@@ -14,8 +14,7 @@ public record SendMessageCommand(
         return FcmMessage.builder()
                 .fcm(fcm)
                 .title(title)
-                .body(body)
-                .deepLink(deepLink)
+                .body(new MessageBody(body, deepLink))
                 .build();
     }
 }

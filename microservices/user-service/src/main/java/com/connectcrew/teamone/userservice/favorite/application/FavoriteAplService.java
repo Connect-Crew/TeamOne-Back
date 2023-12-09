@@ -2,7 +2,7 @@ package com.connectcrew.teamone.userservice.favorite.application;
 
 import com.connectcrew.teamone.userservice.favorite.application.port.in.QueryFavoriteUseCase;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.SaveFavoriteUseCase;
-import com.connectcrew.teamone.userservice.favorite.application.port.in.command.SaveFavoriteCommand;
+import com.connectcrew.teamone.userservice.favorite.application.port.in.command.SetFavoriteCommand;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoriteQuery;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoritesQuery;
 import com.connectcrew.teamone.userservice.favorite.application.port.out.DeleteFavoriteOutput;
@@ -26,10 +26,12 @@ public class FavoriteAplService implements SaveFavoriteUseCase, QueryFavoriteUse
     private final DeleteFavoriteOutput deleteFavoriteOutput;
 
     @Override
-    public Mono<Boolean> saveFavorite(SaveFavoriteCommand command) {
-        return findFavoriteOutput.findByUserIdAndTypeAndTarget(command.userId(), command.favoriteType(), command.target())
-                .flatMap(deleteFavoriteOutput::delete).thenReturn(false)
-                .switchIfEmpty(saveFavoriteOutput.save(command.toDomain()).thenReturn(true));
+    public Mono<Boolean> setFavorite(SetFavoriteCommand command) {
+        return findFavoriteOutput.existsByUserIdAndTypeAndTarget(command.userId(), command.favoriteType(), command.target())
+                .flatMap(exists -> {
+                    if (exists) return deleteFavoriteOutput.delete(command.toDomain()).thenReturn(false);
+                    else return saveFavoriteOutput.save(command.toDomain()).thenReturn(true);
+                });
     }
 
     @Override

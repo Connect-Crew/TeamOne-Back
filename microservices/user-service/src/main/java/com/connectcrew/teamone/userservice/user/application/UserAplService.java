@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.userservice.user.application;
 
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.userservice.notification.application.port.out.SaveFcmOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.FindProfileOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.SaveProfileOutput;
@@ -80,6 +81,6 @@ public class UserAplService implements CreateUserUseCase, QueryUserUseCase {
     @Override
     public Mono<User> findBySocialIdAndProvider(String socialId, String provider) {
         return findUserOutput.findBySocialIdAndProvider(socialId, Social.valueOf(provider))
-                .switchIfEmpty(Mono.error(new IllegalArgumentException(UserExceptionMessage.NOTFOUND_USER.getMessage())));
+                .switchIfEmpty(Mono.error(new NotFoundException(UserExceptionMessage.NOTFOUND_USER.getMessage())));
     }
 }

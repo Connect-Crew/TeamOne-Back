@@ -3,7 +3,7 @@ package com.connectcrew.teamone.userservice.favorite.application.port.in.command
 import com.connectcrew.teamone.userservice.favorite.domain.Favorite;
 import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
 
-public record SaveFavoriteCommand(
+public record SetFavoriteCommand(
         Long userId,
         FavoriteType favoriteType,
         Long target

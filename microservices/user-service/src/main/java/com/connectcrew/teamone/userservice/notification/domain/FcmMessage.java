@@ -6,7 +6,6 @@ import lombok.Builder;
 public record FcmMessage(
         String fcm,
         String title,
-        MessageBody body,
-        String deepLink
+        MessageBody body
 ) {
 }

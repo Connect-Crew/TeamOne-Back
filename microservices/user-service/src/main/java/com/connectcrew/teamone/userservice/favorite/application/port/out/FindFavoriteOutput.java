@@ -9,4 +9,6 @@ public interface FindFavoriteOutput {
     Flux<Favorite> findAllByUserIdAndTypeAndTargets(Long userId, FavoriteType type, Long[] targets);
 
     Mono<Favorite> findByUserIdAndTypeAndTarget(Long userId, FavoriteType type, Long target);
+    Mono<Boolean> existsByUserIdAndTypeAndTarget(Long userId, FavoriteType type, Long target);
+
 }
