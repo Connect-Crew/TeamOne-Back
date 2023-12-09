@@ -1,0 +1,18 @@
+package com.connectcrew.teamone.userservice.favorite.application.port.in.command;
+
+import com.connectcrew.teamone.userservice.favorite.domain.Favorite;
+import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
+
+public record SaveFavoriteCommand(
+        Long userId,
+        FavoriteType favoriteType,
+        Long target
+) {
+    public Favorite toDomain() {
+        return Favorite.builder()
+                .userId(userId)
+                .favoriteType(favoriteType)
+                .target(target)
+                .build();
+    }
+}

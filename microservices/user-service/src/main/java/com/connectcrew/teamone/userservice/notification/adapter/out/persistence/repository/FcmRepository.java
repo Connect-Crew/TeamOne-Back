@@ -1,6 +1,6 @@
-package com.connectcrew.teamone.userservice.notification.domain;
+package com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository;
 
-import com.connectcrew.teamone.userservice.notification.application.FcmEntity;
+import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity.FcmEntity;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

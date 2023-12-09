@@ -26,7 +26,7 @@ public record ProfileResponse(
                 .profile(profile.profile().profile())
                 .introduction(profile.profile().introduction())
                 .temperature(profile.profile().temperature())
-                .responseRate(profile.profile().recvApply() == 0 ? 0 : (int) (((double) profile.profile().resApply() / profile.profile().recvApply()) * 100))
+                .responseRate(profile.profile().responseRate())
                 .parts(profile.parts().stream().map(Part::part).toList())
                 .representProjects(profile.representProjects().stream().map(RepresentProject::projectId).toList())
                 .build();

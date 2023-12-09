@@ -64,7 +64,7 @@ class FavoriteControllerTest {
                         .path("/favorite/favorites")
                         .queryParam("userId", "123456789")
                         .queryParam("type", FavoriteType.PROJECT.name())
-                        .queryParam("ids", ids)
+                        .queryParam("targets", ids)
                         .build())
                 .exchange()
                 .expectStatus().isOk()

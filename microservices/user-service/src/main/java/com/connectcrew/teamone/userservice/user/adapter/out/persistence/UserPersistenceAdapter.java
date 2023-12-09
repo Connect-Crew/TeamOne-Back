@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.user.adapter.out.persistence;
 
-import com.connectcrew.teamone.userservice.notification.domain.FcmRepository;
+import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;
 import com.connectcrew.teamone.userservice.user.adapter.out.persistence.entity.UserEntity;
 import com.connectcrew.teamone.userservice.user.adapter.out.persistence.repository.UserRepository;
 import com.connectcrew.teamone.userservice.user.application.out.FindUserOutput;

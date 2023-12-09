@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.userservice.user.application;
 
+import com.connectcrew.teamone.userservice.notification.application.port.out.SaveFcmOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.FindProfileOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.SaveProfileOutput;
 import com.connectcrew.teamone.userservice.user.application.in.CreateUserUseCase;
@@ -29,6 +30,7 @@ public class UserAplService implements CreateUserUseCase, QueryUserUseCase {
     private final FindUserOutput findUserOutput;
     private final SaveUserOutput saveUserOutput;
     private final SaveProfileOutput saveProfileOutput;
+    private final SaveFcmOutput saveFcmOutput;
 
     @Override
     @Transactional
@@ -39,7 +41,7 @@ public class UserAplService implements CreateUserUseCase, QueryUserUseCase {
                 .then(checkDuplicateUser(command.socialId(), command.provider()))
                 .then(saveUserOutput.save(command.toUserDomain()))
                 .flatMap(user -> saveProfileOutput.save(command.toProfileDomain(user.id())).thenReturn(user))
-                .flatMap(user -> saveUserOutput.save(command.toFcmTokenDomain(user.id())).thenReturn(user));
+                .flatMap(user -> saveFcmOutput.save(command.toFcmTokenDomain(user.id())).thenReturn(user));
     }
 
     private Mono<Boolean> checkAgreement(CreateUserCommand command) {

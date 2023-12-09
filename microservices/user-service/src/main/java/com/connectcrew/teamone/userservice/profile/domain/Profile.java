@@ -13,4 +13,8 @@ public record Profile(
         Integer recvApply,
         Integer resApply
 ) {
+
+    public Integer responseRate() {
+        return recvApply == 0 ? 0 : (int) (((double) resApply / recvApply) * 100);
+    }
 }

@@ -1,15 +1,14 @@
 package com.connectcrew.teamone.userservice.user.application.in.command;
 
 
-import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
+import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.user.domain.User;
 import com.connectcrew.teamone.userservice.user.domain.enums.Role;
 import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import lombok.Builder;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 
 @Builder
 public record CreateUserCommand(
@@ -44,11 +43,13 @@ public record CreateUserCommand(
                 .temperature(36.5)
                 .recvApply(0)
                 .resApply(0)
-                .representProjects(new ArrayList<>())
                 .build();
     }
 
     public FcmToken toFcmTokenDomain(Long id) {
-        return new FcmToken(id, fcm);
+        return FcmToken.builder()
+                .user(id)
+                .token(fcm)
+                .build();
     }
 }

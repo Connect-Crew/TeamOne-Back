@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.userservice.notification.application;
+package com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import lombok.*;
