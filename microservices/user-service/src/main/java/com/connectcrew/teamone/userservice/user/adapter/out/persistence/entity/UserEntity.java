@@ -30,7 +30,6 @@ public class UserEntity {
 
     private String role;
 
-    // TODO 분리하기
     private Boolean termsAgreement; // 서비스 이용 약관
 
     private Boolean privacyAgreement; // 개인정보 처리 방침
