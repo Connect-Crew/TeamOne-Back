@@ -1,5 +1,7 @@
 package com.connectcrew.teamone.compositeservice.service;
 
+import com.connectcrew.teamone.compositeservice.file.application.BannerAplService;
+import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequest;
 import com.connectcrew.teamone.compositeservice.resposne.ProfileRes;
@@ -17,7 +19,7 @@ public class ProfileService {
     private final UserRequest userRequest;
     private final ProjectRequest projectRequest;
 
-    private final BannerService bannerService;
+    private final BannerAplService bannerService;
 
     public Mono<ProfileRes> getProfileRes(Long id) {
         return userRequest.getProfile(id)
@@ -37,7 +39,7 @@ public class ProfileService {
     private Mono<List<RepresentProjectRes>> getRepresentProjectRes(List<Long> ids) {
         return Flux.fromIterable(ids)
                 .flatMap(id -> projectRequest.getProjectThumbnail(id)
-                        .map(thumbnail -> new RepresentProjectRes(id, bannerService.getBannerUrlPath(thumbnail)))
+                        .map(thumbnail -> new RepresentProjectRes(id, FileCategory.BANNER.getUrlPath(thumbnail)))
                         .defaultIfEmpty(new RepresentProjectRes(id, null))
                 )
                 .collectList();

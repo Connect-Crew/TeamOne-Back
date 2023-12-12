@@ -2,7 +2,7 @@ package com.connectcrew.teamone.compositeservice.controller;
 
 import com.connectcrew.teamone.api.project.values.MemberPart;
 import com.connectcrew.teamone.api.user.profile.Profile;
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;

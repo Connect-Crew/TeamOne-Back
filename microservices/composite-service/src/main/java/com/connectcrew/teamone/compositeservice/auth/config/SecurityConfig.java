@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.config;
+package com.connectcrew.teamone.compositeservice.auth.config;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,7 +1,7 @@
-package com.connectcrew.teamone.compositeservice.auth;
+package com.connectcrew.teamone.compositeservice.auth.application;
 
 import com.connectcrew.teamone.api.user.auth.Role;
-import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
+import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;

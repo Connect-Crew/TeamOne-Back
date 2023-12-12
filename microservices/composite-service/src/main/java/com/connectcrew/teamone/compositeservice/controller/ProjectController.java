@@ -1,12 +1,17 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.project.FavoriteUpdateInput;
 import com.connectcrew.teamone.api.project.ProjectFilterOption;
 import com.connectcrew.teamone.api.project.ProjectInput;
 import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
+import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
+import com.connectcrew.teamone.compositeservice.file.application.port.in.SaveFileUseCase;
+import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.model.ChatRoomRequest;
 import com.connectcrew.teamone.compositeservice.model.enums.ChatRoomType;
 import com.connectcrew.teamone.compositeservice.param.ApplyParam;
@@ -17,7 +22,6 @@ import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.FavoriteRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
-import com.connectcrew.teamone.compositeservice.service.BannerService;
 import com.connectcrew.teamone.compositeservice.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -42,17 +46,22 @@ public class ProjectController {
     private final FavoriteRequest favoriteRequest;
     private final ProjectBasicInfo projectBasicInfo;
     private final ProfileService profileService;
-    private final BannerService bannerService;
+
+    private final QueryFileUseCase queryFileUseCase;
+    private final SaveFileUseCase saveFileUseCase;
+    private final DeleteFileUseCase deleteFileUseCase;
 
 
-    public ProjectController(JwtProvider provider, ChatRequest chatRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, BannerService bannerService) {
+    public ProjectController(JwtProvider provider, ChatRequest chatRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, QueryFileUseCase queryFileUseCase, SaveFileUseCase saveFileUseCase, DeleteFileUseCase deleteFileUseCase) {
         this.jwtProvider = provider;
         this.chatRequest = chatRequest;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
         this.profileService = profileService;
-        this.bannerService = bannerService;
+        this.queryFileUseCase = queryFileUseCase;
+        this.saveFileUseCase = saveFileUseCase;
+        this.deleteFileUseCase = deleteFileUseCase;
     }
 
     @GetMapping("/")
@@ -61,21 +70,25 @@ public class ProjectController {
     }
 
     @GetMapping("/banner/{filename}")
-    public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) {
+    public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) throws NotFoundException {
         String[] fileNameAndExtensions = filename.split("\\.");
+        if (fileNameAndExtensions.length != 2) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString());
+        }
         String name = fileNameAndExtensions[0];
         String extension = fileNameAndExtensions[1];
 
-        Optional<MediaType> mediaType = bannerService.getMediaType(extension);
-        if (mediaType.isEmpty()) {
+        Optional<MediaType> mediaType = queryFileUseCase.findContentType(extension);
+        if (mediaType.isEmpty())
             throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString());
-        }
 
-        Resource resource = bannerService.getBanner(name, extension);
+        Optional<Resource> resource = queryFileUseCase.findFile(FileCategory.BANNER, name, extension);
+        if (resource.isEmpty())
+            throw new NotFoundException(ProjectExceptionMessage.BANNER_NOT_FOUND.toString());
 
         return ResponseEntity.ok()
                 .contentType(mediaType.get())
-                .body(resource);
+                .body(resource.get());
     }
 
 
@@ -105,7 +118,7 @@ public class ProjectController {
                 .map(item -> new ProjectItemRes(
                         item,
                         favoriteMap.getOrDefault(item.id(), false),
-                        bannerService.getBannerUrlPath(item.thumbnail())
+                        FileCategory.BANNER.getUrlPath(item.thumbnail())
                 ))
                 .toList();
     }
@@ -122,7 +135,7 @@ public class ProjectController {
                 .flatMap(tuple -> favoriteRequest.isFavorite(id, FavoriteType.PROJECT, projectId)
                         .map(favorite -> Tuples.of(tuple.getT1(), favorite, tuple.getT2())))
                 .map(tuple -> {
-                    List<String> banners = tuple.getT1().banners().stream().map(bannerService::getBannerUrlPath).toList();
+                    List<String> banners = tuple.getT1().banners().stream().map(FileCategory.BANNER::getUrlPath).toList();
                     return new ProjectDetailRes(tuple.getT1(), banners, tuple.getT2(), tuple.getT3());
                 });
     }
@@ -150,13 +163,13 @@ public class ProjectController {
                 .flatMap(bannerPaths -> chatRequest.createChatRoom(new ChatRoomRequest(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
                 .flatMap(tuple ->
                         projectRequest.saveProject(getProjectInput(param, id, tuple.getT2().id().toString(), tuple.getT1()))
-                                .onErrorResume(ex -> bannerService.deleteBanners(tuple.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+                                .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                 )
                 .map(LongValueRes::new);
     }
 
     private Mono<List<String>> saveBanners(Flux<FilePart> banner) {
-        return bannerService.saveBanners(banner)
+        return saveFileUseCase.saveBanners(FileCategory.BANNER, banner)
                 .collectList();
     }
 

@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.resposne.ProfileRes;
 import com.connectcrew.teamone.compositeservice.service.ProfileService;
 import lombok.RequiredArgsConstructor;

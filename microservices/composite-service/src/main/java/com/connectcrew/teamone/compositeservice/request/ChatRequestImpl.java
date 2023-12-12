@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.request;
 
-import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import com.connectcrew.teamone.compositeservice.model.ChatRoomRequest;
 import com.connectcrew.teamone.compositeservice.model.ChatRoomResponse;
 import org.springframework.web.reactive.function.client.WebClient;

@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.request;
 
 import com.connectcrew.teamone.api.project.*;
-import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;

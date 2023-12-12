@@ -1,6 +1,7 @@
-package com.connectcrew.teamone.compositeservice.auth;
+package com.connectcrew.teamone.compositeservice.auth.adapter.in;
 
-import com.connectcrew.teamone.compositeservice.exception.UnauthorizedException;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

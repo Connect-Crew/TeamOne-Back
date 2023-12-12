@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.exception;
+package com.connectcrew.teamone.compositeservice.global.exception;
 
 public class UnauthorizedException extends Exception {
 

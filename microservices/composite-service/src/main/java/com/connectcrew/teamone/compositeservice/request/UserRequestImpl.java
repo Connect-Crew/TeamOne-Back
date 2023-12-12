@@ -7,7 +7,7 @@ import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
 import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.api.user.profile.Profile;
-import com.connectcrew.teamone.compositeservice.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;

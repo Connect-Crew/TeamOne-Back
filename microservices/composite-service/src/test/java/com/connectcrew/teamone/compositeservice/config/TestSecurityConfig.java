@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.config;
 
-import com.connectcrew.teamone.compositeservice.auth.JwtAuthenticationManager;
-import com.connectcrew.teamone.compositeservice.auth.JwtSecurityContextRepository;
+import com.connectcrew.teamone.compositeservice.auth.adapter.in.JwtAuthenticationManager;
+import com.connectcrew.teamone.compositeservice.auth.adapter.in.JwtSecurityContextRepository;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;

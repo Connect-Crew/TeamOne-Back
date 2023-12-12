@@ -7,7 +7,7 @@ import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.api.project.values.*;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;

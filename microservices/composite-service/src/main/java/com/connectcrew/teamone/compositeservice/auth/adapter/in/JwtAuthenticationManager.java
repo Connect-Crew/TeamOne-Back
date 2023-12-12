@@ -1,5 +1,6 @@
-package com.connectcrew.teamone.compositeservice.auth;
+package com.connectcrew.teamone.compositeservice.auth.adapter.in;
 
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
