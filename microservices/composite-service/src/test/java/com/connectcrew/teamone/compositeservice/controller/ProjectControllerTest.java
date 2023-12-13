@@ -14,7 +14,7 @@ import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.resposne.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +74,7 @@ class ProjectControllerTest {
     private JwtProvider jwtProvider;
 
     @MockBean
-    private UserRequestImpl userRequest;
+    private UserWebAdapter userRequest;
 
     @MockBean
     private ProjectRequest projectRequest;

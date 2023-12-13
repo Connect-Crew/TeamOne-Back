@@ -1,34 +1,35 @@
-package com.connectcrew.teamone.compositeservice.request;
+package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.api.user.notification.FcmNotification;
 import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.api.user.profile.Profile;
+import com.connectcrew.teamone.compositeservice.composite.application.port.out.*;
 import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
 
-public class UserRequestImpl implements UserRequest, FavoriteRequest, NotificationRequest {
+@Repository
+@RequiredArgsConstructor
+public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavoriteOutput, SaveFavoriteOutput, SaveNotificationOutput {
 
-    public final String host;
+    @Value("${app.user}")
+    public String host;
 
     private final WebClient webClient;
 
     private final WebClientExceptionHandler exHandler;
 
-    public UserRequestImpl(String host, WebClient webClient) {
-        this.host = host;
-        this.webClient = webClient;
-        this.exHandler = new WebClientExceptionHandler();
-    }
-
+    @Override
     public Mono<User> getUser(String socialId, Social provider) {
         return webClient.get()
                 .uri(String.format("%s/user/?socialId=%s&provider=%s", host, socialId, provider.name()))
@@ -94,15 +95,15 @@ public class UserRequestImpl implements UserRequest, FavoriteRequest, Notificati
                 .onErrorResume(exHandler::handleException);
     }
 
-    @Override
-    public Mono<Boolean> sendNotification(FcmNotification notification) {
-        return webClient.post()
-                .uri(String.format("%s/notification", host))
-                .bodyValue(notification)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .onErrorResume(exHandler::handleException);
-    }
+//    @Override
+//    public Mono<Boolean> sendNotification(FcmNotification notification) {
+//        return webClient.post()
+//                .uri(String.format("%s/notification", host))
+//                .bodyValue(notification)
+//                .retrieve()
+//                .bodyToMono(Boolean.class)
+//                .onErrorResume(exHandler::handleException);
+//    }
 
     @Override
     public Mono<Boolean> saveFcm(Long id, String fcm) {

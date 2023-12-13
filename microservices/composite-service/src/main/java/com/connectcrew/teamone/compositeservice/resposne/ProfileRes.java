@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.resposne;
 
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.RepresentProjectResponse;
 import lombok.Builder;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public record ProfileRes(
         Double temperature,
         Integer responseRate,
         List<String> parts,
-        List<RepresentProjectRes> representProjects
+        List<RepresentProjectResponse> representProjects
 ) {
 
 }

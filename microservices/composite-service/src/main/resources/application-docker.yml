@@ -7,4 +7,4 @@ app:
   chat: http://chat:8080
 
 resource:
-  banner: /resources/banner
+  base-path: /resources/banner

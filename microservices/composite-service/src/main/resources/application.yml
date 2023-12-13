@@ -22,7 +22,7 @@ logging:
     com.connectcrew.teamone: trace
 
 resource:
-  banner: /path/to/banner
+  base-path: /path/to/resource
 
 server:
   port: 9081

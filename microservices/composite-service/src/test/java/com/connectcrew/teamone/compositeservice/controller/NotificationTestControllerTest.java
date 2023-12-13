@@ -5,7 +5,7 @@ import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.param.NotificationTestParam;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.resposne.BooleanValueRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class NotificationTestControllerTest {
     private JwtProvider jwtProvider;
 
     @MockBean
-    private UserRequestImpl userRequest;
+    private UserWebAdapter userRequest;
 
     @MockBean
     private ProjectRequest projectRequest;

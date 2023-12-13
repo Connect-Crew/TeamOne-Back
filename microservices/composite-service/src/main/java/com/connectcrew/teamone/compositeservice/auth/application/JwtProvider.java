@@ -1,6 +1,8 @@
 package com.connectcrew.teamone.compositeservice.auth.application;
 
 import com.connectcrew.teamone.api.user.auth.Role;
+import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
+import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -36,12 +39,22 @@ public class JwtProvider {
         this.secret = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    public JwtToken createToken(String account, Long id, String nickname, Role role) {
+        LocalDateTime now = LocalDateTime.now();
+        return JwtToken.builder()
+                .accessToken(createAccessToken(account, id, nickname, role))
+                .accessTokenExp(now.plusSeconds(JwtProvider.accessExp / 1000))
+                .refreshToken(createRefreshToken(account, id, nickname, role))
+                .refreshTokenExp(now.plusSeconds(JwtProvider.refreshExp / 1000))
+                .build();
+    }
+
     // 토큰 생성
-    public String createAccessToken(String account, Long id, String nickname, Role role) {
+    private String createAccessToken(String account, Long id, String nickname, Role role) {
         return createToken(account, id, nickname, role, accessExp);
     }
 
-    public String createRefreshToken(String account, Long id, String nickname, Role role) {
+    private String createRefreshToken(String account, Long id, String nickname, Role role) {
         return createToken(account, id, nickname, role, refreshExp);
     }
 
@@ -97,29 +110,17 @@ public class JwtProvider {
         }
     }
 
-    // 토큰에 담겨있는 유저 username 획득
-    public String getAccount(String token) {
-        Claims claims = parseClaims(token);
+    public TokenClaim getTokenClaim(String token) {
+        String removedPrefix = token.replace(JwtProvider.BEARER_PREFIX, "");
 
-        return claims.getSubject();
-    }
+        Claims claims = parseClaims(removedPrefix);
 
-    public Role getRole(String token) {
-        Claims claims = parseClaims(token);
-
-        return Role.valueOf(claims.get("role").toString());
-    }
-
-    public Long getId(String token) {
-        Claims claims = parseClaims(token);
-
-        return Long.parseLong(claims.get("id").toString());
-    }
-
-    public String getNickname(String token) {
-        Claims claims = parseClaims(token);
-
-        return claims.get("nickname").toString();
+        return TokenClaim.builder()
+                .socialId(claims.getSubject())
+                .role(Role.valueOf(claims.get("role").toString()))
+                .id(Long.parseLong(claims.get("id").toString()))
+                .nickname(claims.get("nickname").toString())
+                .build();
     }
 
     // Authorization Header를 통해 인증을 한다.

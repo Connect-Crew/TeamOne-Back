@@ -14,7 +14,7 @@ import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import com.connectcrew.teamone.compositeservice.param.LoginParam;
 import com.connectcrew.teamone.compositeservice.param.RegisterParam;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.resposne.LoginResult;
 import com.connectcrew.teamone.compositeservice.resposne.RefreshResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,7 @@ class AuthControllerTest {
     private Auth2TokenValidator tokenValidator;
 
     @MockBean
-    private UserRequestImpl userRequest;
+    private UserWebAdapter userRequest;
     @MockBean
     private JwtProvider jwtProvider;
 

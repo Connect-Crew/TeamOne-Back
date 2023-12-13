@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.config;
 
+import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import com.connectcrew.teamone.compositeservice.request.ChatRequestImpl;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequestImpl;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +17,8 @@ public class RequestBeanConfig {
     }
 
     @Bean
-    public UserRequestImpl userRequest(@Value("${app.user}") String host, WebClient webClient) {
-        return new UserRequestImpl(host, webClient);
+    public WebClientExceptionHandler exHandler() {
+        return new WebClientExceptionHandler();
     }
 
     @Bean
