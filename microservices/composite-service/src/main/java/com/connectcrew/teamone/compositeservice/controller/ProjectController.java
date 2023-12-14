@@ -8,6 +8,7 @@ import com.connectcrew.teamone.api.project.ProjectInput;
 import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.composite.application.port.out.CreateChatRoomOutput;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.SaveFileUseCase;
@@ -18,7 +19,6 @@ import com.connectcrew.teamone.compositeservice.param.ApplyParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
 import com.connectcrew.teamone.compositeservice.param.ReportParam;
-import com.connectcrew.teamone.compositeservice.request.ChatRequest;
 import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
 import com.connectcrew.teamone.compositeservice.resposne.*;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,6 @@ public class ProjectController {
     private final JwtProvider jwtProvider;
     private final ProjectRequest projectRequest;
 
-    private final ChatRequest chatRequest;
     private final FavoriteRequest favoriteRequest;
     private final ProjectBasicInfo projectBasicInfo;
     private final ProfileService profileService;
@@ -49,10 +48,12 @@ public class ProjectController {
     private final SaveFileUseCase saveFileUseCase;
     private final DeleteFileUseCase deleteFileUseCase;
 
+    private final CreateChatRoomOutput createChatRoomOutput; // TODO usecase로 수정
 
-    public ProjectController(JwtProvider provider, ChatRequest chatRequest, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, QueryFileUseCase queryFileUseCase, SaveFileUseCase saveFileUseCase, DeleteFileUseCase deleteFileUseCase) {
+
+    public ProjectController(JwtProvider provider, CreateChatRoomOutput createChatRoomOutput, ProjectRequest projectRequest, FavoriteRequest favoriteRequest, ProfileService profileService, QueryFileUseCase queryFileUseCase, SaveFileUseCase saveFileUseCase, DeleteFileUseCase deleteFileUseCase) {
         this.jwtProvider = provider;
-        this.chatRequest = chatRequest;
+        this.createChatRoomOutput = createChatRoomOutput;
         this.projectRequest = projectRequest;
         this.favoriteRequest = favoriteRequest;
         this.projectBasicInfo = new ProjectBasicInfo();
@@ -158,7 +159,7 @@ public class ProjectController {
         Long id = jwtProvider.getId(removedPrefix);
 
         return saveBanners(banner)
-                .flatMap(bannerPaths -> chatRequest.createChatRoom(new ChatRoomRequest(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
+                .flatMap(bannerPaths -> createChatRoomOutput.createChatRoom(new ChatRoomRequest(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
                 .flatMap(tuple ->
                         projectRequest.saveProject(getProjectInput(param, id, tuple.getT2().id().toString(), tuple.getT1()))
                                 .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex))) // 프로젝트 글 작성 실패시 저장된 배너 삭제

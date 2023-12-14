@@ -3,7 +3,6 @@ package com.connectcrew.teamone.compositeservice.controller;
 import com.connectcrew.teamone.api.user.notification.FcmNotification;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.param.NotificationTestParam;
-import com.connectcrew.teamone.compositeservice.request.NotificationRequest;
 import com.connectcrew.teamone.compositeservice.resposne.BooleanValueRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

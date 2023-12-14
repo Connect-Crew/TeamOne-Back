@@ -2,11 +2,11 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
-import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
 import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.Register;
 import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,16 +33,6 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
     public Mono<User> getUser(String socialId, Social provider) {
         return webClient.get()
                 .uri(String.format("%s/user/?socialId=%s&provider=%s", host, socialId, provider.name()))
-                .retrieve()
-                .bodyToMono(User.class)
-                .onErrorResume(exHandler::handleException);
-    }
-
-    @Override
-    public Mono<User> saveUser(UserInputParam user) {
-        return webClient.post()
-                .uri(String.format("%s/user/", host))
-                .bodyValue(user)
                 .retrieve()
                 .bodyToMono(User.class)
                 .onErrorResume(exHandler::handleException);
@@ -112,6 +102,16 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
                 .bodyValue(new FcmToken(id, fcm))
                 .retrieve()
                 .bodyToMono(Boolean.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<User> save(Register register) {
+        return webClient.post()
+                .uri(String.format("%s/user/", host))
+                .bodyValue(register)
+                .retrieve()
+                .bodyToMono(User.class)
                 .onErrorResume(exHandler::handleException);
     }
 }
