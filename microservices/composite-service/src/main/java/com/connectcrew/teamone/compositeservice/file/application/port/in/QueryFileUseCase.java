@@ -7,7 +7,9 @@ import org.springframework.http.MediaType;
 import java.util.Optional;
 
 public interface QueryFileUseCase {
-    Optional<MediaType> findContentType(String extension);
+
+    Resource find(FileCategory category, String file);
+    MediaType findContentType(String file);
 
     Optional<Resource> findFile(FileCategory category, String name, String extension);
 }

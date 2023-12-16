@@ -2,17 +2,17 @@ package com.connectcrew.teamone.compositeservice.composite.application;
 
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
+import com.connectcrew.teamone.api.user.favorite.FavoriteType;
 import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.application.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.AuthUserUseCase;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.RegisterCommand;
-import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindUserOutput;
-import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveNotificationOutput;
-import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveUserOutput;
-import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
+import com.connectcrew.teamone.compositeservice.composite.application.port.out.*;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
 import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +20,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserAplService implements
         AuthUserUseCase,
-        SaveUserUseCase
+        SaveUserUseCase,
+        QueryUserUseCase
 {
     private final Auth2TokenValidator auth2TokenValidator;
     private final JwtProvider jwtProvider;
     private final SaveUserOutput saveUserOutput;
     private final FindUserOutput findUserOutput;
     private final SaveNotificationOutput saveNotificationOutput;
+    private final FindFavoriteOutput findFavoriteOutput;
+    private final SaveFavoriteOutput saveFavoriteOutput;
 
     @Override
     public Mono<LoginResult> login(String auth2Token, Social social, String fcmToken) {
@@ -67,4 +73,18 @@ public class UserAplService implements
     }
 
 
+    @Override
+    public Mono<Boolean> isFavorite(Long userId, FavoriteType type, Long target) {
+        return findFavoriteOutput.isFavorite(userId, type, target);
+    }
+
+    @Override
+    public Mono<Map<Long, Boolean>> isFavorite(Long userId, FavoriteType type, List<Long> ids) {
+        return findFavoriteOutput.isFavorite(userId, type, ids);
+    }
+
+    @Override
+    public Mono<Boolean> setFavorite(Long userId, FavoriteType type, Long target) {
+        return saveFavoriteOutput.setFavorite(userId, type, target);
+    }
 }

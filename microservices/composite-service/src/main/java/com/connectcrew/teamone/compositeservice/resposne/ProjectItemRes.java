@@ -2,6 +2,7 @@ package com.connectcrew.teamone.compositeservice.resposne;
 
 import com.connectcrew.teamone.api.project.ProjectItem;
 import com.connectcrew.teamone.api.project.values.ProjectCategory;
+import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,11 +23,11 @@ public record ProjectItemRes(
         String goal,
         List<RecruitStatusRes> recruitStatus
 ) {
-    public ProjectItemRes(ProjectItem item, Boolean myFavorite, String thumbnail) {
-        this(
+    public static ProjectItemRes from(ProjectItem item, Boolean myFavorite) {
+        return new ProjectItemRes(
                 item.id(),
                 item.title(),
-                thumbnail,
+                FileCategory.BANNER.getUrlPath(item.thumbnail()),
                 item.region().getDescription(),
                 item.online(),
                 item.careerMin().getDescription(),

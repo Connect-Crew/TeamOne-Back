@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.file.application;
 
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
@@ -30,11 +31,30 @@ public class BannerAplService implements QueryFileUseCase, SaveFileUseCase, Dele
     private final DeleteFileOutput deleteFileOutput;
 
     @Override
-    public Optional<MediaType> findContentType(String extension) {
-        return switch (extension) {
-            case "jpg", "jpeg" -> Optional.of(MediaType.IMAGE_JPEG);
-            case "png" -> Optional.of(MediaType.IMAGE_PNG);
-            default -> Optional.empty();
+    public Resource find(FileCategory category, String file) {
+        String[] fileNameAndExtensions = file.split("\\.");
+        if (fileNameAndExtensions.length != 2) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString());
+        }
+
+        String name = fileNameAndExtensions[0];
+        String extension = fileNameAndExtensions[1];
+
+        return findFile(category, name, extension)
+                .orElseThrow(() -> new NotFoundException(ProjectExceptionMessage.BANNER_NOT_FOUND.toString()));
+    }
+
+    @Override
+    public MediaType findContentType(String file) {
+        String[] fileNameAndExtensions = file.split("\\.");
+        if (fileNameAndExtensions.length != 2) {
+            throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString());
+        }
+
+        return switch (fileNameAndExtensions[1].toLowerCase()) {
+            case "jpg", "jpeg" -> MediaType.IMAGE_JPEG;
+            case "png" -> MediaType.IMAGE_PNG;
+            default -> throw new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString());
         };
     }
 
