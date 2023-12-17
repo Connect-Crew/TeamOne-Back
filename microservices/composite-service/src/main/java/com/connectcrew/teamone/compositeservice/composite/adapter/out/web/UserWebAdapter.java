@@ -66,6 +66,7 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
         String[] host = this.host.replace("http://", "").split(":");
         ParameterizedTypeReference<Map<Long, Boolean>> typeRef = new ParameterizedTypeReference<>() {
         };
+        System.out.printf("userId: %d, type: %s, ids: %s\n", userId, type.name(), ids);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("http")
@@ -74,7 +75,7 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
                         .path("/favorite/favorites")
                         .queryParam("userId", userId)
                         .queryParam("type", type.name())
-                        .queryParam("ids", ids)
+                        .queryParam("targets", ids)
                         .build())
                 .retrieve()
                 .bodyToMono(typeRef)

@@ -34,7 +34,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<String> findProjectThumbnail(Long id) {
         return webClient.get()
-                .uri(String.format("%s/thumbnail?id=%d", host, id))
+                .uri(String.format("%s/project/thumbnail?id=%d", host, id))
                 .retrieve()
                 .bodyToMono(String.class)
                 .onErrorResume(exHandler::handleException);
@@ -49,16 +49,16 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .scheme("http")
                         .host(host[0].trim())
                         .port(Integer.parseInt(host[1].trim()))
-                        .path("/list")
+                        .path("/project/list")
                         .queryParam("lastId", option.lastId())
                         .queryParam("size", option.size())
-                        .queryParam("goal", option.goal())
-                        .queryParam("career", option.career())
-                        .queryParam("region", option.region())
+                        .queryParam("goal", option.goal() != null ? option.goal().name() : null)
+                        .queryParam("career", option.career() != null ? option.career().name() : null)
+                        .queryParam("region", option.region() != null ? option.region().stream().map(Enum::name).toList() : null)
                         .queryParam("online", option.online())
                         .queryParam("part", option.part())
                         .queryParam("skills", option.skills())
-                        .queryParam("states", option.states())
+                        .queryParam("states", option.states() != null ? option.states().stream().map(Enum::name).toList() : null)
                         .queryParam("category", option.category())
                         .queryParam("search", option.search())
                         .build()
@@ -72,7 +72,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<ProjectDetail> find(Long projectId, Long userId) {
         return webClient.get()
-                .uri(String.format("%s/?id=%d&userId=%d", host, projectId, userId))
+                .uri(String.format("%s/project/?id=%d&userId=%d", host, projectId, userId))
                 .retrieve()
                 .bodyToMono(ProjectDetailResponse.class)
                 .onErrorResume(exHandler::handleException)
@@ -85,7 +85,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         };
 
         return webClient.get()
-                .uri(String.format("%s/members?id=%d", host, projectId))
+                .uri(String.format("%s/member/members?id=%d", host, projectId))
                 .retrieve()
                 .bodyToMono(type)
                 .onErrorResume(exHandler::handleException)
@@ -95,7 +95,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<Long> save(CreateProjectInfo input) {
         return webClient.post()
-                .uri(String.format("%s/", host))
+                .uri(String.format("%s/project/", host))
                 .bodyValue(input)
                 .retrieve()
                 .bodyToMono(Long.class)
@@ -105,7 +105,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<Boolean> save(Apply input) {
         return webClient.post()
-                .uri(String.format("%s/apply", host))
+                .uri(String.format("%s/member/apply", host))
                 .bodyValue(input)
                 .retrieve()
                 .bodyToMono(Boolean.class)
@@ -115,7 +115,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<Boolean> save(Report input) {
         return webClient.post()
-                .uri(String.format("%s/report", host))
+                .uri(String.format("%s/project/report", host))
                 .bodyValue(input)
                 .retrieve()
                 .bodyToMono(Boolean.class)
@@ -125,7 +125,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Mono<Integer> updateFavorite(ProjectFavorite favorite) {
         return webClient.post()
-                .uri(String.format("%s/favorite", host))
+                .uri(String.format("%s/project/favorite", host))
                 .bodyValue(favorite)
                 .retrieve()
                 .bodyToMono(Integer.class)

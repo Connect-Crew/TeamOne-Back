@@ -8,6 +8,9 @@ spring:
   profiles:
     include: oauth
 
+  kafka:
+    bootstrap-servers: 192.168.0.56:9082
+
 
 jwt:
   secret: b82e3ae4-539d-43c4-b695-f5a7f0bddb30 # 임의의 Secret Key

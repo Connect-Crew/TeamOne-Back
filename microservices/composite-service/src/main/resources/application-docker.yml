@@ -6,5 +6,9 @@ app:
   project: http://project:8080
   chat: http://chat:8080
 
+spring:
+  kafka:
+    bootstrap-servers: kafka:9093
+
 resource:
   base-path: /resources/banner

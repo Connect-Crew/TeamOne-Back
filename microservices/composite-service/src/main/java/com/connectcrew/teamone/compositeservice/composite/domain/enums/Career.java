@@ -32,9 +32,4 @@ public enum Career {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return description;
-    }
 }

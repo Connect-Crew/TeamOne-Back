@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -27,6 +28,8 @@ public class FavoriteController {
 
     @GetMapping("/favorites")
     Mono<Map<Long, Boolean>> getFavorites(Long userId, FavoriteType type, Long[] targets) {
+        if(targets == null || targets.length == 0) return Mono.just(new HashMap<>());
+
         return queryFavoriteUseCase.findMapByCommand(new FindFavoritesQuery(userId, type, targets));
     }
 

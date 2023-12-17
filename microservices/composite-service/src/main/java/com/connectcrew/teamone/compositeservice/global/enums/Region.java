@@ -32,11 +32,6 @@ public enum Region {
 
     private final String description;
 
-    @Override
-    public String toString() {
-        return description;
-    }
-
     public static List<NameKey> getNameKeys() {
         return Arrays.stream(Region.values()).map(r -> new NameKey(r.description, r.name())).toList();
     }

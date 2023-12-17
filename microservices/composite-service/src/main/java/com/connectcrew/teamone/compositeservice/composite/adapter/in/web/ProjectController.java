@@ -104,10 +104,10 @@ public class ProjectController {
                 .collectList();
     }
 
-    @PostMapping("/")
+    @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     private Mono<SimpleLongResponse> createProject(
             @RequestHeader(JwtProvider.AUTH_HEADER) String token,
-            @RequestPart("banner") Flux<FilePart> banner,
+            @RequestPart(value = "banner", required = false) Flux<FilePart> banner,
             @RequestPart("param") CreateProjectRequest param
     ) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
@@ -134,6 +134,7 @@ public class ProjectController {
 
     @PostMapping("/apply")
     private Mono<SimpleBooleanResponse> applyProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ApplyRequest param) {
+        System.out.println("Test!!!");
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
