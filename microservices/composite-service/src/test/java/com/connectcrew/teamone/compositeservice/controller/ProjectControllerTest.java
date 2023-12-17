@@ -162,7 +162,7 @@ class ProjectControllerTest {
                         Career.SEEKER,
                         Career.YEAR_1,
                         LocalDateTime.now().minusMinutes(5),
-                        ProjectState.RECRUITING,
+                        ProjectState.IN_PROGRESS,
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
@@ -177,7 +177,7 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(10),
-                        ProjectState.PROCEEDING,
+                        ProjectState.IN_PROGRESS,
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
@@ -192,7 +192,7 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(15),
-                        ProjectState.RECRUITING,
+                        ProjectState.COMPLETED,
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
@@ -220,7 +220,7 @@ class ProjectControllerTest {
                         .queryParam("online", true)
                         .queryParam("part", MemberPart.AOS.name())
                         .queryParam("skills", List.of(SkillType.Jira.name(), SkillType.Github.name()))
-                        .queryParam("states", List.of(ProjectState.PROCEEDING.name(), ProjectState.RECRUITING.name()))
+                        .queryParam("states", List.of(ProjectState.IN_PROGRESS.name(), ProjectState.IN_PROGRESS.name()))
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
                         .queryParam("search", "내가 검색하고자 하는 문장")
                         .build()
@@ -282,7 +282,7 @@ class ProjectControllerTest {
                 Region.SEOUL,
                 true,
                 LocalDateTime.now(),
-                ProjectState.PROCEEDING,
+                ProjectState.IN_PROGRESS,
                 Career.SEEKER,
                 Career.YEAR_1,
                 UUID.randomUUID().toString(),
@@ -388,10 +388,10 @@ class ProjectControllerTest {
     @Test
     void memberTest() {
         List<ProjectMember> members = List.of(
-                new ProjectMember(0L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(1L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(2L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(3L, List.of(MemberPart.IOS, MemberPart.AOS))
+                new ProjectMember(0L, true, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(1L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(2L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(3L, false, List.of(MemberPart.IOS, MemberPart.AOS))
         );
         when(projectWebAdapter.findMembers(anyLong())).thenReturn(Mono.just(members));
         when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
@@ -460,6 +460,7 @@ class ProjectControllerTest {
                                 fieldWithPath("[].profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
                                 fieldWithPath("[].profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
                                 fieldWithPath("[].profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
+                                fieldWithPath("[].isLeader").type("Boolean").description("리더 여부"),
                                 fieldWithPath("[].parts").type("String[]").description("프로젝트 직무")
                         )
                 ));
@@ -477,7 +478,7 @@ class ProjectControllerTest {
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                ProjectState.RECRUITING,
+                ProjectState.NOT_STARTED,
                 Career.SEEKER,
                 Career.YEAR_1,
                 List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
@@ -538,7 +539,7 @@ class ProjectControllerTest {
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                ProjectState.RECRUITING,
+                ProjectState.NOT_STARTED,
                 Career.SEEKER,
                 Career.YEAR_1,
                 List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),

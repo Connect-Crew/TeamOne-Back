@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web;
 
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.LoginRequest;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.RegisterRequest;
@@ -26,7 +27,8 @@ public class UserController {
 
     @PostConstruct
     public void init() {
-        log.debug("Test token for test : {}", jwtProvider.createToken("123456", 2L, "TestUser", Role.USER).accessToken());
+        JwtToken token = jwtProvider.createToken("123456", 2L, "TestUser", Role.USER);
+        log.debug("Test token for test : {}", token != null ? token.accessToken() : null);
     }
 
     @PostMapping("/auth/login")
