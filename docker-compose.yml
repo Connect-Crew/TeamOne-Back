@@ -3,7 +3,7 @@ version: "3.7"
 services:
   gateway:
       container_name: teamone-gateway
-      build: microservices/gateway-service
+      build: microservices/gateway
 
       environment:
       - SPRING_PROFILES_ACTIVE=docker

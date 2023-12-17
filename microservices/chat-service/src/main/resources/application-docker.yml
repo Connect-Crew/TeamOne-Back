@@ -11,3 +11,7 @@ spring:
 
   kafka:
     bootstrap-servers: kafka:9093
+
+  redis:
+    host: redis
+    port: 6379

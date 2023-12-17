@@ -1,15 +1,16 @@
 server:
   port: 8080
 
-cloud:
-  gateway:
-    routes:
-      - id: ws_route
-        uri: ws://chat:8080
-        predicates:
-          - Path=/ws/**
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: ws_route
+          uri: ws://chat:8080
+          predicates:
+            - Path=/ws/**
 
-      - id: composite
-        uri: http://composite:8080
-        predicates:
-          - Path=/**
+        - id: composite
+          uri: http://composite:8080
+          predicates:
+            - Path=/**
