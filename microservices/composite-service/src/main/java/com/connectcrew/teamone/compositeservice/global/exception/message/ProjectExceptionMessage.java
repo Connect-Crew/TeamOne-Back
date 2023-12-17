@@ -1,0 +1,41 @@
+package com.connectcrew.teamone.compositeservice.global.exception.message;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public enum ProjectExceptionMessage {
+    NOT_FOUND_PROJECT("프로젝트를 찾을수 없습니다."),
+    INVALID_PROJECT_OWNER("프로젝트의 리더가 아닙니다."),
+    TITLE_LENGTH_2_OVER("프로젝트 제목은 2자 이상이어야 합니다."),
+    TITLE_LENGTH_30_UNDER("프로젝트 제목은 30자 이하여야 합니다."),
+    BANNER_MAX_3("프로젝트 배너는 3개 이하여야 합니다."),
+    ILLEGAL_BANNER_PATH("프로젝트 배너 경로가 올바르지 않습니다."),
+    ILLEGAL_BANNER_NAME("프로젝트 배너 이름이 올바르지 않습니다."),
+    ILLEGAL_BANNER_EXTENSION("프로젝트 배너 확장자가 올바르지 않습니다."),
+    CAREER_MIN_BEFORE_MAX("경력 최소값은 최대값보다 작아야 합니다."),
+    CATEGORY_MIN_1("카테고리는 1개 이상이어야 합니다."),
+    CATEGORY_MAX_3("카테고리는 3개 이하여야 합니다."),
+    INTRODUCTION_LENGTH_1000_UNDER("프로젝트 소개는 1000자 이하여야 합니다."),
+    RECRUIT_COMMENT_LENGTH_30_UNDER("모집 코멘트는 30자 이하여야 합니다."),
+    RECRUIT_MAX_0_OVER("모집 인원은 0명 이상이어야 합니다."),
+    RECRUIT_MAX_SUM_10_UNDER("최대 10명까지 모집 가능합니다."),
+    CREATE_PROJECT_FAILED("프로젝트 생성에 실패했습니다."),
+    LOAD_PROJECT_FAILED("프로젝트 조회에 실패했습니다."),
+    ALREADY_PART_MEMBER("이미 해당 파트의 멤버입니다."),
+    ALREADY_APPLY("이미 해당 파트에 지원했습니다."),
+    COLLECTED_PART("이미 모집이 완료된 파트입니다."),
+    ALREADY_REPORT("이미 신고한 프로젝트입니다."),
+    NOT_FOUND_PART("해당 직무를 찾을 수 없습니다."),
+    BANNER_NOT_FOUND("프로젝트 배너를 찾을 수 없습니다."),
+    INVALID_FAVORITE("프로젝트 좋아요 값이 올바르지 않습니다."),
+    ILLEGAL_CHATROOM_ID("채팅방 ID가 올바르지 않습니다."),
+    FAVORITE_NEGATIVE("프로젝트 좋아요 값은 음수가 될 수 없습니다."),
+    ;
+
+    private final String message;
+
+    @Override
+    public String toString() {
+        return message;
+    }
+}

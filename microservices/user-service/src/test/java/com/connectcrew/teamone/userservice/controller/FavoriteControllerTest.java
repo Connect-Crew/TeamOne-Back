@@ -1,14 +1,15 @@
 package com.connectcrew.teamone.userservice.controller;
 
-import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.userservice.entity.FavoriteEntity;
-import com.connectcrew.teamone.userservice.repository.*;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.connectcrew.teamone.userservice.config.TestBeanConfig;
+import com.connectcrew.teamone.userservice.favorite.adapter.in.web.FavoriteController;
+import com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.entity.FavoriteEntity;
+import com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.repository.FavoriteRepository;
+import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -22,31 +23,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+@Import(TestBeanConfig.class)
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(FavoriteController.class)
 class FavoriteControllerTest {
     @Autowired
     private WebTestClient webTestClient;
-    @MockBean
-    private UserRepository userRepository;
 
-    @MockBean
-    private ProfileRepository profileRepository;
-
-    @MockBean
+    @Autowired
     private FavoriteRepository favoriteRepository;
-
-    @MockBean
-    private PartRepository partRepository;
-
-    @MockBean
-    private RepresentProjectRepository representProjectRepository;
-
-    @MockBean
-    private FcmRepository fcmRepository;
-
-    @MockBean
-    private FirebaseMessaging firebaseMessaging;
 
     @Test
     void getFavorites() {
@@ -64,7 +49,7 @@ class FavoriteControllerTest {
                         .path("/favorite/favorites")
                         .queryParam("userId", "123456789")
                         .queryParam("type", FavoriteType.PROJECT.name())
-                        .queryParam("ids", ids)
+                        .queryParam("targets", ids)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -87,7 +72,7 @@ class FavoriteControllerTest {
 
     @Test
     void getFavorite() {
-        when(favoriteRepository.existsByProfileIdAndTypeAndTarget(anyLong(), anyString(), anyLong())).thenReturn(Mono.just(true));
+        when(favoriteRepository.findByProfileIdAndTypeAndTarget(anyLong(), anyString(), anyLong())).thenReturn(Mono.just(new FavoriteEntity(0L, 0L, FavoriteType.PROJECT.name(), 1L)));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder

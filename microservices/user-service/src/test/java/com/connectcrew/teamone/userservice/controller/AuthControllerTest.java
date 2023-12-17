@@ -5,11 +5,15 @@ import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.api.user.auth.User;
 import com.connectcrew.teamone.api.user.auth.param.UserInputParam;
-import com.connectcrew.teamone.userservice.entity.FcmEntity;
-import com.connectcrew.teamone.userservice.entity.ProfileEntity;
-import com.connectcrew.teamone.userservice.entity.UserEntity;
-import com.connectcrew.teamone.userservice.repository.*;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.connectcrew.teamone.userservice.config.TestBeanConfig;
+import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity.FcmEntity;
+import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.ProfileEntity;
+import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.ProfileRepository;
+import com.connectcrew.teamone.userservice.user.adapter.in.web.AuthController;
+import com.connectcrew.teamone.userservice.user.adapter.out.persistence.entity.UserEntity;
+import com.connectcrew.teamone.userservice.user.adapter.out.persistence.repository.UserRepository;
+import com.connectcrew.teamone.userservice.user.domain.enums.UserExceptionMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,43 +21,34 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+@Import(TestBeanConfig.class)
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(AuthController.class)
 class AuthControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
-    @MockBean
+
+    @Autowired
     private UserRepository userRepository;
 
-    @MockBean
+    @Autowired
     private ProfileRepository profileRepository;
 
-    @MockBean
-    private FavoriteRepository favoriteRepository;
-
-    @MockBean
-    private PartRepository partRepository;
-
-    @MockBean
-    private RepresentProjectRepository representProjectRepository;
-
-    @MockBean
+    @Autowired
     private FcmRepository fcmRepository;
 
-    @MockBean
-    private FirebaseMessaging firebaseMessaging;
 
     @Test
     void find() {
@@ -66,18 +61,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
-                .build();
-
-        ProfileEntity profile = ProfileEntity.builder()
-                .userId(user.getId())
-                .nickname("testNick")
-                .profile("testProfile")
-                .introduction("testIntroduction")
-                .temperature(36.5)
-                .recvApply(1)
-                .resApply(1)
+                .createdDate(OffsetDateTime.now())
+                .modifiedDate(OffsetDateTime.now())
                 .build();
 
         when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
@@ -110,12 +95,12 @@ class AuthControllerTest {
 
     static Stream<Arguments> registerFailArgs() {
         return Stream.of(
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, "fcm"), "서비스 이용약관에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, "fcm"), "개인정보 처리방침에 동의해주세요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, "fcm"), "최소 2글자 이상 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, "fcm"), "최대 10글자 이하로 입력해주세요!"),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, "fcm"), "공백과 특수문자는 들어갈 수 없어요."),
-                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, "fcm"), "이미 존재하는 닉네임입니다.")
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, "fcm"), UserExceptionMessage.TERMS_AGREEMENT_REQUIRED.getMessage()),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, "fcm"), UserExceptionMessage.PRIVACY_AGREEMENT_REQUIRED.getMessage()),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_LESS_2.getMessage()),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_OVER_10.getMessage()),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.SPACE_OR_SPECIAL_CHARACTER_IN_NAME.getMessage()),
+                Arguments.of(new UserInputParam("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.DUPLICATE_NICKNAME.getMessage())
         );
     }
 
@@ -131,8 +116,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdDate(OffsetDateTime.now())
+                .modifiedDate(OffsetDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
@@ -165,8 +150,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdDate(OffsetDateTime.now())
+                .modifiedDate(OffsetDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
@@ -181,7 +166,7 @@ class AuthControllerTest {
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
                 .value(errorInfo -> {
-                    assert errorInfo.getMessage().equals("이미 존재하는 사용자입니다.");
+                    assert errorInfo.getMessage().equals(UserExceptionMessage.ALREADY_EXISTS_USER.getMessage());
                 });
     }
 
@@ -197,8 +182,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdDate(OffsetDateTime.now())
+                .modifiedDate(OffsetDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));

@@ -1,27 +1,13 @@
 package com.connectcrew.teamone.userservice;
 
-import com.connectcrew.teamone.userservice.repository.FavoriteRepository;
-import com.connectcrew.teamone.userservice.repository.PartRepository;
-import com.connectcrew.teamone.userservice.repository.ProfileRepository;
-import com.connectcrew.teamone.userservice.repository.UserRepository;
+import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
+@Import(TestBeanConfig.class)
 class UserServiceApplicationTests {
-
-	@MockBean
-	private UserRepository userRepository;
-
-	@MockBean
-	private ProfileRepository profileRepository;
-
-	@MockBean
-	private FavoriteRepository favoriteRepository;
-
-	@MockBean
-	private PartRepository partRepository;
 
 	@Test
 	void contextLoads() {

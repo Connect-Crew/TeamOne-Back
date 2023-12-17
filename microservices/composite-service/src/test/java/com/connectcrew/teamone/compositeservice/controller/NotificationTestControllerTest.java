@@ -1,28 +1,27 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
-import com.connectcrew.teamone.api.user.notification.FcmNotification;
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.NotificationTestRequest;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.SimpleBooleanResponse;
+import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
-import com.connectcrew.teamone.compositeservice.param.NotificationTestParam;
-import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
-import com.connectcrew.teamone.compositeservice.resposne.BooleanValueRes;
+import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -32,23 +31,20 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 
 @WebFluxTest
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestBeanConfig.class})
 @ExtendWith(RestDocumentationExtension.class)
 class NotificationTestControllerTest {
     @Autowired
-    private WebTestClient webTestClient;
+    private JwtProvider jwtProvider;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     private ApplicationContext context;
 
-    @MockBean
-    private JwtProvider jwtProvider;
-
-    @MockBean
-    private UserRequestImpl userRequest;
-
-    @MockBean
-    private ProjectRequest projectRequest;
+    @Autowired
+    private WebTestClient webTestClient;
 
     @BeforeEach
     void setup(RestDocumentationContextProvider restDocumentation) {
@@ -65,15 +61,16 @@ class NotificationTestControllerTest {
 
     @Test
     void sendNotification() {
-        when(userRequest.sendNotification(any(FcmNotification.class))).thenReturn(Mono.just(true));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(kafkaTemplate.send(anyString(), anyString())).thenReturn(null);
 
         webTestClient.post()
                 .uri("/notification")
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
-                .bodyValue(new NotificationTestParam("title", "body"))
+                .bodyValue(new NotificationTestRequest("title", "body"))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BooleanValueRes.class)
+                .expectBody(SimpleBooleanResponse.class)
                 .consumeWith(document("notification/test-notification",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")

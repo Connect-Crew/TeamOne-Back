@@ -1,21 +1,23 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
-import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.exception.NotFoundException;
-import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.project.*;
-import com.connectcrew.teamone.api.project.values.*;
-import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.api.user.profile.Profile;
-import com.connectcrew.teamone.compositeservice.auth.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
+import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.*;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.*;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ChatWebAdapter;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
+import com.connectcrew.teamone.compositeservice.composite.domain.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
+import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
-import com.connectcrew.teamone.compositeservice.param.ApplyParam;
-import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
-import com.connectcrew.teamone.compositeservice.param.ProjectInputParam;
-import com.connectcrew.teamone.compositeservice.param.ReportParam;
-import com.connectcrew.teamone.compositeservice.request.ProjectRequest;
-import com.connectcrew.teamone.compositeservice.request.UserRequestImpl;
-import com.connectcrew.teamone.compositeservice.resposne.*;
+import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
+import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
+import com.connectcrew.teamone.compositeservice.global.enums.*;
+import com.connectcrew.teamone.compositeservice.global.exception.ErrorInfo;
+import com.connectcrew.teamone.compositeservice.global.exception.NotFoundException;
+import com.connectcrew.teamone.compositeservice.global.exception.message.ProjectExceptionMessage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
@@ -47,6 +48,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -60,7 +62,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 
 @WebFluxTest
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestBeanConfig.class})
 @ExtendWith(RestDocumentationExtension.class)
 class ProjectControllerTest {
 
@@ -70,15 +72,20 @@ class ProjectControllerTest {
     @Autowired
     private ApplicationContext context;
 
-    @MockBean
+    @Autowired
     private JwtProvider jwtProvider;
 
-    @MockBean
-    private UserRequestImpl userRequest;
+    @Autowired
+    private UserWebAdapter userWebAdapter;
 
-    @MockBean
-    private ProjectRequest projectRequest;
+    @Autowired
+    private ProjectWebAdapter projectWebAdapter;
 
+    @Autowired
+    private StaticFileAdapter staticFileAdapter;
+
+    @Autowired
+    private ChatWebAdapter chatWebAdapter;
 
     private static String BANNER_PATH;
 
@@ -155,7 +162,7 @@ class ProjectControllerTest {
                         Career.SEEKER,
                         Career.YEAR_1,
                         LocalDateTime.now().minusMinutes(5),
-                        ProjectState.RECRUITING,
+                        ProjectState.IN_PROGRESS,
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
@@ -170,7 +177,7 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(10),
-                        ProjectState.PROCEEDING,
+                        ProjectState.IN_PROGRESS,
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
@@ -185,7 +192,7 @@ class ProjectControllerTest {
                         Career.NONE,
                         Career.NONE,
                         LocalDateTime.now().minusMinutes(15),
-                        ProjectState.RECRUITING,
+                        ProjectState.COMPLETED,
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
@@ -197,10 +204,11 @@ class ProjectControllerTest {
     @Test
     void listTest() {
         List<ProjectItem> items = initItems();
-        when(jwtProvider.getId(anyString())).thenReturn(1L);
-        when(projectRequest.getProjectList(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
-        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
 
+        System.out.println("asfjabfkjawfbjaskfbnashjk");
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/project/list")
@@ -208,11 +216,11 @@ class ProjectControllerTest {
                         .queryParam("size", 10)
                         .queryParam("goal", ProjectGoal.STARTUP.name())
                         .queryParam("career", Career.YEAR_1.name())
-                        .queryParam("region", Region.SEOUL.name())
+                        .queryParam("region", List.of(Region.SEOUL.name()))
                         .queryParam("online", true)
                         .queryParam("part", MemberPart.AOS.name())
                         .queryParam("skills", List.of(SkillType.Jira.name(), SkillType.Github.name()))
-                        .queryParam("states", List.of(ProjectState.PROCEEDING.name(), ProjectState.RECRUITING.name()))
+                        .queryParam("states", List.of(ProjectState.IN_PROGRESS.name(), ProjectState.IN_PROGRESS.name()))
                         .queryParam("category", List.of(ProjectCategory.IT.name()))
                         .queryParam("search", "내가 검색하고자 하는 문장")
                         .build()
@@ -220,7 +228,7 @@ class ProjectControllerTest {
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<ProjectItemRes>>() {
+                .expectBody(new ParameterizedTypeReference<List<ProjectItemResponse>>() {
                 })
                 .consumeWith(document("project/list",
                         requestHeaders(
@@ -274,7 +282,7 @@ class ProjectControllerTest {
                 Region.SEOUL,
                 true,
                 LocalDateTime.now(),
-                ProjectState.PROCEEDING,
+                ProjectState.IN_PROGRESS,
                 Career.SEEKER,
                 Career.YEAR_1,
                 UUID.randomUUID().toString(),
@@ -287,8 +295,8 @@ class ProjectControllerTest {
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
 
-        when(projectRequest.getProjectDetail(anyLong(), anyLong())).thenReturn(Mono.just(project));
-        when(userRequest.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
+        when(projectWebAdapter.find(anyLong(), anyLong())).thenReturn(Mono.just(project));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
                 0L,
                 "이름",
                 "profile image url",
@@ -298,16 +306,16 @@ class ProjectControllerTest {
                 List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
                 List.of(1L, 2L)
         )));
-        when(jwtProvider.getId(anyString())).thenReturn(1L);
-        when(userRequest.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
-        when(projectRequest.getProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(ProjectDetailRes.class)
+                .expectBody(ProjectDetailResponse.class)
                 .consumeWith(document("project/find-success",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -357,8 +365,8 @@ class ProjectControllerTest {
 
     @Test
     void notFoundTest() {
-        when(projectRequest.getProjectDetail(anyLong(), anyLong())).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
-        when(jwtProvider.getId(anyString())).thenReturn(1L);
+        when(projectWebAdapter.find(anyLong(), anyLong())).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
 
         webTestClient.get()
                 .uri("/project/{projectId}", 0L)
@@ -380,14 +388,14 @@ class ProjectControllerTest {
     @Test
     void memberTest() {
         List<ProjectMember> members = List.of(
-                new ProjectMember(0L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(1L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(2L, List.of(MemberPart.IOS, MemberPart.AOS)),
-                new ProjectMember(3L, List.of(MemberPart.IOS, MemberPart.AOS))
+                new ProjectMember(0L, true, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(1L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(2L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
+                new ProjectMember(3L, false, List.of(MemberPart.IOS, MemberPart.AOS))
         );
-        when(projectRequest.getProjectMembers(anyLong())).thenReturn(Mono.just(members));
-        when(projectRequest.getProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
-        when(userRequest.getProfile(0L)).thenReturn(Mono.just(new Profile(
+        when(projectWebAdapter.findMembers(anyLong())).thenReturn(Mono.just(members));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+        when(userWebAdapter.getProfile(0L)).thenReturn(Mono.just(new Profile(
                 0L,
                 "이름",
                 "profile image url",
@@ -397,7 +405,7 @@ class ProjectControllerTest {
                 List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
                 List.of(1L, 2L)
         )));
-        when(userRequest.getProfile(1L)).thenReturn(Mono.just(new Profile(
+        when(userWebAdapter.getProfile(1L)).thenReturn(Mono.just(new Profile(
                 1L,
                 "이름",
                 "profile image url",
@@ -407,7 +415,7 @@ class ProjectControllerTest {
                 List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
                 List.of(1L, 2L)
         )));
-        when(userRequest.getProfile(2L)).thenReturn(Mono.just(new Profile(
+        when(userWebAdapter.getProfile(2L)).thenReturn(Mono.just(new Profile(
                 2L,
                 "이름",
                 "profile image url",
@@ -417,7 +425,7 @@ class ProjectControllerTest {
                 List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
                 List.of(1L, 2L)
         )));
-        when(userRequest.getProfile(3L)).thenReturn(Mono.just(new Profile(
+        when(userWebAdapter.getProfile(3L)).thenReturn(Mono.just(new Profile(
                 3L,
                 "이름",
                 "profile image url",
@@ -428,7 +436,7 @@ class ProjectControllerTest {
                 List.of(1L, 2L)
         )));
 
-        ParameterizedTypeReference<List<ProjectMemberRes>> resType = new ParameterizedTypeReference<>() {
+        ParameterizedTypeReference<List<ProjectMemberResponse>> resType = new ParameterizedTypeReference<>() {
         };
 
         webTestClient.get()
@@ -452,6 +460,7 @@ class ProjectControllerTest {
                                 fieldWithPath("[].profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
                                 fieldWithPath("[].profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
                                 fieldWithPath("[].profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
+                                fieldWithPath("[].isLeader").type("Boolean").description("리더 여부"),
                                 fieldWithPath("[].parts").type("String[]").description("프로젝트 직무")
                         )
                 ));
@@ -460,14 +469,16 @@ class ProjectControllerTest {
     @Test
     void createProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.saveProject(any(ProjectInput.class))).thenReturn(Mono.just(0L));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.just(0L));
+        when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
+        when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
 
-        ProjectInputParam param = new ProjectInputParam(
+        CreateProjectRequest param = new CreateProjectRequest(
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                ProjectState.RECRUITING,
+                ProjectState.NOT_STARTED,
                 Career.SEEKER,
                 Career.YEAR_1,
                 List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
@@ -475,11 +486,11 @@ class ProjectControllerTest {
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new RecruitInput(MemberPart.PL_PM_PO, "코멘트", 2),
-                        new RecruitInput(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.AOS, "코멘트", 2),
-                        new RecruitInput(MemberPart.IOS, "코멘트", 2),
-                        new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
+                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2)
                 ),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
@@ -496,7 +507,7 @@ class ProjectControllerTest {
                 .bodyValue(multipartData)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(LongValueRes.class)
+                .expectBody(SimpleLongResponse.class)
                 .consumeWith(document("project/create-success",
                                 requestHeaders(
                                         headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -518,14 +529,17 @@ class ProjectControllerTest {
     @Test
     void createFailureTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.saveProject(any(ProjectInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
+        when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
+        when(staticFileAdapter.delete(any(FileCategory.class), anyString())).thenReturn(true);
+        when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
 
-        ProjectInputParam param = new ProjectInputParam(
+        CreateProjectRequest param = new CreateProjectRequest(
                 "프로젝트 제목",
                 Region.SEOUL,
                 true,
-                ProjectState.RECRUITING,
+                ProjectState.NOT_STARTED,
                 Career.SEEKER,
                 Career.YEAR_1,
                 List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
@@ -533,11 +547,11 @@ class ProjectControllerTest {
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new RecruitInput(MemberPart.PL_PM_PO, "코멘트", 2),
-                        new RecruitInput(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
-                        new RecruitInput(MemberPart.AOS, "코멘트", 2),
-                        new RecruitInput(MemberPart.IOS, "코멘트", 2),
-                        new RecruitInput(MemberPart.BACKEND, "코멘트", 2)
+                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2),
+                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2)
                 ),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
@@ -572,7 +586,7 @@ class ProjectControllerTest {
                 .uri("/project/")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(ProjectBasicInfo.class)
+                .expectBody(ProjectBasicInfoResponse.class)
                 .consumeWith(document("project/basic-info",
                         responseFields(
                                 fieldWithPath("region[]").type("NameKey[]").description("지역 이름 및 키값 배열"),
@@ -595,17 +609,18 @@ class ProjectControllerTest {
     @Test
     void favoriteTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(userRequest.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
-        when(projectRequest.updateFavorite(any(FavoriteUpdateInput.class))).thenReturn(Mono.just(10));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(userWebAdapter.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
+        when(projectWebAdapter.updateFavorite(any(ProjectFavorite.class))).thenReturn(Mono.just(10));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/favorite")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ProjectFavoriteParam(1L))
+                .bodyValue(new ProjectFavoriteRequest(1L))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FavoriteRes.class)
+                .expectBody(FavoriteResponse.class)
                 .consumeWith(document("project/favorite",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -624,16 +639,16 @@ class ProjectControllerTest {
     @Test
     void applyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.just(true));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BooleanValueRes.class)
+                .expectBody(SimpleBooleanResponse.class)
                 .consumeWith(document("project/apply",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -652,13 +667,13 @@ class ProjectControllerTest {
     @Test
     void notfoundApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorInfo.class)
@@ -676,13 +691,13 @@ class ProjectControllerTest {
     @Test
     void invalidApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.applyProject(any(ApplyInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyParam(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
@@ -700,16 +715,16 @@ class ProjectControllerTest {
     @Test
     void reportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.just(true));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/report")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .bodyValue(new ReportRequest(1L, "신고 메시지"))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BooleanValueRes.class)
+                .expectBody(SimpleBooleanResponse.class)
                 .consumeWith(document("project/report",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
@@ -727,13 +742,13 @@ class ProjectControllerTest {
     @Test
     void notfoundReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .bodyValue(new ReportRequest(1L, "신고 메시지"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorInfo.class)
@@ -751,13 +766,13 @@ class ProjectControllerTest {
     @Test
     void invalidReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
-        when(jwtProvider.getId(anyString())).thenReturn(0L);
-        when(projectRequest.reportProject(any(ReportInput.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ReportParam(1L, "신고 메시지"))
+                .bodyValue(new ReportRequest(1L, "신고 메시지"))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
