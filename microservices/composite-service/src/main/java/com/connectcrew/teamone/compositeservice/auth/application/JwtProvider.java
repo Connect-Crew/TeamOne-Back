@@ -79,7 +79,7 @@ public class JwtProvider {
     public Authentication getAuthentication(String token) throws UnauthorizedException {
         // token에서 bearer 제거
         String removeBearer;
-        if (token.startsWith(BEARER_PREFIX))
+        if (token.startsWith(BEARER_PREFIX) && token.length() > BEARER_PREFIX.length() + 10)
             removeBearer = token.replace(BEARER_PREFIX, "");
         else
             throw new UnauthorizedException("Invalid token"); // Bearer 없으면 Invalid token
