@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -31,7 +32,11 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     @Override
     public Mono<List<Member>> findAllByProject(Long project) {
         log.trace("findAllByProject - project: {}", project);
-        return findMemberOutput.findAllByProject(project);
+        return findProjectOutput.findById(project)
+                .flatMap(p -> findMemberOutput.findAllByProject(project)
+                        .map(members -> members.stream()
+                                .map(member -> member.setLeader(Objects.equals(p.leader(), member.memberId())))
+                                .toList()));
     }
 
     @Override

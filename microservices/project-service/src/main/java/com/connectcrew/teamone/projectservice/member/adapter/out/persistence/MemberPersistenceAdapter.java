@@ -41,7 +41,7 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
 
                     return memberList.stream()
                             .collect(Collectors.groupingBy(MemberEntity::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
-                            .entrySet().stream().map(e -> new Member(e.getKey(), e.getValue())).toList();
+                            .entrySet().stream().map(e -> new Member(e.getKey(), false, e.getValue())).toList();
                 });
     }
 

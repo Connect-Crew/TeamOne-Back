@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ProjectState {
-    RECRUITING("모집중"),
-    RECRUIT_END("모집마감"),
-    PROCEEDING("진행중"),
-    END("종료");
+    NOT_STARTED("진행 전"),
+    IN_PROGRESS("진행 후"),
+    COMPLETED("종료"),
+    DELETED("삭제");
 
     private final String description;
 

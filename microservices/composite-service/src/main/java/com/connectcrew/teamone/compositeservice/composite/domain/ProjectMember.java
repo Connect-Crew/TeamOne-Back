@@ -6,6 +6,7 @@ import java.util.List;
 
 public record ProjectMember(
         Long memberId,
+        Boolean isLeader,
         List<MemberPart> parts
 ) {
 }

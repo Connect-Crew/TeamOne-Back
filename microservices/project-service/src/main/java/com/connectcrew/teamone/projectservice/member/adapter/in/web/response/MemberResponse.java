@@ -7,12 +7,14 @@ import java.util.List;
 
 public record MemberResponse(
         Long memberId,
+        Boolean isLeader,
         List<MemberPart> parts
 ) {
 
     public static MemberResponse from(Member member) {
         return new MemberResponse(
                 member.memberId(),
+                member.isLeader(),
                 member.parts()
         );
     }

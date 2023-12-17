@@ -98,6 +98,7 @@ public class ProjectController {
     private Mono<List<ProjectMemberResponse>> getProjectMembers(@PathVariable Long projectId) {
         return queryProjectUseCase.getProjectMemberList(projectId)
                 .flatMapMany(Flux::fromIterable)
+                .doOnNext(member -> System.out.println(member))
                 .flatMap(member -> queryProfileUseCase.getFullProfile(member.memberId())
                         .map(ProfileResponse::from)
                         .map(profileRes -> new ProjectMemberResponse(member, profileRes)))

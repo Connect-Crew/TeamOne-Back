@@ -6,6 +6,10 @@ import java.util.List;
 
 public record Member(
         Long memberId,
+        Boolean isLeader,
         List<MemberPart> parts
 ) {
+    public Member setLeader(Boolean leader) {
+        return new Member(memberId, leader, parts);
+    }
 }

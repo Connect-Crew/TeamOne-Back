@@ -65,6 +65,7 @@ public class ProjectEntity {
     }
 
     public Project toDomain(List<String> banners, List<RecruitStatus> recruitStatuses, List<String> skills, List<ProjectCategory> categories) {
+        System.out.println(state);
         return Project.builder()
                 .id(id)
                 .title(title)
