@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -61,8 +61,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(OffsetDateTime.now())
-                .modifiedDate(OffsetDateTime.now())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
 
         when(userRepository.findBySocialIdAndProvider(anyString(), anyString())).thenReturn(Mono.just(user));
@@ -116,8 +116,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(OffsetDateTime.now())
-                .modifiedDate(OffsetDateTime.now())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
@@ -150,8 +150,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(OffsetDateTime.now())
-                .modifiedDate(OffsetDateTime.now())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));
@@ -182,8 +182,8 @@ class AuthControllerTest {
                 .role(Role.USER.name())
                 .termsAgreement(true)
                 .privacyAgreement(true)
-                .createdDate(OffsetDateTime.now())
-                .modifiedDate(OffsetDateTime.now())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
 
         when(profileRepository.existsByNickname(anyString())).thenReturn(Mono.just(false));

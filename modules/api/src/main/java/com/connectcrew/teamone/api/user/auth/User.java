@@ -2,6 +2,8 @@ package com.connectcrew.teamone.api.user.auth;
 
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record User(
         Long id,
@@ -10,8 +12,8 @@ public record User(
         String username,
         String email,
         Role role,
-        String createdDate,
-        String modifiedDate
+        LocalDateTime createdDate,
+        LocalDateTime modifiedDate
 ) {
 
 }

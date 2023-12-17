@@ -8,7 +8,7 @@ import com.connectcrew.teamone.userservice.user.domain.enums.Role;
 import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import lombok.Builder;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Builder
 public record CreateUserCommand(
@@ -29,8 +29,8 @@ public record CreateUserCommand(
                 .username(username)
                 .email(email)
                 .role(Role.USER)
-                .createdDate(OffsetDateTime.now())
-                .modifiedDate(OffsetDateTime.now())
+                .createdDate(LocalDateTime.now())
+                .modifiedDate(LocalDateTime.now())
                 .build();
     }
 

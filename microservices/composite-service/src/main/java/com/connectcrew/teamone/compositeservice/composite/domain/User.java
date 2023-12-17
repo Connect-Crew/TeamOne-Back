@@ -3,7 +3,7 @@ package com.connectcrew.teamone.compositeservice.composite.domain;
 import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.enums.Social;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public record User(
         Long id,
@@ -12,7 +12,7 @@ public record User(
         String username,
         String email,
         Role role,
-        OffsetDateTime createdDate,
-        OffsetDateTime modifiedDate
+        LocalDateTime createdDate,
+        LocalDateTime modifiedDate
 ) {
 }

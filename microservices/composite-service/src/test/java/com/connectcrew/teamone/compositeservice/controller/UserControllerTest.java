@@ -38,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -90,14 +90,14 @@ class UserControllerTest {
 
     @Test
     void loginTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, OffsetDateTime.now(), OffsetDateTime.now());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now(), LocalDateTime.now());
         Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userWebAdapter.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
         when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(userWebAdapter.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
-        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", OffsetDateTime.now(), "refreshToken", OffsetDateTime.now()));
+        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -133,7 +133,7 @@ class UserControllerTest {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userWebAdapter.getUser(anyString(), any(Social.class))).thenReturn(Mono.error(new NotFoundException("사용자를 찾을 수 없습니다.")));
         when(userWebAdapter.saveFcm(anyLong(), anyString())).thenReturn(Mono.just(true));
-        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", OffsetDateTime.now(), "refreshToken", OffsetDateTime.now()));
+        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
         webTestClient.post()
                 .uri("/auth/login")
@@ -193,13 +193,13 @@ class UserControllerTest {
 
     @Test
     void registerTest() {
-        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, OffsetDateTime.now(), OffsetDateTime.now());
+        User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now(), LocalDateTime.now());
         Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userWebAdapter.save(any(Register.class))).thenReturn(Mono.just(user));
         when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
-        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", OffsetDateTime.now(), "refreshToken", OffsetDateTime.now()));
+        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
         webTestClient.post()
                 .uri("/auth/register")
@@ -300,7 +300,7 @@ class UserControllerTest {
     @Test
     void refreshTest() {
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", OffsetDateTime.now(), "refreshToken", OffsetDateTime.now()));
+        when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
         webTestClient.post()
                 .uri("/auth/refresh")

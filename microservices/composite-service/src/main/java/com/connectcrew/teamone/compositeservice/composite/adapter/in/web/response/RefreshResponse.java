@@ -2,13 +2,13 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respon
 
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public record RefreshResponse(
         String token,
-        OffsetDateTime exp,
+        LocalDateTime exp,
         String refresh,
-        OffsetDateTime refreshExp
+        LocalDateTime refreshExp
 ) {
     public static RefreshResponse from(JwtToken token) {
         return new RefreshResponse(

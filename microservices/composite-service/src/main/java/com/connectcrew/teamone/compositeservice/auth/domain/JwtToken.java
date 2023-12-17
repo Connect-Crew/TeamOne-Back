@@ -2,13 +2,13 @@ package com.connectcrew.teamone.compositeservice.auth.domain;
 
 import lombok.Builder;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Builder
 public record JwtToken(
         String accessToken,
-        OffsetDateTime accessTokenExp,
+        LocalDateTime accessTokenExp,
         String refreshToken,
-        OffsetDateTime refreshTokenExp
+        LocalDateTime refreshTokenExp
 ) {
 }

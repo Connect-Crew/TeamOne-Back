@@ -5,7 +5,7 @@ import com.connectcrew.teamone.userservice.user.domain.enums.Role;
 import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import lombok.Builder;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Builder
 public record User(
@@ -17,8 +17,8 @@ public record User(
         Role role,
         Boolean termsAgreement,
         Boolean privacyAgreement,
-        OffsetDateTime createdDate,
-        OffsetDateTime modifiedDate
+        LocalDateTime createdDate,
+        LocalDateTime modifiedDate
 ) {
 
 }

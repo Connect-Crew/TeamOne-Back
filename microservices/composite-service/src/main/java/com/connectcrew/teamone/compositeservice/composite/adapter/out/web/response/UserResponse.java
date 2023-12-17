@@ -4,7 +4,7 @@ import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.enums.Social;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public record UserResponse(
         Long id,
@@ -13,8 +13,8 @@ public record UserResponse(
         String username,
         String email,
         Role role,
-        OffsetDateTime createdDate,
-        OffsetDateTime modifiedDate
+        LocalDateTime createdDate,
+        LocalDateTime modifiedDate
 ) {
     public User toDomain() {
         return new User(id, socialId, provider, username, email, role, createdDate, modifiedDate);

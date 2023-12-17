@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -40,7 +40,7 @@ public class JwtProvider {
     }
 
     public JwtToken createToken(String account, Long id, String nickname, Role role) {
-        OffsetDateTime now = OffsetDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         return JwtToken.builder()
                 .accessToken(createAccessToken(account, id, nickname, role))
                 .accessTokenExp(now.plusSeconds(JwtProvider.accessExp / 1000))

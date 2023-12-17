@@ -7,7 +7,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @Getter
@@ -34,9 +34,9 @@ public class UserEntity {
 
     private Boolean privacyAgreement; // 개인정보 처리 방침
 
-    private OffsetDateTime createdDate;
+    private LocalDateTime createdDate;
 
-    private OffsetDateTime modifiedDate;
+    private LocalDateTime modifiedDate;
 
     public User toDomain() {
         return User.builder()

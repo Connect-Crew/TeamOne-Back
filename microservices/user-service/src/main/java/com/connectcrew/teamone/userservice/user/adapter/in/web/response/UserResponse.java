@@ -5,7 +5,7 @@ import com.connectcrew.teamone.userservice.user.domain.enums.Role;
 import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import lombok.Builder;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Builder
 public record UserResponse(
@@ -15,8 +15,8 @@ public record UserResponse(
         String username,
         String email,
         Role role,
-        OffsetDateTime createdDate,
-        OffsetDateTime modifiedDate
+        LocalDateTime createdDate,
+        LocalDateTime modifiedDate
 ) {
 
     public static UserResponse fromDomain(User user) {
