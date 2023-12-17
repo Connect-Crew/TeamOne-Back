@@ -1,18 +1,18 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in;
 
-import com.connectcrew.teamone.api.project.ApplyInput;
-import com.connectcrew.teamone.api.project.ProjectInput;
-import com.connectcrew.teamone.api.project.ReportInput;
-import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
+import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
+import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
+import com.connectcrew.teamone.compositeservice.composite.domain.Report;
 import reactor.core.publisher.Mono;
 
 public interface SaveProjectUseCase {
 
-    Mono<Long> save(ProjectInput input);
+    Mono<Long> save(CreateProjectCommand command);
 
-    Mono<Boolean> save(ApplyInput input);
+    Mono<Boolean> save(Apply apply);
 
-    Mono<Boolean> save(ReportInput input);
+    Mono<Boolean> save(Report report);
 
-    Mono<Integer> setFavorite(ProjectFavoriteParam param);
+    Mono<Integer> setFavorite(ProjectFavorite favorite);
 }

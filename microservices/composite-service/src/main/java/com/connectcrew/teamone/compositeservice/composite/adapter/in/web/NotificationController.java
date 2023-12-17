@@ -4,7 +4,7 @@ import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.NotificationTestRequest;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SendNotificationUseCase;
-import com.connectcrew.teamone.compositeservice.resposne.BooleanValueRes;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.SimpleBooleanResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +20,10 @@ public class NotificationController {
     private final SendNotificationUseCase sendNotificationUseCase;
 
     @PostMapping
-    public Mono<BooleanValueRes> sendNotification(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody NotificationTestRequest request) {
+    public Mono<SimpleBooleanResponse> sendNotification(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody NotificationTestRequest request) {
         TokenClaim tokenClaim = jwtProvider.getTokenClaim(token);
 
         return sendNotificationUseCase.send(request.toCommand(tokenClaim.id()))
-                .map(BooleanValueRes::new);
+                .map(SimpleBooleanResponse::new);
     }
 }

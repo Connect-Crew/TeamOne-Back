@@ -1,9 +1,11 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request;
 
-import com.connectcrew.teamone.api.project.values.*;
+
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.swing.plaf.synth.Region;
 import java.util.List;
 
 public record ProjectListRequest(

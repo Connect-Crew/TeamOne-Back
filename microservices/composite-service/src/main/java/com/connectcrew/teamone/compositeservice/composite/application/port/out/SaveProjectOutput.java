@@ -1,14 +1,14 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
-import com.connectcrew.teamone.api.project.ApplyInput;
-import com.connectcrew.teamone.api.project.ProjectInput;
-import com.connectcrew.teamone.api.project.ReportInput;
+import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
+import com.connectcrew.teamone.compositeservice.composite.domain.Report;
+import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
 import reactor.core.publisher.Mono;
 
 public interface SaveProjectOutput {
-    Mono<Long> save(ProjectInput input);
+    Mono<Long> save(CreateProjectInfo input);
 
-    Mono<Boolean> save(ApplyInput input);
+    Mono<Boolean> save(Apply input);
 
-    Mono<Boolean> save(ReportInput input);
+    Mono<Boolean> save(Report input);
 }

@@ -18,6 +18,6 @@ public class ChatAplService implements CreateChatRoomUseCase {
 
     @Override
     public Mono<ChatRoom> createChatRoom(CreateChatRoomCommand command) {
-        return createChatRoomOutput.createChatRoom(command.toDomain(null));
+        return createChatRoomOutput.createChatRoom(command.type(), command.members());
     }
 }

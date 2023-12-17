@@ -1,13 +1,13 @@
 package com.connectcrew.teamone.compositeservice.composite.application;
 
-import com.connectcrew.teamone.api.project.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveProjectUseCase;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
-import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
+import com.connectcrew.teamone.compositeservice.composite.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,22 +42,22 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
 
 
     @Override
-    public Mono<Long> save(ProjectInput input) {
-        return saveProjectOutput.save(input);
+    public Mono<Long> save(CreateProjectCommand command) {
+        return saveProjectOutput.save(command.toDomain());
     }
 
     @Override
-    public Mono<Boolean> save(ApplyInput input) {
-        return saveProjectOutput.save(input);
+    public Mono<Boolean> save(Apply apply) {
+        return saveProjectOutput.save(apply);
     }
 
     @Override
-    public Mono<Boolean> save(ReportInput input) {
-        return saveProjectOutput.save(input);
+    public Mono<Boolean> save(Report report) {
+        return saveProjectOutput.save(report);
     }
 
     @Override
-    public Mono<Integer> setFavorite(ProjectFavoriteParam param) {
-        return updateProjectOutput.updateFavorite(param);
+    public Mono<Integer> setFavorite(ProjectFavorite favorite) {
+        return updateProjectOutput.updateFavorite(favorite);
     }
 }

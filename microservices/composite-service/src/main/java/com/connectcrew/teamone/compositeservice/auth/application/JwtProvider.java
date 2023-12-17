@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.auth.application;
 
-import com.connectcrew.teamone.api.user.auth.Role;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
+import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -40,7 +40,7 @@ public class JwtProvider {
     }
 
     public JwtToken createToken(String account, Long id, String nickname, Role role) {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         return JwtToken.builder()
                 .accessToken(createAccessToken(account, id, nickname, role))
                 .accessTokenExp(now.plusSeconds(JwtProvider.accessExp / 1000))

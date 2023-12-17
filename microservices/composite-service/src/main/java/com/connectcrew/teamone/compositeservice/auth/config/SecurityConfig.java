@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.auth.config;
 
-import com.connectcrew.teamone.api.exception.ErrorInfo;
+import com.connectcrew.teamone.compositeservice.global.exception.ErrorInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

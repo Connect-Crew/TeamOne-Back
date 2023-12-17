@@ -1,12 +1,15 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
-import com.connectcrew.teamone.api.user.auth.Social;
-import com.connectcrew.teamone.api.user.auth.User;
-import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.api.user.notification.FcmToken;
-import com.connectcrew.teamone.api.user.profile.Profile;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.request.RegisterRequest;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProfileResponse;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.SaveFcmTokenRequest;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.UserResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
 import com.connectcrew.teamone.compositeservice.composite.domain.Register;
+import com.connectcrew.teamone.compositeservice.composite.domain.User;
+import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
+import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +37,9 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
         return webClient.get()
                 .uri(String.format("%s/user/?socialId=%s&provider=%s", host, socialId, provider.name()))
                 .retrieve()
-                .bodyToMono(User.class)
-                .onErrorResume(exHandler::handleException);
+                .bodyToMono(UserResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(UserResponse::toDomain);
     }
 
     @Override
@@ -43,8 +47,9 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
         return webClient.get()
                 .uri(String.format("%s/profile/?id=%d", host, id))
                 .retrieve()
-                .bodyToMono(Profile.class)
-                .onErrorResume(exHandler::handleException);
+                .bodyToMono(ProfileResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(ProfileResponse::toDomain);
     }
 
     @Override
@@ -85,21 +90,11 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
                 .onErrorResume(exHandler::handleException);
     }
 
-//    @Override
-//    public Mono<Boolean> sendNotification(FcmNotification notification) {
-//        return webClient.post()
-//                .uri(String.format("%s/notification", host))
-//                .bodyValue(notification)
-//                .retrieve()
-//                .bodyToMono(Boolean.class)
-//                .onErrorResume(exHandler::handleException);
-//    }
-
     @Override
     public Mono<Boolean> saveFcm(Long id, String fcm) {
         return webClient.post()
                 .uri(String.format("%s/notification/token", host))
-                .bodyValue(new FcmToken(id, fcm))
+                .bodyValue(new SaveFcmTokenRequest(id, fcm))
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .onErrorResume(exHandler::handleException);
@@ -109,7 +104,7 @@ public class UserWebAdapter implements SaveUserOutput, FindUserOutput, FindFavor
     public Mono<User> save(Register register) {
         return webClient.post()
                 .uri(String.format("%s/user/", host))
-                .bodyValue(register)
+                .bodyValue(RegisterRequest.from(register))
                 .retrieve()
                 .bodyToMono(User.class)
                 .onErrorResume(exHandler::handleException);

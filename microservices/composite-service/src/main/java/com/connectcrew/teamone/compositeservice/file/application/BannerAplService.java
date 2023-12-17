@@ -1,7 +1,5 @@
 package com.connectcrew.teamone.compositeservice.file.application;
 
-import com.connectcrew.teamone.api.exception.NotFoundException;
-import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.SaveFileUseCase;
@@ -9,6 +7,8 @@ import com.connectcrew.teamone.compositeservice.file.application.port.out.Delete
 import com.connectcrew.teamone.compositeservice.file.application.port.out.FindFileOutput;
 import com.connectcrew.teamone.compositeservice.file.application.port.out.SaveFileOutput;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
+import com.connectcrew.teamone.compositeservice.global.exception.NotFoundException;
+import com.connectcrew.teamone.compositeservice.global.exception.message.ProjectExceptionMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;

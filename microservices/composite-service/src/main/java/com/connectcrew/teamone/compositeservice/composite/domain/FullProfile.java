@@ -1,7 +1,5 @@
 package com.connectcrew.teamone.compositeservice.composite.domain;
 
-import com.connectcrew.teamone.api.user.profile.Profile;
-
 import java.util.List;
 
 public record FullProfile(

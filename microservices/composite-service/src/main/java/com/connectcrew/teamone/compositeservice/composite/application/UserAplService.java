@@ -1,9 +1,5 @@
 package com.connectcrew.teamone.compositeservice.composite.application;
 
-import com.connectcrew.teamone.api.user.auth.Social;
-import com.connectcrew.teamone.api.user.auth.User;
-import com.connectcrew.teamone.api.user.favorite.FavoriteType;
-import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.application.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
@@ -13,7 +9,11 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.in.Qu
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.RegisterCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
+import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
+import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
+import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

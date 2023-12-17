@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.event;
 
-import com.connectcrew.teamone.api.user.notification.FcmNotification;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SendNotificationOutput;
+import com.connectcrew.teamone.compositeservice.composite.domain.FcmNotification;
 import com.connectcrew.teamone.compositeservice.global.constants.KafkaEventTopic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

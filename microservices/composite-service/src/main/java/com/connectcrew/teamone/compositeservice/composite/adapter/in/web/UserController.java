@@ -1,6 +1,5 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web;
 
-import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.LoginRequest;
@@ -10,6 +9,7 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.RefreshResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.AuthUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProfileUseCase;
+import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
-import com.connectcrew.teamone.api.user.auth.Social;
-import com.connectcrew.teamone.api.user.auth.User;
-import com.connectcrew.teamone.api.user.profile.Profile;
+import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
+import com.connectcrew.teamone.compositeservice.composite.domain.User;
+import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import reactor.core.publisher.Mono;
 
 public interface FindUserOutput {

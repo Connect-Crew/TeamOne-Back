@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in;
 
-import com.connectcrew.teamone.api.project.ProjectDetail;
-import com.connectcrew.teamone.api.project.ProjectItem;
-import com.connectcrew.teamone.api.project.ProjectMember;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
+import com.connectcrew.teamone.compositeservice.composite.domain.ProjectDetail;
+import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
+import com.connectcrew.teamone.compositeservice.composite.domain.ProjectMember;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

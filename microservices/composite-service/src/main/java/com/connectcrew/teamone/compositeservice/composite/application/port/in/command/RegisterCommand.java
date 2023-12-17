@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in.command;
 
-import com.connectcrew.teamone.api.user.auth.Social;
 import com.connectcrew.teamone.compositeservice.composite.domain.Register;
+import com.connectcrew.teamone.compositeservice.global.enums.Social;
 
 public record RegisterCommand(
         String token,

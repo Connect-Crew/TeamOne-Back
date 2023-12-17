@@ -1,8 +1,5 @@
 package com.connectcrew.teamone.compositeservice.global.exception;
 
-import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.exception.InvalidOwnerException;
-import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;

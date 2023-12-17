@@ -1,11 +1,14 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
-import com.connectcrew.teamone.api.project.*;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.MemberResponse;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectDetailResponse;
+import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectItemResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
+import com.connectcrew.teamone.compositeservice.composite.domain.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
 import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
-import com.connectcrew.teamone.compositeservice.param.ProjectFavoriteParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -61,8 +64,9 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .build()
                 )
                 .retrieve()
-                .bodyToFlux(ProjectItem.class)
-                .onErrorResume(exHandler::handleException);
+                .bodyToFlux(ProjectItemResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(ProjectItemResponse::toDomain);
     }
 
     @Override
@@ -70,24 +74,26 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/?id=%d&userId=%d", host, projectId, userId))
                 .retrieve()
-                .bodyToMono(ProjectDetail.class)
-                .onErrorResume(exHandler::handleException);
+                .bodyToMono(ProjectDetailResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(ProjectDetailResponse::toDomain);
     }
 
     @Override
     public Mono<List<ProjectMember>> findMembers(Long projectId) {
-        ParameterizedTypeReference<List<ProjectMember>> type = new ParameterizedTypeReference<>() {
+        ParameterizedTypeReference<List<MemberResponse>> type = new ParameterizedTypeReference<>() {
         };
 
         return webClient.get()
                 .uri(String.format("%s/members?id=%d", host, projectId))
                 .retrieve()
                 .bodyToMono(type)
-                .onErrorResume(exHandler::handleException);
+                .onErrorResume(exHandler::handleException)
+                .map(members -> members.stream().map(MemberResponse::toDomain).toList());
     }
 
     @Override
-    public Mono<Long> save(ProjectInput input) {
+    public Mono<Long> save(CreateProjectInfo input) {
         return webClient.post()
                 .uri(String.format("%s/", host))
                 .bodyValue(input)
@@ -97,7 +103,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(ApplyInput input) {
+    public Mono<Boolean> save(Apply input) {
         return webClient.post()
                 .uri(String.format("%s/apply", host))
                 .bodyValue(input)
@@ -107,7 +113,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(ReportInput input) {
+    public Mono<Boolean> save(Report input) {
         return webClient.post()
                 .uri(String.format("%s/report", host))
                 .bodyValue(input)
@@ -117,10 +123,10 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Integer> updateFavorite(ProjectFavoriteParam param) {
+    public Mono<Integer> updateFavorite(ProjectFavorite favorite) {
         return webClient.post()
                 .uri(String.format("%s/favorite", host))
-                .bodyValue(param)
+                .bodyValue(favorite)
                 .retrieve()
                 .bodyToMono(Integer.class)
                 .onErrorResume(exHandler::handleException);

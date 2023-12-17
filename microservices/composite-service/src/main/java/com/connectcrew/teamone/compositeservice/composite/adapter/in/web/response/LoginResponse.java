@@ -2,7 +2,7 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respon
 
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public record LoginResponse(
@@ -15,9 +15,9 @@ public record LoginResponse(
         List<String> parts,
         String email,
         String token,
-        LocalDateTime exp,
+        OffsetDateTime exp,
         String refreshToken,
-        LocalDateTime refreshExp
+        OffsetDateTime refreshExp
 ) {
 
     public static LoginResponse from(LoginResult result) {

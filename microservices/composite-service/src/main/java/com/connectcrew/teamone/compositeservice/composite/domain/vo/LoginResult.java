@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.compositeservice.composite.domain.vo;
 
-import com.connectcrew.teamone.api.user.auth.User;
-import com.connectcrew.teamone.api.user.profile.Profile;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
+import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
+import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Builder
@@ -19,9 +19,9 @@ public record LoginResult(
         List<String> parts,
         String email,
         String token,
-        LocalDateTime exp,
+        OffsetDateTime exp,
         String refreshToken,
-        LocalDateTime refreshExp
+        OffsetDateTime refreshExp
 ) {
     public static LoginResult from(User user, Profile profile, JwtToken token) {
         return LoginResult.builder()
