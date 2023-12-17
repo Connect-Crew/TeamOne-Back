@@ -611,11 +611,12 @@ class ProjectControllerTest {
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(userWebAdapter.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
         when(projectWebAdapter.updateFavorite(any(ProjectFavorite.class))).thenReturn(Mono.just(10));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/favorite")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ProjectFavoriteRequest(1L, true))
+                .bodyValue(new ProjectFavoriteRequest(1L))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(FavoriteResponse.class)
@@ -624,8 +625,7 @@ class ProjectControllerTest {
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
                         ),
                         requestFields(
-                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
-                                fieldWithPath("favorite").type("Boolean").description("좋아요 여부 (Deprecated)")
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디")
                         ),
                         responseFields(
                                 fieldWithPath("project").type("Number").description("프로젝트 아이디"),

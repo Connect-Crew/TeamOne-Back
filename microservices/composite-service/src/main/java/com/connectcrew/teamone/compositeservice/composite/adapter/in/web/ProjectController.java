@@ -123,11 +123,11 @@ public class ProjectController {
 
 
     @PostMapping("/favorite")
-    private Mono<FavoriteResponse> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteRequest param) { // TODO param에 favorite 여부 제거
+    private Mono<FavoriteResponse> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteRequest param) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
-
-        return saveProjectUseCase.setFavorite(new ProjectFavorite(param.projectId(), param.favorite()))
+        return queryUserUseCase.isFavorite(id, FavoriteType.PROJECT, param.projectId())
+                .flatMap(favorite -> saveProjectUseCase.setFavorite(new ProjectFavorite(param.projectId(), !favorite)))
                 .flatMap(newFavorite -> saveUserUseCase.setFavorite(id, FavoriteType.PROJECT, param.projectId())
                         .map(favorite -> new FavoriteResponse(param.projectId(), favorite, newFavorite)));
     }
