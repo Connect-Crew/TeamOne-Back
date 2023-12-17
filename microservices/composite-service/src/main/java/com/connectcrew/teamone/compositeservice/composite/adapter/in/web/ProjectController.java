@@ -117,18 +117,19 @@ public class ProjectController {
                 .flatMap(bannerPaths -> createChatRoomUseCase.createChatRoom(new CreateChatRoomCommand(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
                 .flatMap(tuple -> saveProjectUseCase.save(param.toCommand(id, tuple.getT2().id()))
                         .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+                        // TODO 프로젝트 글 작성 실패시 채팅방 삭제
                 .map(SimpleLongResponse::new);
     }
 
 
     @PostMapping("/favorite")
-    private Mono<FavoriteResponse> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteRequest param) {
+    private Mono<FavoriteResponse> favoriteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ProjectFavoriteRequest param) { // TODO param에 favorite 여부 제거
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
-        return saveProjectUseCase.setFavorite(new ProjectFavorite(param.project(), param.favorite()))
-                .flatMap(newFavorite -> saveUserUseCase.setFavorite(id, FavoriteType.PROJECT, param.project())
-                        .map(favorite -> new FavoriteResponse(param.project(), favorite, newFavorite)));
+        return saveProjectUseCase.setFavorite(new ProjectFavorite(param.projectId(), param.favorite()))
+                .flatMap(newFavorite -> saveUserUseCase.setFavorite(id, FavoriteType.PROJECT, param.projectId())
+                        .map(favorite -> new FavoriteResponse(param.projectId(), favorite, newFavorite)));
     }
 
     @PostMapping("/apply")

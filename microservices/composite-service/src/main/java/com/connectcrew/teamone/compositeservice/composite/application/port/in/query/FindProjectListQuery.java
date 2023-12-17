@@ -2,8 +2,8 @@ package com.connectcrew.teamone.compositeservice.composite.application.port.in.q
 
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFilterOption;
 import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
+import com.connectcrew.teamone.compositeservice.global.enums.Region;
 
-import javax.swing.plaf.synth.Region;
 import java.util.List;
 
 public record FindProjectListQuery(

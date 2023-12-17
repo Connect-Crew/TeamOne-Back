@@ -2,7 +2,6 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.reques
 
 
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
-import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateRecruitCommand;
 import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import com.connectcrew.teamone.compositeservice.global.enums.Region;
 
@@ -20,7 +19,7 @@ public record CreateProjectRequest(
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,
-        List<CreateRecruitCommand> recruits,
+        List<CreateRecruitRequest> recruits,
         List<String> skills
 ) {
     public CreateProjectCommand toCommand(Long leader, UUID chatRoomId) {
@@ -38,7 +37,7 @@ public record CreateProjectRequest(
                 category,
                 goal,
                 introduction,
-                recruits,
+                recruits.stream().map(CreateRecruitRequest::toCommand).toList(),
                 skills
         );
     }

@@ -9,7 +9,6 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.RefreshResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.AuthUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProfileUseCase;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ public class UserController {
 
     @PostMapping("/auth/login")
     public Mono<LoginResponse> login(@RequestBody LoginRequest request) {
-        return authUserUseCase.login(request.token(), Social.valueOf(request.social()), request.fcm())
+        return authUserUseCase.login(request.token(), request.social(), request.fcm())
                 .map(LoginResponse::from);
     }
 
