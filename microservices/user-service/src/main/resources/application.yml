@@ -24,3 +24,11 @@ db:
 logging:
   level:
     com.connectcrew.teamone: trace
+
+discord:
+  bot:
+    token: Discord Bot Token
+
+  channel:
+    report: Discord Report Channel ID
+    error: Discord Error Channel ID
