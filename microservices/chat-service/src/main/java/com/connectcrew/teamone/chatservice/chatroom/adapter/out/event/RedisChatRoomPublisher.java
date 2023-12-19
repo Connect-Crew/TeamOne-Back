@@ -1,7 +1,8 @@
 package com.connectcrew.teamone.chatservice.chatroom.adapter.out.event;
 
+import com.connectcrew.teamone.chatservice.chat.domain.Chat;
+import com.connectcrew.teamone.chatservice.chat.domain.enums.MessageType;
 import com.connectcrew.teamone.chatservice.chatroom.adapter.in.event.MemberModifiedEvent;
-import com.connectcrew.teamone.chatservice.chatroom.adapter.out.event.event.ChatRoomCreatedEvent;
 import com.connectcrew.teamone.chatservice.chatroom.adapter.out.event.publisher.ChatRoomCreatedEventPublisher;
 import com.connectcrew.teamone.chatservice.chatroom.application.port.out.ModifiedMemberChatRoomEventOutput;
 import com.connectcrew.teamone.chatservice.chatroom.domain.ChatRoom;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -27,7 +29,9 @@ public class RedisChatRoomPublisher implements ChatRoomCreatedEventPublisher, Mo
     @Override
     public void publishChatRoomCreated(ChatRoom chatRoom) {
         try {
-            String message = objectMapper.writeValueAsString(ChatRoomCreatedEvent.of(chatRoom));
+            Chat chat = new Chat(MessageType.ENTER, -1L, chatRoom.id(), "채팅방이 생성되었습니다.", LocalDateTime.now());
+            String message = objectMapper.writeValueAsString(chat);
+            Chat tmp = objectMapper.readValue(message, Chat.class);
             redisTemplate.convertAndSend(RedisTopic.CHAT.getTopic(), message);
         } catch (Exception e) {
             log.error("publish error", e);

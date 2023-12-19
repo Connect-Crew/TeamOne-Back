@@ -19,7 +19,8 @@ public class ChatMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            Chat chat = objectMapper.readValue(message.toString(), Chat.class);
+
+            Chat chat = objectMapper.readValue(message.getBody(), Chat.class);
 
             sendChatUseCase.sendChat(chat);
         } catch (Exception e) {

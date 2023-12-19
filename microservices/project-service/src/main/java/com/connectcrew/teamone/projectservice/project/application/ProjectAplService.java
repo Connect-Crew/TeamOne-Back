@@ -135,8 +135,8 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
 
             recruitMaxSum += recruit.max();
         }
-        if (recruitMaxSum > 10)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_10_UNDER.toString()));
+        if (recruitMaxSum > 30)
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_30_UNDER.toString()));
 
         return Mono.just(command);
     }

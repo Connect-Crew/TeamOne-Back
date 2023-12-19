@@ -4,10 +4,12 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.reques
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
 import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import lombok.Builder;
 
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 public record CreateProjectRequest(
         String title,
         Region region,

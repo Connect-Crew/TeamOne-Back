@@ -24,7 +24,7 @@ public record ProjectFilterOptionRequest(
         return ProjectQuery.builder()
                 .lastId(lastId)
                 .size(size)
-                .goal(ProjectGoal.valueOf(goal))
+                .goal(goal != null ? ProjectGoal.valueOf(goal) : null)
                 .career(career)
                 .region(region)
                 .online(online)

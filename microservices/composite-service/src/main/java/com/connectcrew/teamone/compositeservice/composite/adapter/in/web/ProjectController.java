@@ -2,22 +2,22 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web;
 
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
-import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.ProjectListRequest;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.*;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateChatRoomCommand;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.SaveFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
 import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
-import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.ApplyRequest;
-import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.ProjectFavoriteRequest;
-import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.CreateProjectRequest;
-import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.ReportRequest;
+import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -40,6 +40,7 @@ public class ProjectController {
     private static final ProjectBasicInfoResponse projectBasicInfo = new ProjectBasicInfoResponse();
 
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper;
     private final CreateChatRoomUseCase createChatRoomUseCase;
     private final SaveUserUseCase saveUserUseCase;
     private final SaveFileUseCase saveFileUseCase;
@@ -109,17 +110,55 @@ public class ProjectController {
     private Mono<SimpleLongResponse> createProject(
             @RequestHeader(JwtProvider.AUTH_HEADER) String token,
             @RequestPart(value = "banner", required = false) Flux<FilePart> banner,
-            @RequestPart("param") CreateProjectRequest param
+            @RequestPart String title,
+            @RequestPart String region,
+            @RequestPart String online,
+            @RequestPart String state,
+            @RequestPart String careerMin,
+            @RequestPart String careerMax,
+            @RequestPart Flux<String> leaderParts,
+            @RequestPart Flux<String> category,
+            @RequestPart String goal,
+            @RequestPart String introduction,
+            @RequestPart Flux<String> recruits,
+            @RequestPart Flux<String> skills
     ) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
-        return saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
-                .flatMap(bannerPaths -> createChatRoomUseCase.createChatRoom(new CreateChatRoomCommand(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
-                .flatMap(tuple -> saveProjectUseCase.save(param.toCommand(id, tuple.getT2().id()))
-                        .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
+        System.out.println(state);
+
+        return Mono.zip(
+                        leaderParts.map(MemberPart::valueOf).collectList(),
+                        category.map(ProjectCategory::valueOf).collectList(),
+                        recruits.map(r -> {
+                            try {
+                                return objectMapper.readValue(r, CreateRecruitRequest.class);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).collectList(),
+                        skills.collectList()
+                ).map(tuple -> CreateProjectRequest.builder()
+                        .title(title)
+                        .region(Region.valueOf(region))
+                        .online(Boolean.valueOf(online))
+                        .state(ProjectState.valueOf(state))
+                        .careerMin(Career.valueOf(careerMin))
+                        .careerMax(Career.valueOf(careerMax))
+                        .leaderParts(tuple.getT1())
+                        .category(tuple.getT2())
+                        .goal(ProjectGoal.valueOf(goal))
+                        .introduction(introduction)
+                        .recruits(tuple.getT3())
+                        .skills(tuple.getT4())
+                        .build())
+                .flatMap(request -> saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
+                        .flatMap(bannerPaths -> createChatRoomUseCase.createChatRoom(new CreateChatRoomCommand(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
+                        .flatMap(tuple -> saveProjectUseCase.save(request.toCommand(id, tuple.getT2().id()))
+                                .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                         // TODO 프로젝트 글 작성 실패시 채팅방 삭제
-                .map(SimpleLongResponse::new);
+                        .map(SimpleLongResponse::new));
     }
 
 

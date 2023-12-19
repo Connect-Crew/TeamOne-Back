@@ -21,6 +21,7 @@ public class RedisMessagePublisher implements ChatPublisher {
     public void publish(Chat chat) {
         try {
             String message = objectMapper.writeValueAsString(chat);
+            System.out.println(message);
             redisTemplate.convertAndSend(RedisTopic.CHAT.getTopic(), message);
         } catch (Exception e) {
             log.error("publish error", e);
