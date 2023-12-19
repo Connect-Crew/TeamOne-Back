@@ -1,6 +1,8 @@
-package com.connectcrew.teamone.userservice.notification.adapter.in.event;
+package com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener;
 
 import com.connectcrew.teamone.userservice.gloabal.constants.KafkaEventTopic;
+import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.DiscordMessageEvent;
+import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.SendMessageEvent;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,17 @@ public class NotificationEventListener {
             sendMessageUseCase.sendMessage(event.toCommand()).subscribe();
         } catch (Exception e) {
             log.error("consumePushNotificationEvent error", e);
+        }
+    }
+
+    @KafkaListener(topics = KafkaEventTopic.DiscordNotification, groupId = "user-service")
+    public void consumeDiscordNotificationEvent(String body) {
+        try {
+            DiscordMessageEvent event = objectMapper.readValue(body, DiscordMessageEvent.class);
+
+            sendMessageUseCase.sendMessage(event.toCommand()).subscribe();
+        } catch (Exception e) {
+            log.error("consumeDiscordNotificationEvent error", e);
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.connectcrew.teamone.userservice.notification.adapter.out.discord;
 
+import com.connectcrew.teamone.userservice.notification.application.port.out.SendDiscordOutput;
+import com.connectcrew.teamone.userservice.notification.domain.DiscordChannel;
+import com.connectcrew.teamone.userservice.notification.domain.DiscordMessage;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -8,16 +11,18 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
+import java.util.Objects;
+
 @Slf4j
 @Repository
-public class DiscordNotificationAdapter {
+public class DiscordNotificationAdapter implements SendDiscordOutput {
 
     private final String token;
 
     private final JDA jda;
 
-    private final TextChannel reportChannel;
-    private final TextChannel errorChannel;
+    private final Map<DiscordChannel, TextChannel> channels;
 
     public DiscordNotificationAdapter(@Value("${discord.bot.token}") String token, @Value("${discord.channel.report}") String reportChannel, @Value("${discord.channel.error}") String errorChannel) {
         this.token = token;
@@ -26,14 +31,23 @@ public class DiscordNotificationAdapter {
                     .setActivity(Activity.playing("모니터링"))
                     .build().awaitReady();
 
-            this.reportChannel = jda.getTextChannelById(reportChannel);
-            this.errorChannel = jda.getTextChannelById(errorChannel);
+            channels = Map.of(
+                    DiscordChannel.REPORT, Objects.requireNonNull(jda.getTextChannelById(reportChannel)),
+                    DiscordChannel.ERROR, Objects.requireNonNull(jda.getTextChannelById(errorChannel))
+            );
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-
-//    public void sendReport(String message) {
-//        reportChannel.sendMessage(message).queue();
-//    }
+    @Override
+    public boolean sendMessage(DiscordMessage message) {
+        log.trace("send message: {}", message);
+        try {
+            channels.get(message.channel()).sendMessage(message.toMessage()).queue();
+            return true;
+        } catch (Exception e) {
+            log.trace("send message - error: {}", e.getMessage(), e);
+            return false;
+        }
+    }
 }

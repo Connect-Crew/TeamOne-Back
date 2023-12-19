@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.userservice.notification.adapter.in.event;
+package com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event;
 
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
 

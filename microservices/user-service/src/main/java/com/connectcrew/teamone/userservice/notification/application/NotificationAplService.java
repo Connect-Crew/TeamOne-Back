@@ -2,11 +2,9 @@ package com.connectcrew.teamone.userservice.notification.application;
 
 import com.connectcrew.teamone.userservice.notification.application.port.in.SaveFcmTokenUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
+import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
-import com.connectcrew.teamone.userservice.notification.application.port.out.DeleteFcmOutput;
-import com.connectcrew.teamone.userservice.notification.application.port.out.FindFcmOutput;
-import com.connectcrew.teamone.userservice.notification.application.port.out.SaveFcmOutput;
-import com.connectcrew.teamone.userservice.notification.application.port.out.SendMessageOutput;
+import com.connectcrew.teamone.userservice.notification.application.port.out.*;
 import com.connectcrew.teamone.userservice.notification.domain.FcmMessage;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -23,6 +21,7 @@ public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenU
     private final DeleteFcmOutput deleteFcmOutput;
     private final SendMessageOutput sendMessageOutput;
     private final SaveFcmOutput saveFcmOutput;
+    private final SendDiscordOutput sendDiscordOutput;
 
     @Override
     public Mono<Boolean> sendMessage(SendMessageCommand command) {
@@ -38,6 +37,12 @@ public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenU
                     }
                 })
                 .then()
+                .thenReturn(true);
+    }
+
+    @Override
+    public Mono<Boolean> sendMessage(DiscordMessageCommand command) {
+        return Mono.just(sendDiscordOutput.sendMessage(command.toDomain()))
                 .thenReturn(true);
     }
 
