@@ -474,31 +474,30 @@ class ProjectControllerTest {
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
         when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
 
-        CreateProjectRequest param = new CreateProjectRequest(
-                "프로젝트 제목",
-                Region.SEOUL,
-                true,
-                ProjectState.NOT_STARTED,
-                Career.SEEKER,
-                Career.YEAR_1,
-                List.of(MemberPart.PL_PM_PO, MemberPart.UI_UX_DESIGNER),
-                List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
-                ProjectGoal.STARTUP,
-                "프로젝트 설명",
-                List.of(
-                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2)
-                ),
-                List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
-        );
-
         MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
-        multipartData.add("param", param);
         multipartData.add("banner", new ClassPathResource("banner1.png"));
         multipartData.add("banner", new ClassPathResource("banner2.png"));
+        multipartData.add("title", "프로젝트 제목");
+        multipartData.add("region", Region.SEOUL.name());
+        multipartData.add("online", true);
+        multipartData.add("state", ProjectState.NOT_STARTED.name());
+        multipartData.add("careerMin", Career.SEEKER.name());
+        multipartData.add("careerMax", Career.YEAR_1.name());
+        multipartData.add("leaderParts", MemberPart.PL_PM_PO.name());
+        multipartData.add("leaderParts", MemberPart.UI_UX_DESIGNER.name());
+        multipartData.add("category", ProjectCategory.IT.name());
+        multipartData.add("category", ProjectCategory.ECOMMERCE.name());
+        multipartData.add("goal", ProjectGoal.STARTUP.name());
+        multipartData.add("introduction", "프로젝트 설명");
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2));
+        multipartData.add("skills", SkillType.Swift.name());
+        multipartData.add("skills", SkillType.Kotlin.name());
+        multipartData.add("skills", SkillType.Spring.name());
+
 
         webTestClient.post()
                 .uri("/project/")
@@ -514,7 +513,18 @@ class ProjectControllerTest {
                                 ),
                                 requestParts(
                                         partWithName("banner").optional().description("프로젝트 배너 이미지 최대 3개로 .jpg, .png, .jpeg 확장자만 허용합니다."),
-                                        partWithName("param").description("프로젝트 생성 정보")
+                                        partWithName("title").description("프로젝트 제목"),
+                                        partWithName("region").description("프로젝트 지역"),
+                                        partWithName("online").description("온라인 여부"),
+                                        partWithName("state").description("프로젝트 상태"),
+                                        partWithName("careerMin").description("최소 경력"),
+                                        partWithName("careerMax").description("최대 경력"),
+                                        partWithName("leaderParts").description("프로젝트 리더 직무 (Collection)"),
+                                        partWithName("category").description("프로젝트 분야 (Collection)"),
+                                        partWithName("goal").description("프로젝트 목표"),
+                                        partWithName("introduction").description("프로젝트 소개"),
+                                        partWithName("recruits").description("프로젝트 모집 정보 (Collection)"),
+                                        partWithName("skills").description("프로젝트 스킬 (Collection)")
                                 ),
                                 responseFields(
                                         fieldWithPath("value").type("Long").description("생성된 프로젝트 ID")

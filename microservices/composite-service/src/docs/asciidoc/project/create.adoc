@@ -15,13 +15,13 @@ link:../index.html[home으로 돌아가기]
 
 include::{snippets}/project/create-success/request-headers.adoc[]
 
-=== request body
+=== parts
 
 include::{snippets}/project/create-success/request-parts.adoc[]
 
-==== Pram description
+==== recruit param description
 
-include::{snippets}/../../src/docs/asciidoc/project/projectinputparam.adoc[]
+include::{snippets}/../../src/docs/asciidoc/project/recruitstatus.adoc[]
 
 == Response
 
