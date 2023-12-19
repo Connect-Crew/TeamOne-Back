@@ -18,7 +18,7 @@ public enum ProjectExceptionMessage {
     INTRODUCTION_LENGTH_1000_UNDER("프로젝트 소개는 1000자 이하여야 합니다."),
     RECRUIT_COMMENT_LENGTH_30_UNDER("모집 코멘트는 30자 이하여야 합니다."),
     RECRUIT_MAX_0_OVER("모집 인원은 0명 이상이어야 합니다."),
-    RECRUIT_MAX_SUM_10_UNDER("최대 10명까지 모집 가능합니다."),
+    RECRUIT_MAX_SUM_30_UNDER("최대 30자리 까지 모집 가능합니다."),
     CREATE_PROJECT_FAILED("프로젝트 생성에 실패했습니다."),
     LOAD_PROJECT_FAILED("프로젝트 조회에 실패했습니다."),
     ALREADY_PART_MEMBER("이미 해당 파트의 멤버입니다."),

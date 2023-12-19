@@ -86,11 +86,11 @@ public class UserAplService implements UpdateUserUseCase, QueryUserUseCase, Dele
      * 이때, User가 DB에 존재하지 않으면 새로 생성한다.
      */
     private List<User> getUsersIfNotExistCreateUser(Set<Long> userIds) {
-        List<User> users = findUserOutput.findAllByIds(userIds);
+        List<User> users = new ArrayList<>(findUserOutput.findAllByIds(userIds));
+
         HashSet<Long> userIdsSet = users.stream().map(User::id).collect(Collectors.toCollection(HashSet::new));
         for (Long userId : userIds) {
             if (userIdsSet.contains(userId)) continue;
-
             users.add(new User(userId, new HashSet<>()));
         }
         return users;
