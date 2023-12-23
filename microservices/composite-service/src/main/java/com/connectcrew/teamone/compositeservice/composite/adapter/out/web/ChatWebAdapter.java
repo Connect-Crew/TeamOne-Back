@@ -4,7 +4,7 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.reques
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ChatRoomResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.CreateChatRoomOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.ChatRoom;
-import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

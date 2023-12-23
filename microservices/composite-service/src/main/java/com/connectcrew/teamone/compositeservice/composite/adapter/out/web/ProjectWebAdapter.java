@@ -8,7 +8,7 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.S
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
-import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;

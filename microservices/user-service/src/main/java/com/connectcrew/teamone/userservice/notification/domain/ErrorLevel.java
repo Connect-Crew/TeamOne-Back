@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.notification.domain;
 
-public enum MessageLevel {
+public enum ErrorLevel {
     DEBUG,
     INFO,
     WARNING,

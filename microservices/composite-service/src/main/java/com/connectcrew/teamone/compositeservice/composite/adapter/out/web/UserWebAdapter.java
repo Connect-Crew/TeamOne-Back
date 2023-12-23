@@ -10,7 +10,7 @@ import com.connectcrew.teamone.compositeservice.composite.domain.Register;
 import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
 import com.connectcrew.teamone.compositeservice.global.enums.Social;
-import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;

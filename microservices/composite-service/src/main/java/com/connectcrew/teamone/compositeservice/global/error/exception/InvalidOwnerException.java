@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.global.exception;
+package com.connectcrew.teamone.compositeservice.global.error.exception;
 
 public class InvalidOwnerException extends Exception {
     public InvalidOwnerException() {

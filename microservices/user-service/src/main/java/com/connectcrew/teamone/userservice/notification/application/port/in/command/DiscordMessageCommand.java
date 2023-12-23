@@ -2,17 +2,16 @@ package com.connectcrew.teamone.userservice.notification.application.port.in.com
 
 import com.connectcrew.teamone.userservice.notification.domain.DiscordChannel;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordMessage;
-import com.connectcrew.teamone.userservice.notification.domain.MessageLevel;
+import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
 
 public record DiscordMessageCommand(
-        MessageLevel level,
+        ErrorLevel level,
         DiscordChannel channel,
-        String caller,
         String title,
         String message
 ) {
 
     public DiscordMessage toDomain() {
-        return new DiscordMessage(level, channel, caller, title, message);
+        return new DiscordMessage(level, channel, title, message);
     }
 }

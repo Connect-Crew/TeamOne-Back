@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.global.exception.message;
+package com.connectcrew.teamone.compositeservice.global.error.message;
 
 import lombok.RequiredArgsConstructor;
 

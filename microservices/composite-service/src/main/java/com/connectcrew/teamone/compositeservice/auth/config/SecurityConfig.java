@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.auth.config;
 
-import com.connectcrew.teamone.compositeservice.global.exception.ErrorInfo;
+import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -62,10 +62,10 @@ public class SecurityConfig {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.UNAUTHORIZED, exchange.getRequest().getPath().value(), "인증이 만료되었습니다.");
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exchange.getRequest().getPath().value(), "인증이 만료되었습니다.");
         byte[] errorBytes;
         try {
-            errorBytes = objectMapper.writeValueAsBytes(errorInfo);
+            errorBytes = objectMapper.writeValueAsBytes(errorResponse);
         } catch (JsonProcessingException e) {
             errorBytes = "{\"message\": \"Error occurred while processing the response\"}".getBytes(StandardCharsets.UTF_8);
             response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,11 +79,11 @@ public class SecurityConfig {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.UNAUTHORIZED, exchange.getRequest().getPath().value(), "권한이 없는 사용자입니다.");
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exchange.getRequest().getPath().value(), "권한이 없는 사용자입니다.");
 
         byte[] errorBytes;
         try {
-            errorBytes = objectMapper.writeValueAsBytes(errorInfo);
+            errorBytes = objectMapper.writeValueAsBytes(errorResponse);
         } catch (JsonProcessingException e) {
             errorBytes = "{\"message\": \"Error occurred while processing the response\"}".getBytes(StandardCharsets.UTF_8);
             response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);

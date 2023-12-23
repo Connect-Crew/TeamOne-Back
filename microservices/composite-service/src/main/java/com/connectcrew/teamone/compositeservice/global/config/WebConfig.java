@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.global.config;
 
-import com.connectcrew.teamone.compositeservice.global.exception.WebClientExceptionHandler;
+import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
