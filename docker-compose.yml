@@ -34,6 +34,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
       - DB_PW=${DB_PASSWORD}
+      - DISCORD_BOT_TOKEN=${DISCORD_TOKEN}
 
   chat:
     container_name: teamone-chat

@@ -30,5 +30,5 @@ discord:
     token: Discord Bot Token
 
   channel:
-    report: Discord Report Channel ID
-    error: Discord Error Channel ID
+    report: 1186286837824770068
+    error: 1186286883479748639
