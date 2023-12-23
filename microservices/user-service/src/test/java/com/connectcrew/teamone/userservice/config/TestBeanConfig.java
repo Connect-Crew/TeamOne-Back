@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.config;
 
 import com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.repository.FavoriteRepository;
+import com.connectcrew.teamone.userservice.notification.adapter.out.discord.DiscordNotificationAdapter;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;
 import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.PartRepository;
 import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.ProfileRepository;
@@ -57,4 +58,7 @@ public class TestBeanConfig {
 
     @MockBean
     private FirebaseMessaging firebaseMessaging;
+
+    @MockBean
+    private DiscordNotificationAdapter discordNotificationAdapter;
 }

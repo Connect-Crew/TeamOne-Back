@@ -51,7 +51,7 @@ class NotificationControllerTest {
         FirebaseMessaging firebase = Mockito.mock(FirebaseMessaging.class);
         FcmPersistenceAdapter fcmAdapter = new FcmPersistenceAdapter(fcmRepository);
         FcmMessageAdapter messageAdapter = new FcmMessageAdapter(firebase, objectMapper);
-        NotificationAplService service = new NotificationAplService(fcmAdapter, fcmAdapter, messageAdapter, null);
+        NotificationAplService service = new NotificationAplService(fcmAdapter, fcmAdapter, messageAdapter, null, null);
 
         when(fcmRepository.findAllByUserId(anyLong())).thenReturn(Flux.fromIterable(List.of(new FcmEntity(0L, 1L, "token1"), new FcmEntity(1L, 1L, "token2"))));
         when(firebase.send(any(Message.class))).thenReturn("test");
@@ -67,7 +67,7 @@ class NotificationControllerTest {
         FirebaseMessaging firebase = Mockito.mock(FirebaseMessaging.class);
         FcmPersistenceAdapter fcmAdapter = new FcmPersistenceAdapter(fcmRepository);
         FcmMessageAdapter messageAdapter = new FcmMessageAdapter(firebase, objectMapper);
-        NotificationAplService service = new NotificationAplService(fcmAdapter, fcmAdapter, messageAdapter, null);
+        NotificationAplService service = new NotificationAplService(fcmAdapter, fcmAdapter, messageAdapter, null, null);
 
         when(fcmRepository.findAllByUserId(anyLong())).thenReturn(Flux.fromIterable(List.of(new FcmEntity(0L, 1L, "token1"), new FcmEntity(1L, 1L, "token2"))));
         when(firebase.send(any(Message.class))).thenAnswer(new Answer<String>() {
