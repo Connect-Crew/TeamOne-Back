@@ -1,5 +1,8 @@
-package com.connectcrew.teamone.compositeservice.global.exception;
+package com.connectcrew.teamone.compositeservice.global.error.adapter.out;
 
+import com.connectcrew.teamone.compositeservice.global.error.exception.InvalidOwnerException;
+import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
+import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +45,7 @@ public class WebClientExceptionHandler {
 
     private String getErrorMessage(WebClientResponseException ex) {
         try {
-            return mapper.readValue(new String(ex.getResponseBodyAsByteArray(), StandardCharsets.UTF_8), ErrorInfo.class).getMessage();
+            return mapper.readValue(new String(ex.getResponseBodyAsByteArray(), StandardCharsets.UTF_8), ErrorResponse.class).getMessage();
         } catch (IOException ioex) {
             return ex.getMessage();
         }

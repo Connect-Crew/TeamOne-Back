@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.global.exception;
+package com.connectcrew.teamone.compositeservice.global.error.domain;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 
 @Getter
-public class ErrorInfo {
+public class ErrorResponse {
     private final LocalDateTime timestamp;
     private final String path;
     private final Integer status;
@@ -14,7 +14,7 @@ public class ErrorInfo {
     private final String message;
 
     // Object Mapping에 사용
-    public ErrorInfo() {
+    public ErrorResponse() {
         timestamp = null;
         status = null;
         error = null;
@@ -22,7 +22,7 @@ public class ErrorInfo {
         message = null;
     }
 
-    public ErrorInfo(HttpStatus httpStatus, String path, String message) {
+    public ErrorResponse(HttpStatus httpStatus, String path, String message) {
         timestamp = LocalDateTime.now();
         this.status = httpStatus.value();
         this.error = httpStatus.getReasonPhrase();

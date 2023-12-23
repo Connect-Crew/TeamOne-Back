@@ -16,6 +16,8 @@ import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
 import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
 import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.connectcrew.teamone.compositeservice.global.error.application.port.in.SendErrorNotificationUseCase;
+import com.connectcrew.teamone.compositeservice.global.error.enums.ErrorLevel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,7 @@ public class ProjectController {
     private final QueryProjectUseCase queryProjectUseCase;
     private final QueryProfileUseCase queryProfileUseCase;
     private final DeleteFileUseCase deleteFileUseCase;
+    private final SendErrorNotificationUseCase sendErrorNotificationUseCase;
 
     @GetMapping("/")
     public ProjectBasicInfoResponse getProjectBasicInfo() {
@@ -58,12 +61,18 @@ public class ProjectController {
 
     @GetMapping("/banner/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable("filename") String filename) {
-        MediaType mediaType = queryFileUseCase.findContentType(filename);
-        Resource resource = queryFileUseCase.find(FileCategory.BANNER, filename);
+        try {
+            MediaType mediaType = queryFileUseCase.findContentType(filename);
+            Resource resource = queryFileUseCase.find(FileCategory.BANNER, filename);
 
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .body(resource);
+            return ResponseEntity.ok()
+                    .contentType(mediaType)
+                    .body(resource);
+        } catch (Exception e) {
+            sendErrorNotificationUseCase.send("ProjectController.getImage", ErrorLevel.ERROR, e);
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @GetMapping("/list")
@@ -78,7 +87,8 @@ public class ProjectController {
                         .map(project ->
                                 ProjectItemResponse.from(project, tuple.getT2().getOrDefault(project.id(), false))
                         ).toList()
-                );
+                )
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectList", ErrorLevel.ERROR, ex));
     }
 
     @GetMapping("/{projectId}")
@@ -92,18 +102,19 @@ public class ProjectController {
                 .map(tuple -> {
                     List<String> banners = tuple.getT1().banners().stream().map(FileCategory.BANNER::getUrlPath).toList();
                     return new ProjectDetailResponse(tuple.getT1(), banners, tuple.getT2(), ProfileResponse.from(tuple.getT3()));
-                });
+                })
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectDetail", ErrorLevel.ERROR, ex));
     }
 
     @GetMapping("/members/{projectId}")
     private Mono<List<ProjectMemberResponse>> getProjectMembers(@PathVariable Long projectId) {
         return queryProjectUseCase.getProjectMemberList(projectId)
                 .flatMapMany(Flux::fromIterable)
-                .doOnNext(member -> System.out.println(member))
                 .flatMap(member -> queryProfileUseCase.getFullProfile(member.memberId())
                         .map(ProfileResponse::from)
                         .map(profileRes -> new ProjectMemberResponse(member, profileRes)))
-                .collectList();
+                .collectList()
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectMembers", ErrorLevel.ERROR, ex));
     }
 
     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -125,8 +136,6 @@ public class ProjectController {
     ) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
-
-        System.out.println(state);
 
         return Mono.zip(
                         leaderParts.map(MemberPart::valueOf).collectList(),
@@ -158,7 +167,8 @@ public class ProjectController {
                         .flatMap(tuple -> saveProjectUseCase.save(request.toCommand(id, tuple.getT2().id()))
                                 .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                         // TODO 프로젝트 글 작성 실패시 채팅방 삭제
-                        .map(SimpleLongResponse::new));
+                        .map(SimpleLongResponse::new))
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
     }
 
 
@@ -169,7 +179,8 @@ public class ProjectController {
         return queryUserUseCase.isFavorite(id, FavoriteType.PROJECT, param.projectId())
                 .flatMap(favorite -> saveProjectUseCase.setFavorite(new ProjectFavorite(param.projectId(), !favorite)))
                 .flatMap(newFavorite -> saveUserUseCase.setFavorite(id, FavoriteType.PROJECT, param.projectId())
-                        .map(favorite -> new FavoriteResponse(param.projectId(), favorite, newFavorite)));
+                        .map(favorite -> new FavoriteResponse(param.projectId(), favorite, newFavorite)))
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.favoriteProject", ErrorLevel.ERROR, ex));
     }
 
     @PostMapping("/apply")
@@ -178,7 +189,8 @@ public class ProjectController {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
-        return saveProjectUseCase.save(param.toDomain(id)).map(SimpleBooleanResponse::new);
+        return saveProjectUseCase.save(param.toDomain(id)).map(SimpleBooleanResponse::new)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.applyProject", ErrorLevel.ERROR, ex));
     }
 
     @PostMapping("/report")
@@ -186,6 +198,7 @@ public class ProjectController {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
-        return saveProjectUseCase.save(param.toDomain(id)).map(SimpleBooleanResponse::new);
+        return saveProjectUseCase.save(param.toDomain(id)).map(SimpleBooleanResponse::new)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.reportProject", ErrorLevel.ERROR, ex));
     }
 }

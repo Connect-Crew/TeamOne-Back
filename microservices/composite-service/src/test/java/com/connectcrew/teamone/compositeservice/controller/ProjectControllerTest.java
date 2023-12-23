@@ -15,9 +15,9 @@ import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.global.enums.*;
-import com.connectcrew.teamone.compositeservice.global.exception.ErrorInfo;
-import com.connectcrew.teamone.compositeservice.global.exception.NotFoundException;
-import com.connectcrew.teamone.compositeservice.global.exception.message.ProjectExceptionMessage;
+import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
+import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
+import com.connectcrew.teamone.compositeservice.global.error.message.ProjectExceptionMessage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -373,7 +373,7 @@ class ProjectControllerTest {
                 .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/find-not-found",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -578,7 +578,7 @@ class ProjectControllerTest {
                 .bodyValue(multipartData)
                 .exchange()
                 .expectStatus().isBadRequest()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/create-failure",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -686,7 +686,7 @@ class ProjectControllerTest {
                 .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/apply-notfound",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -710,7 +710,7 @@ class ProjectControllerTest {
                 .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/apply-invalid",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -761,7 +761,7 @@ class ProjectControllerTest {
                 .bodyValue(new ReportRequest(1L, "신고 메시지"))
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/report-notfound",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -785,7 +785,7 @@ class ProjectControllerTest {
                 .bodyValue(new ReportRequest(1L, "신고 메시지"))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("project/report-invalid",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),

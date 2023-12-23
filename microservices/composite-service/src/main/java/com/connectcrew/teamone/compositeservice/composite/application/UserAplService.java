@@ -14,7 +14,7 @@ import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
 import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
 import com.connectcrew.teamone.compositeservice.global.enums.Social;
-import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
+import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

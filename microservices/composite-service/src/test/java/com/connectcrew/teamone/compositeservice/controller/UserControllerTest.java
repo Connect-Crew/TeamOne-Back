@@ -20,9 +20,9 @@ import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.enums.Social;
-import com.connectcrew.teamone.compositeservice.global.exception.ErrorInfo;
-import com.connectcrew.teamone.compositeservice.global.exception.NotFoundException;
-import com.connectcrew.teamone.compositeservice.global.exception.UnauthorizedException;
+import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
+import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
+import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -140,7 +140,7 @@ class UserControllerTest {
                 .bodyValue(new LoginRequest("sampleToken", Social.GOOGLE, "fcm"))
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("auth/login-failure-not-register",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -151,7 +151,7 @@ class UserControllerTest {
                         )
                 ))
                 .consumeWith(response -> {
-                    ErrorInfo result = response.getResponseBody();
+                    ErrorResponse result = response.getResponseBody();
 
                     assert result != null;
                     assertThat(result.getPath()).isEqualTo("/auth/login");
@@ -170,7 +170,7 @@ class UserControllerTest {
                 .bodyValue(new LoginRequest("sampleToken", Social.GOOGLE, "fcm"))
                 .exchange()
                 .expectStatus().isUnauthorized()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("auth/login-failure",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -181,7 +181,7 @@ class UserControllerTest {
                         )
                 ))
                 .consumeWith(response -> {
-                    ErrorInfo result = response.getResponseBody();
+                    ErrorResponse result = response.getResponseBody();
 
                     assert result != null;
                     assertThat(result.getPath()).isEqualTo("/auth/login");
@@ -245,7 +245,7 @@ class UserControllerTest {
                 .bodyValue(new RegisterRequest("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isUnauthorized()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("auth/unauthorized-register-failure",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -256,7 +256,7 @@ class UserControllerTest {
                         )
                 ))
                 .consumeWith(response -> {
-                    ErrorInfo result = response.getResponseBody();
+                    ErrorResponse result = response.getResponseBody();
 
                     assert result != null;
                     assertThat(result.getPath()).isEqualTo("/auth/register");
@@ -276,7 +276,7 @@ class UserControllerTest {
                 .bodyValue(new RegisterRequest("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .expectBody(ErrorInfo.class)
+                .expectBody(ErrorResponse.class)
                 .consumeWith(document("auth/register-failure",
                         responseFields(
                                 fieldWithPath("path").type("String").description("요청 경로"),
@@ -287,7 +287,7 @@ class UserControllerTest {
                         )
                 ))
                 .consumeWith(response -> {
-                    ErrorInfo result = response.getResponseBody();
+                    ErrorResponse result = response.getResponseBody();
 
                     assert result != null;
                     assertThat(result.getPath()).isEqualTo("/auth/register");
