@@ -1,10 +1,13 @@
 package com.connectcrew.teamone.userservice.notification.application;
 
+import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SaveFcmTokenUseCase;
+import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.out.*;
+import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
 import com.connectcrew.teamone.userservice.notification.domain.FcmMessage;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -13,10 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenUseCase {
+public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenUseCase, SendErrorNotificationUseCase {
+    private static final String SERVICE_NAME = "user-service";
     private final FindFcmOutput findFcmOutput;
     private final DeleteFcmOutput deleteFcmOutput;
     private final SendMessageOutput sendMessageOutput;
@@ -50,5 +57,28 @@ public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenU
     public Mono<Boolean> saveFcmToken(Long user, String token) {
         return saveFcmOutput.save(FcmToken.builder().user(user).token(token).build())
                 .thenReturn(true);
+    }
+
+    @Override
+    public void send(String method, ErrorLevel level, Throwable ex) {
+        ErrorNotification notification = ErrorNotification.builder()
+                .service(SERVICE_NAME)
+                .caller(method)
+                .level(level)
+                .message(getExceptionMessages((Exception) ex))
+                .build();
+
+        sendDiscordOutput.sendMessage(notification.toCommand().toDomain());
+    }
+
+    private String getExceptionMessages(Exception ex) {
+        List<String> causeMessages =  new ArrayList<>();
+
+        while (ex != null) {
+            causeMessages.add(ex.getClass().getSimpleName() + " : " + ex.getMessage());
+            ex = (Exception) ex.getCause();
+        }
+
+        return String.join("\n\tCause By ", causeMessages);
     }
 }
