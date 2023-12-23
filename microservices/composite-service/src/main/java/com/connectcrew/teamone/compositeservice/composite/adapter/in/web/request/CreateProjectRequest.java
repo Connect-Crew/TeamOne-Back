@@ -24,10 +24,10 @@ public record CreateProjectRequest(
         List<CreateRecruitRequest> recruits,
         List<String> skills
 ) {
-    public CreateProjectCommand toCommand(Long leader, UUID chatRoomId) {
+    public CreateProjectCommand toCommand(Long leader, UUID chatRoomId, List<String> banners) {
         return new CreateProjectCommand(
                 title,
-                List.of(),
+                banners,
                 region,
                 online,
                 state,

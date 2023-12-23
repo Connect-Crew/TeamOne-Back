@@ -21,7 +21,7 @@ public class SendErrorAplService implements SendErrorNotificationUseCase {
 
     @Override
     public void send(String method, ErrorLevel level, Throwable ex) {
-
+        log.warn("send - method: {}, level: {}, ex: {}", method, level, ex.getMessage(), ex);
         ErrorNotification notification = ErrorNotification.builder()
                 .service(SERVICE_NAME)
                 .caller(method)

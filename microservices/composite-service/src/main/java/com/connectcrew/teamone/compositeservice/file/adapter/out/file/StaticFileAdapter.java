@@ -29,9 +29,10 @@ public class StaticFileAdapter implements SaveFileOutput, FindFileOutput, Delete
     @Override
     public Flux<String> saveAll(FileCategory category, Flux<FilePart> files) {
         return files
+                .doOnNext(file -> log.trace("try save file: {}, extension: {}", file.filename(), getFileExtension(file.filename())))
                 .filter(file -> category.isAllowedExtension(getFileExtension(file.filename())))
                 .flatMap(file -> {
-                    String fileName = UUID.randomUUID() + getFileExtension(file.filename());
+                    String fileName = String.format("%s.%s", UUID.randomUUID(), getFileExtension(file.filename()));
                     Path filePath = Path.of(basePath, category.name(), fileName);
                     log.trace("save file: {}", filePath);
                     return file.transferTo(filePath).thenReturn(fileName);
@@ -40,7 +41,12 @@ public class StaticFileAdapter implements SaveFileOutput, FindFileOutput, Delete
 
     private String getFileExtension(String fileName) {
         int lastDotIndex = fileName.lastIndexOf('.');
-        return (lastDotIndex != -1) ? fileName.substring(lastDotIndex) : "";
+        if (lastDotIndex < 0) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
+        }
+
+//        return (lastDotIndex != -1) ? fileName.substring(lastDotIndex) : "";
+        return fileName.substring(lastDotIndex + 1);
     }
 
     @Override
@@ -67,7 +73,7 @@ public class StaticFileAdapter implements SaveFileOutput, FindFileOutput, Delete
     public boolean delete(FileCategory category, String fileName) {
         log.trace("Try to delete file: {}", fileName);
         Path filePath = Path.of(basePath, category.name(), fileName);
-        if(filePath.toFile().exists()) {
+        if (filePath.toFile().exists()) {
             log.trace("File deleted: {}", filePath);
             return filePath.toFile().delete();
         }

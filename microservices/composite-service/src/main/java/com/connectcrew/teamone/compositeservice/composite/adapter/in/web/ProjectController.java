@@ -138,37 +138,51 @@ public class ProjectController {
         Long id = claim.id();
 
         return Mono.zip(
-                        leaderParts.map(MemberPart::valueOf).collectList(),
-                        category.map(ProjectCategory::valueOf).collectList(),
+                        leaderParts.collectList(),
+                        category.collectList(),
                         recruits.map(r -> {
                             try {
                                 return objectMapper.readValue(r, CreateRecruitRequest.class);
                             } catch (JsonProcessingException e) {
+                                log.error("createProject - recruit json parse error: {}", e.getMessage(), e);
                                 throw new RuntimeException(e);
                             }
                         }).collectList(),
                         skills.collectList()
-                ).map(tuple -> CreateProjectRequest.builder()
-                        .title(title)
-                        .region(Region.valueOf(region))
+                )
+                .doOnNext(tuple -> log.trace("createProject - title: {}, region: {}, online: {}, state: {}, careerMin: {}, careerMax: {}, leaderParts: {}, category: {}, goal: {}, introduction: {}, recruits: {}, skills: {}",
+                        title, region, online, state, careerMin, careerMax, tuple.getT1(), tuple.getT2(), goal, introduction, tuple.getT3(), tuple.getT4()))
+                .map(tuple -> CreateProjectRequest.builder()
+                        .title(removeQuotation(title))
+                        .region(Region.valueOf(removeQuotation(region)))
                         .online(Boolean.valueOf(online))
-                        .state(ProjectState.valueOf(state))
-                        .careerMin(Career.valueOf(careerMin))
-                        .careerMax(Career.valueOf(careerMax))
-                        .leaderParts(tuple.getT1())
-                        .category(tuple.getT2())
-                        .goal(ProjectGoal.valueOf(goal))
-                        .introduction(introduction)
+                        .state(ProjectState.valueOf(removeQuotation(state)))
+                        .careerMin(Career.valueOf(removeQuotation(careerMin)))
+                        .careerMax(Career.valueOf(removeQuotation(careerMax)))
+                        .leaderParts(tuple.getT1().stream().map(this::removeQuotation).map(MemberPart::valueOf).toList())
+                        .category(tuple.getT2().stream().map(this::removeQuotation).map(ProjectCategory::valueOf).toList())
+                        .goal(ProjectGoal.valueOf(removeQuotation(goal)))
+                        .introduction(removeQuotation(introduction))
                         .recruits(tuple.getT3())
-                        .skills(tuple.getT4())
+                        .skills(tuple.getT4().stream().map(this::removeQuotation).toList())
                         .build())
                 .flatMap(request -> saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
+                        .doOnNext(bannerPaths -> log.trace("createProject - bannerPaths: {}", bannerPaths))
                         .flatMap(bannerPaths -> createChatRoomUseCase.createChatRoom(new CreateChatRoomCommand(ChatRoomType.PROJECT, Set.of(id))).map(res -> Tuples.of(bannerPaths, res)))
-                        .flatMap(tuple -> saveProjectUseCase.save(request.toCommand(id, tuple.getT2().id()))
+                        .flatMap(tuple -> saveProjectUseCase.save(request.toCommand(id, tuple.getT2().id(), tuple.getT1()))
                                 .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, tuple.getT1()).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                         // TODO 프로젝트 글 작성 실패시 채팅방 삭제
                         .map(SimpleLongResponse::new))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
+    }
+
+    private String removeQuotation(String str) {
+        String result = str;
+        if(str.startsWith("\""))
+            result = str.substring(1);
+        if(str.endsWith("\""))
+            result = result.substring(0, result.length() - 1);
+        return result;
     }
 
 

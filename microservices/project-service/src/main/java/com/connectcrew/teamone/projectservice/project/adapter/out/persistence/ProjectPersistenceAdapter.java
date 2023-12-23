@@ -47,7 +47,7 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
     }
 
     private Mono<BannerEntity> findThumbnail(Long project) {
-        return bannerRepository.findByProjectOrderByIdx(project)
+        return bannerRepository.findFirstByProjectOrderByIdx(project)
                 .defaultIfEmpty(new BannerEntity());
     }
 
@@ -138,7 +138,7 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
 
     @Override
     public Mono<String> findProjectThumbnail(Long id) {
-        return bannerRepository.findByProjectOrderByIdx(id)
+        return bannerRepository.findFirstByProjectOrderByIdx(id)
                 .map(BannerEntity::getPath);
     }
 

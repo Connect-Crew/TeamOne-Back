@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
 public interface BannerRepository extends ReactiveCrudRepository<BannerEntity, Long> {
     Flux<BannerEntity> findAllByProject(Long project);
 
-    Mono<BannerEntity> findByProjectOrderByIdx(Long project);
+    Mono<BannerEntity> findFirstByProjectOrderByIdx(Long project);
 }
