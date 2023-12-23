@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.projectservice.global.exceptions;
+package com.connectcrew.teamone.projectservice.global.exceptions.adapter;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;

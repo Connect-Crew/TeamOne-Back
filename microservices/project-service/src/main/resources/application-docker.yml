@@ -6,3 +6,8 @@ db:
   port: 3306
   id: root
   pw: MYSQL_PASSWORD
+
+
+spring:
+  kafka:
+    bootstrap-servers: kafka:9093

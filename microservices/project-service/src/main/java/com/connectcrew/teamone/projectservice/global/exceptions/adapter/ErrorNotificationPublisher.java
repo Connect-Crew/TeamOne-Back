@@ -1,8 +1,8 @@
-package com.connectcrew.teamone.compositeservice.global.error.adapter.out;
+package com.connectcrew.teamone.projectservice.global.exceptions.adapter;
 
-import com.connectcrew.teamone.compositeservice.global.constants.KafkaEventTopic;
-import com.connectcrew.teamone.compositeservice.global.error.application.port.out.SendErrorNotificationOutput;
-import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorNotification;
+import com.connectcrew.teamone.projectservice.global.constants.KafkaEventTopic;
+import com.connectcrew.teamone.projectservice.global.exceptions.application.port.out.SendErrorNotificationOutput;
+import com.connectcrew.teamone.projectservice.global.exceptions.domain.ErrorNotification;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
