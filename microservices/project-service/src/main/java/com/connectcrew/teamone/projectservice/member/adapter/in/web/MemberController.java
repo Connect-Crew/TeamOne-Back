@@ -6,6 +6,7 @@ import com.connectcrew.teamone.projectservice.member.adapter.in.web.request.Appl
 import com.connectcrew.teamone.projectservice.member.adapter.in.web.response.MemberResponse;
 import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
+import com.connectcrew.teamone.projectservice.notification.application.port.in.SendNotificationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -21,6 +22,7 @@ public class MemberController {
 
     private final UpdateMemberUseCase updateMemberUseCase;
 
+    private final SendNotificationUseCase sendNotificationUseCase;
     private final SendErrorNotificationUseCase sendErrorNotificationUseCase;
 
     @GetMapping("/members")
@@ -34,6 +36,10 @@ public class MemberController {
     @PostMapping("/apply")
     public Mono<Boolean> apply(@RequestBody ApplyRequest request) {
         return updateMemberUseCase.apply(request.toCommand())
+                .flatMap(result -> {
+                    if (!result) return Mono.just(false);
+                    return sendNotificationUseCase.sendToLeader(request.projectId(), "새로운 지원자가 있습니다!", "지원자를 확인해주세요!", "");
+                })
                 .doOnError(ex -> sendErrorNotificationUseCase.send("MemberController.apply", ErrorLevel.ERROR, ex));
     }
 }

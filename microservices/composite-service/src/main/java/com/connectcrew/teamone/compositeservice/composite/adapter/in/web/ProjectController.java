@@ -199,7 +199,6 @@ public class ProjectController {
 
     @PostMapping("/apply")
     private Mono<SimpleBooleanResponse> applyProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody ApplyRequest param) {
-        System.out.println("Test!!!");
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 

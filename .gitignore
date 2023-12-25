@@ -45,5 +45,8 @@ out/
 ### application-dev.yml ###
 /microservices/*/src/main/resources/application-dev.yml
 
+### Firebase ###
+/microservices/user-service/src/main/resources/firebase/teamone-firebase-adminsdk.json
+
 ### firebase admin sdk ###
 microservices/user-service/src/main/resources/firebase/teamone-firebase-adminsdk.json
