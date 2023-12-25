@@ -1,13 +1,13 @@
 package com.connectcrew.teamone.userservice.notification.application;
 
-import com.connectcrew.teamone.api.notification.error.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SaveFcmTokenUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.out.*;
-import com.connectcrew.teamone.api.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.userservice.notification.domain.FcmMessage;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.google.firebase.messaging.FirebaseMessagingException;

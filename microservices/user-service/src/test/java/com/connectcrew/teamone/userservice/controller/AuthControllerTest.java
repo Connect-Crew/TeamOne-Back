@@ -1,10 +1,10 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.user.Role;
-import com.connectcrew.teamone.api.user.Social;
-import com.connectcrew.teamone.api.user.UserRegisterRequest;
-import com.connectcrew.teamone.api.user.UserResponse;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
+import com.connectcrew.teamone.api.userservice.user.UserResponse;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity.FcmEntity;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;

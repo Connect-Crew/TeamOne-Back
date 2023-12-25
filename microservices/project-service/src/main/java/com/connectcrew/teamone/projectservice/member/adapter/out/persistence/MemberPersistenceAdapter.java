@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence;
 
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;

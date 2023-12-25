@@ -19,7 +19,7 @@ public class NotificationEventAdapter implements SendNotificationOutput {
 
     public void send(Notification notification) {
         try {
-            String body = objectMapper.writeValueAsString(notification);
+            String body = objectMapper.writeValueAsString(notification.toEvent());
             kafkaTemplate.send(KafkaEventTopic.PushNotification, body);
         } catch (Exception e) {
             log.error("send error - topic: {}, body: {}",  KafkaEventTopic.PushNotification, notification , e);

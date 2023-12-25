@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository;
 
-import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.projectservice.enums.*;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.ProjectCustomEntity;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectOption;
 import io.r2dbc.spi.Row;

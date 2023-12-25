@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.application.port.out;
 
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

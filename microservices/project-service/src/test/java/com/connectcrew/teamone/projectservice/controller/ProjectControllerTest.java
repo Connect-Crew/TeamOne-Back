@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.project.ReportInput;
+import com.connectcrew.teamone.api.projectservice.project.ReportRequest;
 import com.connectcrew.teamone.projectservice.config.TestConfig;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
@@ -65,7 +65,7 @@ class ProjectControllerTest {
 
         webTestClient.post()
                 .uri("/project/report")
-                .bodyValue(new ReportInput(
+                .bodyValue(new ReportRequest(
                         1L,
                         1L,
                         "testComment"
@@ -83,7 +83,7 @@ class ProjectControllerTest {
 
         webTestClient.post()
                 .uri("/project/report")
-                .bodyValue(new ReportInput(
+                .bodyValue(new ReportRequest(
                         1L,
                         1L,
                         "testComment"
@@ -101,7 +101,7 @@ class ProjectControllerTest {
 
         webTestClient.post()
                 .uri("/project/report")
-                .bodyValue(new ReportInput(
+                .bodyValue(new ReportRequest(
                         1L,
                         1L,
                         "testComment"

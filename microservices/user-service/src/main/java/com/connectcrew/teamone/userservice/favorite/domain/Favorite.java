@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.favorite.domain;
 
-import com.connectcrew.teamone.api.favorite.FavoriteType;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import lombok.Builder;
 
 @Builder

@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.userservice.user.application;
 
 import com.connectcrew.teamone.api.exception.NotFoundException;
-import com.connectcrew.teamone.api.user.Social;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.userservice.notification.application.port.out.SaveFcmOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.FindProfileOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.SaveProfileOutput;

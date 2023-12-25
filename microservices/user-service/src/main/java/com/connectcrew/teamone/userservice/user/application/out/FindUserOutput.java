@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.user.application.out;
 
-import com.connectcrew.teamone.api.user.Social;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.userservice.user.domain.User;
 import reactor.core.publisher.Mono;
 

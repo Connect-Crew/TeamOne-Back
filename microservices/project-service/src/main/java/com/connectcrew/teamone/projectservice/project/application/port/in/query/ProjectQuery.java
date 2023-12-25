@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.application.port.in.query;
 
-import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.ProjectFilterOptionRequest;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectOption;
 import lombok.Builder;
 
@@ -20,6 +21,22 @@ public record ProjectQuery(
         List<ProjectCategory> category,
         String search
 ) {
+
+    public static ProjectQuery from(ProjectFilterOptionRequest request) {
+        return new ProjectQuery(
+                request.lastId(),
+                request.size(),
+                request.goal() != null ? ProjectGoal.valueOf(request.goal()) : null,
+                request.career(),
+                request.region(),
+                request.online(),
+                request.part(),
+                request.skills(),
+                request.states(),
+                request.category(),
+                request.search()
+        );
+    }
 
     public ProjectOption toOption() {
         return new ProjectOption(

@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
 import lombok.*;

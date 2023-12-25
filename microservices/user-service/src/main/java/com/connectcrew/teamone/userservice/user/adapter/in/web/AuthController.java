@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.userservice.user.adapter.in.web;
 
-import com.connectcrew.teamone.api.notification.error.ErrorLevel;
-import com.connectcrew.teamone.api.user.Social;
-import com.connectcrew.teamone.api.user.UserRegisterRequest;
-import com.connectcrew.teamone.api.user.UserResponse;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
+import com.connectcrew.teamone.api.userservice.user.UserResponse;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.userservice.user.application.in.CreateUserUseCase;
 import com.connectcrew.teamone.userservice.user.application.in.QueryUserUseCase;

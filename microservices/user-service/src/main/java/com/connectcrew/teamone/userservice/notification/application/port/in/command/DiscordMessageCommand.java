@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.userservice.notification.application.port.in.command;
 
-import com.connectcrew.teamone.api.notification.error.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordChannel;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordMessage;
-import com.connectcrew.teamone.api.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 
 public record DiscordMessageCommand(
         ErrorLevel level,

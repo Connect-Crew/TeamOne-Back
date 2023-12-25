@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.userservice.user.domain;
 
 
-import com.connectcrew.teamone.api.user.Role;
-import com.connectcrew.teamone.api.user.Social;
-import com.connectcrew.teamone.api.user.UserResponse;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserResponse;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

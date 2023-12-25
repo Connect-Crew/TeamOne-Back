@@ -1,14 +1,14 @@
 package com.connectcrew.teamone.projectservice.project.application;
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
-import com.connectcrew.teamone.projectservice.project.adapter.in.web.request.CreateRecruitRequest;
 import com.connectcrew.teamone.projectservice.project.application.port.in.CreateProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.UpdateProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.CreateProjectCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.CreateRecruitCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.FavoriteCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.ReportCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
@@ -126,7 +126,7 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
 
         // 8. recruit 조건 검사 (comment는 최대 30글자, max는 0 이상인지, 모든 recruit의 max의 합이 10 이하인지)
         int recruitMaxSum = 0;
-        for (CreateRecruitRequest recruit : command.recruits()) {
+        for (CreateRecruitCommand recruit : command.recruits()) {
             if (recruit.comment().length() > 30)
                 return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_COMMENT_LENGTH_30_UNDER.toString()));
 

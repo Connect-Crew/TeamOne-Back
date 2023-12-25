@@ -2,8 +2,8 @@ package com.connectcrew.teamone.projectservice.project.adapter.out.persistence;
 
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.project.values.MemberPart;
-import com.connectcrew.teamone.api.project.values.ProjectCategory;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.*;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;

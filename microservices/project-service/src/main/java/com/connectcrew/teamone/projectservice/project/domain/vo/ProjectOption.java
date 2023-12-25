@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.domain.vo;
 
-import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.projectservice.enums.*;
 
 import java.util.List;
 

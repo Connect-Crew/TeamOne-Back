@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.application.port.out;
 
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;

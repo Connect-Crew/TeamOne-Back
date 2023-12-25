@@ -4,7 +4,7 @@ import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.favorite.adapter.in.web.FavoriteController;
 import com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.entity.FavoriteEntity;
 import com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.repository.FavoriteRepository;
-import com.connectcrew.teamone.api.favorite.FavoriteType;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

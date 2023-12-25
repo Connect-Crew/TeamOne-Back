@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.userservice.user.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.user.Role;
-import com.connectcrew.teamone.api.user.Social;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.userservice.user.domain.User;
 import lombok.*;
 import org.springframework.data.annotation.Id;

@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.userservice.profile.adapter.in.web;
 
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.api.notification.error.ErrorLevel;
-import com.connectcrew.teamone.api.profile.ProfileResponse;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.profile.ProfileResponse;
 import com.connectcrew.teamone.userservice.profile.application.in.QueryProfileUseCase;
 import com.connectcrew.teamone.userservice.profile.domain.vo.FullProfile;
 import lombok.RequiredArgsConstructor;

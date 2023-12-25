@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.notification.application.port.in.command;
 
-import com.connectcrew.teamone.api.notification.push.SendMessageEvent;
+import com.connectcrew.teamone.api.userservice.notification.push.SendMessageEvent;
 import com.connectcrew.teamone.userservice.notification.domain.FcmMessage;
 import com.connectcrew.teamone.userservice.notification.domain.MessageBody;
 

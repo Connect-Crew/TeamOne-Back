@@ -1,10 +1,10 @@
 package com.connectcrew.teamone.projectservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.project.ApplyInput;
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.config.TestConfig;
 import com.connectcrew.teamone.projectservice.member.adapter.in.web.MemberController;
+import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
@@ -78,7 +78,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -108,7 +108,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -129,7 +129,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -159,7 +159,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -189,7 +189,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -219,7 +219,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyInput(
+                .bodyValue(new ApplyRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,

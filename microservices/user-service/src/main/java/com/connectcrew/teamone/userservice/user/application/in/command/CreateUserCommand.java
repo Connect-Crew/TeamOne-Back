@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.userservice.user.application.in.command;
 
 
-import com.connectcrew.teamone.api.user.Role;
-import com.connectcrew.teamone.api.user.Social;
-import com.connectcrew.teamone.api.user.UserRegisterRequest;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.user.domain.User;

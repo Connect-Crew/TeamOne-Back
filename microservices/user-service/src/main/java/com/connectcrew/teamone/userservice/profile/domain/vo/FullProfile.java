@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.profile.domain.vo;
 
-import com.connectcrew.teamone.api.profile.ProfileResponse;
+import com.connectcrew.teamone.api.userservice.profile.ProfileResponse;
 import com.connectcrew.teamone.userservice.profile.domain.Part;
 import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.profile.domain.RepresentProject;

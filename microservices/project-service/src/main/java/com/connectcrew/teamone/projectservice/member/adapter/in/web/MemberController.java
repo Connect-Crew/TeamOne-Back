@@ -1,11 +1,13 @@
 package com.connectcrew.teamone.projectservice.member.adapter.in.web;
 
+import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
+import com.connectcrew.teamone.api.projectservice.member.MemberResponse;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.projectservice.global.exceptions.enums.ErrorLevel;
-import com.connectcrew.teamone.projectservice.member.adapter.in.web.request.ApplyRequest;
-import com.connectcrew.teamone.projectservice.member.adapter.in.web.response.MemberResponse;
 import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.ApplyCommand;
+import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.notification.application.port.in.SendNotificationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +30,14 @@ public class MemberController {
     @GetMapping("/members")
     public Mono<List<MemberResponse>> getProjectMembers(Long id) {
         return queryMemberUseCase.findAllByProject(id)
-                .map(MemberResponse::from)
+                .map(members -> members.stream().map(Member::toResponse).toList())
                 .doOnError(ex -> sendErrorNotificationUseCase.send("MemberController.getProjectMembers", ErrorLevel.ERROR, ex));
 
     }
 
     @PostMapping("/apply")
     public Mono<Boolean> apply(@RequestBody ApplyRequest request) {
-        return updateMemberUseCase.apply(request.toCommand())
+        return updateMemberUseCase.apply(ApplyCommand.from(request))
                 .flatMap(result -> {
                     if (!result) return Mono.just(false);
                     return sendNotificationUseCase.sendToLeader(request.projectId(), "새로운 지원자가 있습니다!", "지원자를 확인해주세요!", "");

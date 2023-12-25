@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener;
 
 import com.connectcrew.teamone.api.constants.KafkaEventTopic;
-import com.connectcrew.teamone.api.notification.push.SendMessageEvent;
-import com.connectcrew.teamone.api.notification.error.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.push.SendMessageEvent;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;

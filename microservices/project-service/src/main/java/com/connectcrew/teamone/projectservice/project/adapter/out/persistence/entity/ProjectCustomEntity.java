@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.project.values.*;
+import com.connectcrew.teamone.api.projectservice.enums.*;
 import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 
