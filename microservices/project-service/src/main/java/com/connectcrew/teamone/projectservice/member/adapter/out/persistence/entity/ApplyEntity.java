@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.ApplyState;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -23,6 +24,7 @@ public class ApplyEntity {
     private Long user;
 
     private String message;
+    private ApplyState state;
 
     public static ApplyEntity from(Apply apply) {
         return ApplyEntity.builder()
@@ -31,6 +33,7 @@ public class ApplyEntity {
                 .partId(apply.part())
                 .user(apply.userId())
                 .message(apply.message())
+                .state(apply.state())
                 .build();
     }
 
@@ -41,6 +44,7 @@ public class ApplyEntity {
                 .part(partId)
                 .userId(user)
                 .message(message)
+                .state(state)
                 .build();
     }
 }

@@ -5,8 +5,13 @@ import com.connectcrew.teamone.api.userservice.notification.report.ReportNotific
 public record Report(
         Long userId,
         Long projectId,
-        String reason
+        String reason,
+        ReportState state
 ) {
+
+    public Report(Long userId, Long projectId, String reason) {
+        this(userId, projectId, reason, ReportState.WAITING);
+    }
 
     public ReportNotification toNotification() {
         return new ReportNotification(

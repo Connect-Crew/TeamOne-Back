@@ -8,13 +8,14 @@ import java.util.List;
 public record Member(
         Long memberId,
         Boolean isLeader,
-        List<MemberPart> parts
+        List<MemberPart> parts,
+        MemberState state
 ) {
     public MemberResponse toResponse() {
         return new MemberResponse(memberId, isLeader, parts);
     }
 
     public Member setLeader(Boolean leader) {
-        return new Member(memberId, leader, parts);
+        return new Member(memberId, leader, parts, state);
     }
 }

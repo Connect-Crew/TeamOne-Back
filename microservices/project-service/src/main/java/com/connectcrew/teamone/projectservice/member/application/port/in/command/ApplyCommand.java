@@ -3,6 +3,7 @@ package com.connectcrew.teamone.projectservice.member.application.port.in.comman
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.ApplyState;
 
 public record ApplyCommand(
         Long userId,
@@ -26,6 +27,7 @@ public record ApplyCommand(
                 .projectId(projectId)
                 .part(partId)
                 .message(message)
+                .state(ApplyState.WAITING)
                 .build();
     }
 }

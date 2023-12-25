@@ -8,6 +8,7 @@ public record Apply(
         Long userId,
         Long projectId,
         Long part,
-        String message
+        String message,
+        ApplyState state
 ) {
 }
