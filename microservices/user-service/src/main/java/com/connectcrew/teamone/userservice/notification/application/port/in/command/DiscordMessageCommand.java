@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.notification.application.port.in.command;
 
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.report.ReportNotification;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordChannel;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordMessage;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
@@ -14,6 +15,10 @@ public record DiscordMessageCommand(
 
     public static DiscordMessageCommand from(ErrorNotification event) {
         return new DiscordMessageCommand(event.level(), DiscordChannel.ERROR, String.format("%s\t%s", event.service(), event.caller()), event.message());
+    }
+
+    public static DiscordMessageCommand from(ReportNotification event) {
+        return new DiscordMessageCommand(ErrorLevel.INFO, DiscordChannel.REPORT, String.format("user: %d\tproject: %d", event.userId(), event.projectId()), event.reason());
     }
 
     public DiscordMessage toDomain() {

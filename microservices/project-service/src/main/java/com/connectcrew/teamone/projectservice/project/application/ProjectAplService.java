@@ -14,6 +14,7 @@ import com.connectcrew.teamone.projectservice.project.application.port.in.comman
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.SaveProjectOutput;
+import com.connectcrew.teamone.projectservice.project.application.port.out.SendReportMessageOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
@@ -43,6 +44,7 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
     private final UpdateProjectOutput updateProjectOutput;
     private final FindMemberOutput findMemberOutput;
     private final SaveMemberOutput saveMemberOutput;
+    private final SendReportMessageOutput sendReportMessageOutput;
 
     @Override
     public Flux<ProjectItem> findAllByQuery(ProjectQuery query) {
@@ -151,6 +153,7 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
     @Override
     public Mono<Boolean> report(ReportCommand command) {
         return saveProjectOutput.report(command.toDomain())
+                .doOnNext(sendReportMessageOutput::send)
                 .thenReturn(true);
     }
 

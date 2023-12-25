@@ -1,8 +1,9 @@
 package com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener;
 
 import com.connectcrew.teamone.api.constants.KafkaEventTopic;
-import com.connectcrew.teamone.api.userservice.notification.push.SendMessageEvent;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.push.SendMessageEvent;
+import com.connectcrew.teamone.api.userservice.notification.report.ReportNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
@@ -34,6 +35,17 @@ public class NotificationEventListener {
     public void consumeErrorNotificationEvent(String body) {
         try {
             ErrorNotification event = objectMapper.readValue(body, ErrorNotification.class);
+
+            sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event)).subscribe();
+        } catch (Exception e) {
+            log.error("consumeErrorNotificationEvent error", e);
+        }
+    }
+
+    @KafkaListener(topics = KafkaEventTopic.ReportNotification, groupId = "user-service")
+    public void consumeReportNotificationEvent(String body) {
+        try {
+            ReportNotification event = objectMapper.readValue(body, ReportNotification.class);
 
             sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event)).subscribe();
         } catch (Exception e) {

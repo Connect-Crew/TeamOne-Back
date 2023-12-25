@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.projectservice.notification.adapter.out.event;
 
+import com.connectcrew.teamone.api.constants.KafkaEventTopic;
 import com.connectcrew.teamone.projectservice.notification.application.port.out.SendNotificationOutput;
 import com.connectcrew.teamone.projectservice.notification.domain.Notification;
-import com.connectcrew.teamone.projectservice.notification.domain.constants.KafkaEventTopic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -8,6 +8,7 @@ import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repos
 import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.repository.RepresentProjectRepository;
 import com.connectcrew.teamone.userservice.user.adapter.out.persistence.repository.UserRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
+import net.dv8tion.jda.api.JDA;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -58,6 +59,9 @@ public class TestBeanConfig {
 
     @MockBean
     private FirebaseMessaging firebaseMessaging;
+
+    @MockBean
+    private JDA jda;
 
     @MockBean
     private DiscordNotificationAdapter discordNotificationAdapter;

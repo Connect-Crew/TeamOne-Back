@@ -9,10 +9,34 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.r2dbc.core.DatabaseClient;
 
 @TestConfiguration
 public class TestConfig {
+    // kafka beans
+    @MockBean
+    KafkaTemplate<String, String> kafkaTemplate;
+
+    @MockBean
+    ProducerFactory<String, String> producerFactory;
+
+    @MockBean
+    ConsumerFactory<String, String> consumerFactory;
+
+    @MockBean
+    ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory;
+
+    @MockBean
+    MessageListenerContainer messageListenerContainer;
+
+    @MockBean
+    KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     @MockBean
     ConnectionFactory connectionFactory;
