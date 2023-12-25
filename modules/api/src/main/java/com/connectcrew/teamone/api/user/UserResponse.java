@@ -1,11 +1,11 @@
-package com.connectcrew.teamone.api.user.auth;
+package com.connectcrew.teamone.api.user;
 
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record User(
+public record UserResponse(
         Long id,
         String socialId,
         Social provider,
@@ -14,6 +14,6 @@ public record User(
         Role role,
         LocalDateTime createdDate,
         LocalDateTime modifiedDate
-) {
 
+) {
 }

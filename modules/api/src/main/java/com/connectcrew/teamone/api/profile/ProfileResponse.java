@@ -1,11 +1,11 @@
-package com.connectcrew.teamone.api.user.profile;
+package com.connectcrew.teamone.api.profile;
 
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record Profile(
+public record ProfileResponse(
         Long id,
         String nickname,
         String profile,

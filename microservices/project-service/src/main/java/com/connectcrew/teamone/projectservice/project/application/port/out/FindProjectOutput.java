@@ -13,6 +13,8 @@ public interface FindProjectOutput {
 
     Mono<Project> findById(Long id);
 
+    Mono<Long> findLeaderById(Long projectId);
+
     Mono<String> findProjectThumbnail(Long id);
 
     Mono<Boolean> existsProjectById(Long id);

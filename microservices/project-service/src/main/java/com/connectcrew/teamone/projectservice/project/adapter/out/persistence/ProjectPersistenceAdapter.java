@@ -137,6 +137,12 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
     }
 
     @Override
+    public Mono<Long> findLeaderById(Long projectId) {
+        return projectRepository.findById(projectId)
+                .map(ProjectEntity::getLeader);
+    }
+
+    @Override
     public Mono<String> findProjectThumbnail(Long id) {
         return bannerRepository.findFirstByProjectOrderByIdx(id)
                 .map(BannerEntity::getPath);

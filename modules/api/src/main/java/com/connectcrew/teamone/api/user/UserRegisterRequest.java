@@ -1,10 +1,9 @@
-package com.connectcrew.teamone.api.user.auth.param;
+package com.connectcrew.teamone.api.user;
 
-import com.connectcrew.teamone.api.user.auth.Social;
 import lombok.Builder;
 
 @Builder
-public record UserInputParam(
+public record UserRegisterRequest(
         String socialId,
         Social provider,
         String username,

@@ -1,5 +1,7 @@
 package com.connectcrew.teamone.userservice.notification.domain;
 
+import com.connectcrew.teamone.api.notification.error.ErrorLevel;
+
 public record DiscordMessage(
         ErrorLevel level,
         DiscordChannel channel,

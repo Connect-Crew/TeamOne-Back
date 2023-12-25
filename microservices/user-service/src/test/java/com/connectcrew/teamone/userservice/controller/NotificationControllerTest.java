@@ -1,6 +1,5 @@
 package com.connectcrew.teamone.userservice.controller;
 
-import com.connectcrew.teamone.api.user.notification.FcmToken;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.notification.adapter.in.web.NotificationController;
 import com.connectcrew.teamone.userservice.notification.adapter.out.messaging.FcmMessageAdapter;
@@ -9,6 +8,7 @@ import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;
 import com.connectcrew.teamone.userservice.notification.application.NotificationAplService;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
+import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -100,7 +100,7 @@ class NotificationControllerTest {
 
         webTestClient.post()
                 .uri("/notification/token")
-                .bodyValue(new FcmToken(0L, "fcm"))
+                .bodyValue(new FcmToken(null, 0L, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Boolean.class);

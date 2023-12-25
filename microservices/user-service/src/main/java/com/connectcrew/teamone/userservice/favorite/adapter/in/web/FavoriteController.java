@@ -5,9 +5,9 @@ import com.connectcrew.teamone.userservice.favorite.application.port.in.SaveFavo
 import com.connectcrew.teamone.userservice.favorite.application.port.in.command.SetFavoriteCommand;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoriteQuery;
 import com.connectcrew.teamone.userservice.favorite.application.port.in.query.FindFavoritesQuery;
-import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
+import com.connectcrew.teamone.api.favorite.FavoriteType;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
+import com.connectcrew.teamone.api.notification.error.ErrorLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

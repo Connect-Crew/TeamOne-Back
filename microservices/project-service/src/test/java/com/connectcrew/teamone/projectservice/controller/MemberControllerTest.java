@@ -9,6 +9,7 @@ import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.ent
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
+import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.ProjectEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +70,7 @@ public class MemberControllerTest {
                 .targetCollect(2)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
+        when(projectRepository.findById(anyLong())).thenReturn(Mono.just(ProjectEntity.builder().leader(1L).build()));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
         when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));

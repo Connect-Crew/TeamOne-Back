@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.userservice.favorite.application.port.out;
 
 import com.connectcrew.teamone.userservice.favorite.domain.Favorite;
-import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
+import com.connectcrew.teamone.api.favorite.FavoriteType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

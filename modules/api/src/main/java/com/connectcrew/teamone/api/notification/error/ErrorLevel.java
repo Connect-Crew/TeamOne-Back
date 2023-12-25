@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.userservice.notification.domain;
+package com.connectcrew.teamone.api.notification.error;
 
 public enum ErrorLevel {
     DEBUG,

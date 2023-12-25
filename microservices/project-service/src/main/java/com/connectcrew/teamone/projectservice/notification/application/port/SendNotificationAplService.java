@@ -17,8 +17,8 @@ public class SendNotificationAplService implements SendNotificationUseCase {
 
     @Override
     public Mono<Boolean> sendToLeader(Long projectId, String title, String body, String deepLink) {
-        return findProjectOutput.findById(projectId)
-                .doOnNext(project -> sendNotificationOutput.send(new Notification(project.leader(), title, body, deepLink)))
+        return findProjectOutput.findLeaderById(projectId)
+                .doOnNext(leader -> sendNotificationOutput.send(new Notification(leader, title, body, deepLink)))
                 .thenReturn(true);
     }
 }

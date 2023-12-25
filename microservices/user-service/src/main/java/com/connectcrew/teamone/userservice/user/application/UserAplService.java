@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.userservice.user.application;
 
 import com.connectcrew.teamone.api.exception.NotFoundException;
+import com.connectcrew.teamone.api.user.Social;
 import com.connectcrew.teamone.userservice.notification.application.port.out.SaveFcmOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.FindProfileOutput;
 import com.connectcrew.teamone.userservice.profile.application.out.SaveProfileOutput;
@@ -10,7 +11,6 @@ import com.connectcrew.teamone.userservice.user.application.in.command.CreateUse
 import com.connectcrew.teamone.userservice.user.application.out.FindUserOutput;
 import com.connectcrew.teamone.userservice.user.application.out.SaveUserOutput;
 import com.connectcrew.teamone.userservice.user.domain.User;
-import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import com.connectcrew.teamone.userservice.user.domain.enums.UserExceptionMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

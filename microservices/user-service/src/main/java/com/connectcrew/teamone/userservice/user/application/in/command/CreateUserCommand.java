@@ -1,11 +1,12 @@
 package com.connectcrew.teamone.userservice.user.application.in.command;
 
 
+import com.connectcrew.teamone.api.user.Role;
+import com.connectcrew.teamone.api.user.Social;
+import com.connectcrew.teamone.api.user.UserRegisterRequest;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.user.domain.User;
-import com.connectcrew.teamone.userservice.user.domain.enums.Role;
-import com.connectcrew.teamone.userservice.user.domain.enums.Social;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,21 @@ public record CreateUserCommand(
         boolean privacyAgreement,
         String fcm
 ) {
+
+    public static CreateUserCommand from(UserRegisterRequest request) {
+        return CreateUserCommand.builder()
+                .socialId(request.socialId())
+                .provider(request.provider())
+                .username(request.username())
+                .nickname(request.nickname())
+                .profile(request.profile())
+                .email(request.email())
+                .termsAgreement(request.termsAgreement())
+                .privacyAgreement(request.privacyAgreement())
+                .fcm(request.fcm())
+                .build();
+    }
+
     public User toUserDomain() {
         return User.builder()
                 .socialId(socialId)

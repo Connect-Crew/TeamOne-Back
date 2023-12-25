@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.user.profile.Profile;
+import com.connectcrew.teamone.api.profile.ProfileResponse;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.profile.adapter.in.web.ProfileController;
 import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.PartEntity;
@@ -76,7 +76,7 @@ class ProfileControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Profile.class);
+                .expectBody(ProfileResponse.class);
     }
 
     @Test

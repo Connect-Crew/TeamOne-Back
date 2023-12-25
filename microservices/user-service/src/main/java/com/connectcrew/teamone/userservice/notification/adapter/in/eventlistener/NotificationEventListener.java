@@ -1,9 +1,11 @@
 package com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener;
 
-import com.connectcrew.teamone.userservice.gloabal.constants.KafkaEventTopic;
-import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.ErrorNotification;
-import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.SendMessageEvent;
+import com.connectcrew.teamone.api.constants.KafkaEventTopic;
+import com.connectcrew.teamone.api.notification.push.SendMessageEvent;
+import com.connectcrew.teamone.api.notification.error.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
+import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
+import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,7 @@ public class NotificationEventListener {
         try {
             SendMessageEvent event = objectMapper.readValue(body, SendMessageEvent.class);
 
-            sendMessageUseCase.sendMessage(event.toCommand()).subscribe();
+            sendMessageUseCase.sendMessage(SendMessageCommand.from(event)).subscribe();
         } catch (Exception e) {
             log.error("consumePushNotificationEvent error", e);
         }
@@ -33,7 +35,7 @@ public class NotificationEventListener {
         try {
             ErrorNotification event = objectMapper.readValue(body, ErrorNotification.class);
 
-            sendMessageUseCase.sendMessage(event.toCommand()).subscribe();
+            sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event)).subscribe();
         } catch (Exception e) {
             log.error("consumeErrorNotificationEvent error", e);
         }

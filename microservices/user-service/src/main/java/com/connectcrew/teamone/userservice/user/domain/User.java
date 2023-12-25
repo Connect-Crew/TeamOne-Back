@@ -1,8 +1,9 @@
 package com.connectcrew.teamone.userservice.user.domain;
 
 
-import com.connectcrew.teamone.userservice.user.domain.enums.Role;
-import com.connectcrew.teamone.userservice.user.domain.enums.Social;
+import com.connectcrew.teamone.api.user.Role;
+import com.connectcrew.teamone.api.user.Social;
+import com.connectcrew.teamone.api.user.UserResponse;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -20,5 +21,17 @@ public record User(
         LocalDateTime createdDate,
         LocalDateTime modifiedDate
 ) {
+    public UserResponse toResponse() {
+        return UserResponse.builder()
+                .id(id)
+                .socialId(socialId)
+                .provider(provider)
+                .username(username)
+                .email(email)
+                .role(role)
+                .createdDate(createdDate)
+                .modifiedDate(modifiedDate)
+                .build();
+    }
 
 }

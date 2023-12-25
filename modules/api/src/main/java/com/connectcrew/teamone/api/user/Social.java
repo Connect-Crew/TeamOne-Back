@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.api.user.auth;
+package com.connectcrew.teamone.api.user;
 
 public enum Social {
     GOOGLE,
