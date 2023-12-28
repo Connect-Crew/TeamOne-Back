@@ -10,7 +10,7 @@ import java.util.List;
 public interface FindMemberOutput {
 
     Mono<List<Member>> findAllByProject(Long project);
-    Flux<MemberPart> findAllPartIdByProjectAndUser(Long project, Long user);
+    Flux<MemberPart> findAllUserPartByProjectAndUser(Long project, Long user);
 
     Mono<Boolean> existsMemberByPartAndUser(Long partId, Long user);
 

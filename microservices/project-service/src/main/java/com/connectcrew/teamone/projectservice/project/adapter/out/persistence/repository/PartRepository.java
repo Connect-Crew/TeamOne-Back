@@ -12,5 +12,8 @@ public interface PartRepository extends ReactiveCrudRepository<PartEntity, Long>
     Mono<PartEntity> findByProjectAndPart(Long project, String part);
 
     @Query("SELECT p.* FROM part AS p JOIN member AS m ON p.id = m.part_id WHERE p.project = :project AND m.user = :user")
-    Flux<PartEntity> findAllByProjectAndUser(Long project, Long user);
+    Flux<PartEntity> findAllUserPartByProjectAndUser(Long project, Long user);
+
+    @Query("SELECT p.* FROM part AS p JOIN apply AS a ON p.id = a.part_id WHERE p.project = :project AND a.user = :user")
+    Flux<PartEntity> findAllAppliedPartByProjectAndUser(Long project, Long user);
 }

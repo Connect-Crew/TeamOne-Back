@@ -67,7 +67,7 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
 
     @NotNull
     private Mono<UserRelationWithProject> getUserRelationWithProject(Long id, Long userId) {
-        return findMemberOutput.findAllPartIdByProjectAndUser(id, userId)
+        return findMemberOutput.findAllUserPartByProjectAndUser(id, userId)
                 .collect(Collectors.toSet())
                 .map(UserRelationWithProject::from);
     }

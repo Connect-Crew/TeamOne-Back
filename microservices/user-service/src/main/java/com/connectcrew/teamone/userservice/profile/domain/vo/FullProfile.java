@@ -14,7 +14,7 @@ public record FullProfile(
 ) {
     public ProfileResponse toResponse() {
         return ProfileResponse.builder()
-                .id(profile().id())
+                .id(profile().userId())
                 .nickname(profile().nickname())
                 .profile(profile().profile())
                 .introduction(profile().introduction())

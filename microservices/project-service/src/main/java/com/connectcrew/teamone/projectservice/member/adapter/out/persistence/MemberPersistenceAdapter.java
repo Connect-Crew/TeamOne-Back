@@ -47,8 +47,11 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     }
 
     @Override
-    public Flux<MemberPart> findAllPartIdByProjectAndUser(Long project, Long user) {
-        return partRepository.findAllByProjectAndUser(project, user)
+    public Flux<MemberPart> findAllUserPartByProjectAndUser(Long project, Long user) {
+        return Flux.merge(
+                    partRepository.findAllUserPartByProjectAndUser(project, user),
+                    partRepository.findAllAppliedPartByProjectAndUser(project, user)
+                )
                 .map(part -> MemberPart.valueOf(part.getPart()));
     }
 
