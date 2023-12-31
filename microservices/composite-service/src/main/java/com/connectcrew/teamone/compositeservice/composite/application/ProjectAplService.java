@@ -31,6 +31,12 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
     }
 
     @Override
+    public Mono<List<ProjectItem>> getProjectList(Long userId) {
+        log.trace("getProjectList: {}", userId);
+        return findProjectOutput.findAllProjectItems(userId).collectList();
+    }
+
+    @Override
     public Mono<ProjectDetail> find(Long id, Long userId) {
         return findProjectOutput.find(id, userId);
     }

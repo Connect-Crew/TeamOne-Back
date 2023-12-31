@@ -14,6 +14,8 @@ public interface FindProjectOutput {
 
     Flux<ProjectItem> findAllProjectItems(ProjectFilterOption option);
 
+    Flux<ProjectItem> findAllProjectItems(Long userId);
+
     Mono<ProjectDetail> find(Long projectId, Long userId);
 
     Mono<List<ProjectMember>> findMembers(Long projectId);

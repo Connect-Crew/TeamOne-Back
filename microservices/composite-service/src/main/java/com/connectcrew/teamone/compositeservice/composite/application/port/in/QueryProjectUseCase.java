@@ -12,6 +12,8 @@ public interface QueryProjectUseCase {
 
     Mono<List<ProjectItem>> getProjectList(FindProjectListQuery query);
 
+    Mono<List<ProjectItem>> getProjectList(Long userId);
+
     Mono<ProjectDetail> find(Long id, Long userId);
 
     Mono<List<ProjectMember>> getProjectMemberList(Long projectId);

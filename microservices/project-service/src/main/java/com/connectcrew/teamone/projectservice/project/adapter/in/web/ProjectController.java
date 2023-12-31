@@ -32,6 +32,13 @@ public class ProjectController {
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectList", ErrorLevel.ERROR, ex));
     }
 
+    @GetMapping("/list/{userId}")
+    public Flux<ProjectItemResponse> getProjectList(@PathVariable Long userId) {
+        return queryProjectUseCase.findAllByUserId(userId)
+                .map(ProjectItem::toResponse)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectList", ErrorLevel.ERROR, ex));
+    }
+
     @PostMapping("/")
     public Mono<Long> createProject(@RequestBody CreateProjectRequest request) {
         return createProjectUseCase.create(CreateProjectCommand.from(request))

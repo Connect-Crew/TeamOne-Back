@@ -208,7 +208,6 @@ class ProjectControllerTest {
         when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
         when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
 
-        System.out.println("asfjabfkjawfbjaskfbnashjk");
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/project/list")
@@ -246,6 +245,50 @@ class ProjectControllerTest {
                                 parameterWithName("states").optional().description("프로젝트 상태 (Optional)"),
                                 parameterWithName("category").optional().description("프로젝트 카테고리 (Optional)"),
                                 parameterWithName("search").optional().description("프로젝트 검색어 (Optional)")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type("Number").description("프로젝트 ID"),
+                                fieldWithPath("[].title").type("String").description("프로젝트 제목"),
+                                fieldWithPath("[].thumbnail").type("String (Optional)").optional().description("프로젝트 썸네일"),
+                                fieldWithPath("[].region").type("String").description("프로젝트 지역"),
+                                fieldWithPath("[].online").type("Boolean").description("온라인 여부"),
+                                fieldWithPath("[].careerMin").type("String").description("최소 프로젝트 경력"),
+                                fieldWithPath("[].careerMax").type("String").description("최대 프로젝트 경력"),
+                                fieldWithPath("[].createdAt").type("Datetime").description("프로젝트 생성 날짜"),
+                                fieldWithPath("[].state").type("String").description("프로젝트 상태"),
+                                fieldWithPath("[].favorite").type("Number").description("프로젝트 좋아요 수"),
+                                fieldWithPath("[].myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트 여부"),
+                                fieldWithPath("[].category").type("String[]").description("프로젝트 분야"),
+                                fieldWithPath("[].goal").type("String").description("프로젝트 목표"),
+                                fieldWithPath("[].recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
+                                fieldWithPath("[].recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
+                                fieldWithPath("[].recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
+                                fieldWithPath("[].recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
+                                fieldWithPath("[].recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
+                                fieldWithPath("[].recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
+                                fieldWithPath("[].recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
+                                fieldWithPath("[].recruitStatus[].applied").type("Boolean").description("프로젝트 지원 여부 (해당 요청에서는 무조건 null입니다. 사용X)")
+                        )
+                ));
+    }
+
+    @Test
+    void myListTest() {
+        List<ProjectItem> items = initItems();
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllProjectItems(anyLong())).thenReturn(Flux.fromIterable(items));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
+
+        webTestClient.get()
+                .uri("/project/mylist")
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<List<ProjectItemResponse>>() {
+                })
+                .consumeWith(document("project/mylist",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
                         ),
                         responseFields(
                                 fieldWithPath("[].id").type("Number").description("프로젝트 ID"),

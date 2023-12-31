@@ -91,6 +91,22 @@ public class ProjectController {
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectList", ErrorLevel.ERROR, ex));
     }
 
+    @GetMapping("/mylist")
+    private Mono<List<ProjectItemResponse>> getProjectList(@RequestHeader(JwtProvider.AUTH_HEADER) String token) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        return queryProjectUseCase.getProjectList(id)
+                .flatMap(projects -> queryUserUseCase.isFavorite(id, FavoriteType.PROJECT, projects.stream().map(ProjectItem::id).toList())
+                        .map(favoriteMap -> Tuples.of(projects, favoriteMap)))
+                .map(tuple -> tuple.getT1().stream()
+                        .map(project ->
+                                ProjectItemResponse.from(project, tuple.getT2().getOrDefault(project.id(), false))
+                        ).toList()
+                )
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.getProjectList", ErrorLevel.ERROR, ex));
+    }
+
     @GetMapping("/{projectId}")
     private Mono<ProjectDetailResponse> getProjectDetail(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);

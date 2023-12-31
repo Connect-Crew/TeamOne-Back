@@ -46,6 +46,14 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
                 .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3()));
     }
 
+    @Override
+    public Flux<ProjectItem> findAllByUserId(Long userId) {
+        return customRepository.findAllByUserId(userId)
+                .flatMap(project -> findThumbnail(project.id()).map(banner -> Tuples.of(project, banner)))
+                .flatMap(tuple -> findAllRecruitByProject(tuple.getT1().id()).map(parts -> Tuples.of(tuple.getT1(), tuple.getT2(), parts)))
+                .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3()));
+    }
+
     private Mono<BannerEntity> findThumbnail(Long project) {
         return bannerRepository.findFirstByProjectOrderByIdx(project)
                 .defaultIfEmpty(new BannerEntity());

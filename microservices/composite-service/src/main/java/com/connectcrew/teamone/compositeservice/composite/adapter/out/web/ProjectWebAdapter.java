@@ -70,6 +70,16 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
+    public Flux<ProjectItem> findAllProjectItems(Long userId) {
+        return webClient.get()
+                .uri(String.format("%s/project/%d", host, userId))
+                .retrieve()
+                .bodyToFlux(ProjectItemResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(ProjectItemResponse::toDomain);
+    }
+
+    @Override
     public Mono<ProjectDetail> find(Long projectId, Long userId) {
         return webClient.get()
                 .uri(String.format("%s/project/?id=%d&userId=%d", host, projectId, userId))

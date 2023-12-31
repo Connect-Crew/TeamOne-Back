@@ -16,6 +16,7 @@
 
 - link:project/basicinfo.html[프로젝트 기본 정보 불러오기 - /project/]
 - link:project/list.html[프로젝트 모집 목록 가져오기 - /project/list]
+- link:project/mylist.html[내 프로젝트 목록 가져오기 - /project/mylist]
 - link:project/find.html[프로젝트 모집글 불러오기 - /project/\{projectId\}]
 - link:project/members.html[프로젝트 멤버 불러오기 - /project/members/\{projectId\}]
 - link:project/create.html[프로젝트 모집글 작성하기 - /project/]

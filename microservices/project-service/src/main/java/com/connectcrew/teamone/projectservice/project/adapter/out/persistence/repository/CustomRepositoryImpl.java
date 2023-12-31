@@ -132,6 +132,40 @@ public class CustomRepositoryImpl implements CustomRepository {
                 .all();
     }
 
+    @Override
+    public Flux<ProjectCustomEntity> findAllByUserId(Long userId) {
+        /* 예시 SQL
+        SELECT p.*,
+            GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories
+        FROM project p
+            JOIN part pt ON p.id = pt.project
+            JOIN member m ON pt.id = m.part_id
+            LEFT JOIN category cat ON p.id = cat.project
+        WHERE m.user = 2
+        GROUP BY p.id
+        ORDER BY p.id DESC
+        LIMIT 10;
+         */
+
+        String sql = String.format(
+                "SELECT p.*," +
+                        "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
+                        "FROM project p " +
+                        "JOIN part pt ON p.id = pt.project " +
+                        "JOIN member m ON pt.id = m.part_id " +
+                        "LEFT JOIN category cat ON p.id = cat.project " +
+                        "WHERE m.user = %d " +
+                        "GROUP BY p.id " +
+                        "ORDER BY p.id DESC " +
+                        "LIMIT 10",
+                userId
+        );
+
+        return dc.sql(sql)
+                .map((row, meta) -> rowToEntity(row))
+                .all();
+    }
+
     private ProjectCustomEntity rowToEntity(Row row) {
         Long id = row.get("id", Long.class);
         String title = row.get("title", String.class);

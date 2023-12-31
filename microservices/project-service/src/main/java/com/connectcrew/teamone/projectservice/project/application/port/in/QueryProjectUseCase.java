@@ -11,6 +11,9 @@ import reactor.util.function.Tuple2;
 public interface QueryProjectUseCase {
 
     Flux<ProjectItem> findAllByQuery(ProjectQuery query);
+
+    Flux<ProjectItem> findAllByUserId(Long userId);
+
     Mono<Tuple2<Project, UserRelationWithProject>> findById(Long id, Long userId);
 
     Mono<String> findProjectThumbnail(Long id);

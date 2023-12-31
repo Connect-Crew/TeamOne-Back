@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 public interface FindProjectOutput {
     Flux<ProjectItem> findAllByQuery(ProjectOption option);
 
+    Flux<ProjectItem> findAllByUserId(Long userId);
+
     Mono<Project> findById(Long id);
 
     Mono<Long> findLeaderById(Long projectId);
