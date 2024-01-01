@@ -6,4 +6,6 @@ import reactor.core.publisher.Flux;
 
 public interface CategoryRepository extends ReactiveCrudRepository<CategoryEntity, Long> {
     Flux<CategoryEntity> findAllByProject(Long project);
+
+    Flux<CategoryEntity> deleteAllByProject(Long project);
 }

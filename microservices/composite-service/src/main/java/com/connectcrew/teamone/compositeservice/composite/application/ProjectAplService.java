@@ -2,7 +2,9 @@ package com.connectcrew.teamone.compositeservice.composite.application;
 
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveProjectUseCase;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.UpdateProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.ModifyProjectCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
@@ -18,7 +20,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCase {
+public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseCase, SaveProjectUseCase {
 
     private final FindProjectOutput findProjectOutput;
     private final SaveProjectOutput saveProjectOutput;
@@ -65,5 +67,10 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
     @Override
     public Mono<Integer> setFavorite(ProjectFavorite favorite) {
         return updateProjectOutput.updateFavorite(favorite);
+    }
+
+    @Override
+    public Mono<Long> update(ModifyProjectCommand command) {
+        return updateProjectOutput.update(command.toDomain());
     }
 }

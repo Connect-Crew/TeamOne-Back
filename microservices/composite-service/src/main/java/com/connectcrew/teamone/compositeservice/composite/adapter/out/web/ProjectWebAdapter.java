@@ -8,6 +8,7 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.S
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
+import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
 import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -139,6 +140,16 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                 .bodyValue(favorite)
                 .retrieve()
                 .bodyToMono(Integer.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Long> update(ModifyProjectInfo project) {
+        return webClient.put()
+                .uri(String.format("%s/project/", host))
+                .bodyValue(project)
+                .retrieve()
+                .bodyToMono(Long.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

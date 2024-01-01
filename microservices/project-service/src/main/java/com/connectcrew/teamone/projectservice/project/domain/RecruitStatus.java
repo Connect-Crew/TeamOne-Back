@@ -32,4 +32,13 @@ public record RecruitStatus(
                 .max(request.max())
                 .build();
     }
+
+    public static RecruitStatus from(CreateRecruitCommand request, int current) {
+        return RecruitStatus.builder()
+                .part(request.part())
+                .comment(request.comment())
+                .current(current)
+                .max(request.max())
+                .build();
+    }
 }

@@ -7,4 +7,6 @@ import reactor.core.publisher.Flux;
 public interface SkillRepository extends ReactiveCrudRepository<SkillEntity, Long> {
 
     Flux<SkillEntity> findAllByProject(Long project);
+
+    Flux<SkillEntity> deleteAllByProject(Long project);
 }

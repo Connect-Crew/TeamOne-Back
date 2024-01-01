@@ -9,6 +9,7 @@ import com.connectcrew.teamone.projectservice.project.application.port.in.Update
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.CreateProjectCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.FavoriteCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.ReportCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.UpdateProjectCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,12 @@ public class ProjectController {
     public Mono<Long> createProject(@RequestBody CreateProjectRequest request) {
         return createProjectUseCase.create(CreateProjectCommand.from(request))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
+    }
+
+    @PutMapping("/")
+    public Mono<Long> updateProject(@RequestBody UpdateProjectRequest request) {
+        return updateProjectUseCase.update(UpdateProjectCommand.from(request))
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateProject", ErrorLevel.ERROR, ex));
     }
 
     @GetMapping("/")

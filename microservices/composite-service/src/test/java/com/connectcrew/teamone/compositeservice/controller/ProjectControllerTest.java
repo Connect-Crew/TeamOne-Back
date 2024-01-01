@@ -10,6 +10,7 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWe
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
 import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
+import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
@@ -631,6 +632,77 @@ class ProjectControllerTest {
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
                         )
                 ));
+    }
+
+    @Test
+    void updateProjectTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.update(any(ModifyProjectInfo.class))).thenReturn(Mono.just(0L));
+        when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
+
+        MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+        multipartData.add("banner", new ClassPathResource("banner1.png"));
+        multipartData.add("banner", new ClassPathResource("banner2.png"));
+        multipartData.add("title", "프로젝트 제목");
+        multipartData.add("region", Region.SEOUL.name());
+        multipartData.add("online", true);
+        multipartData.add("state", ProjectState.NOT_STARTED.name());
+        multipartData.add("careerMin", Career.SEEKER.name());
+        multipartData.add("careerMax", Career.YEAR_1.name());
+        multipartData.add("leaderParts", MemberPart.PL_PM_PO.name());
+        multipartData.add("leaderParts", MemberPart.UI_UX_DESIGNER.name());
+        multipartData.add("category", ProjectCategory.IT.name());
+        multipartData.add("category", ProjectCategory.ECOMMERCE.name());
+        multipartData.add("goal", ProjectGoal.STARTUP.name());
+        multipartData.add("introduction", "프로젝트 설명");
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2));
+        multipartData.add("skills", SkillType.Swift.name());
+        multipartData.add("skills", SkillType.Kotlin.name());
+        multipartData.add("skills", SkillType.Spring.name());
+
+
+        webTestClient.put()
+                .uri("/project/{projectId}", 5L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(multipartData)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SimpleLongResponse.class)
+                .consumeWith(document("project/update-success",
+                                requestHeaders(
+                                        headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                                ),
+                                pathParameters(
+                                        parameterWithName("projectId").description("Project Id")
+                                ),
+                                requestParts(
+                                        partWithName("banner").optional().description("프로젝트 배너 이미지 최대 3개로 .jpg, .png, .jpeg 확장자만 허용합니다."),
+                                        partWithName("title").description("프로젝트 제목"),
+                                        partWithName("region").description("프로젝트 지역"),
+                                        partWithName("online").description("온라인 여부"),
+                                        partWithName("state").description("프로젝트 상태"),
+                                        partWithName("careerMin").description("최소 경력"),
+                                        partWithName("careerMax").description("최대 경력"),
+                                        partWithName("leaderParts").description("프로젝트 리더 직무 (Collection)"),
+                                        partWithName("category").description("프로젝트 분야 (Collection)"),
+                                        partWithName("goal").description("프로젝트 목표"),
+                                        partWithName("introduction").description("프로젝트 소개"),
+                                        partWithName("recruits").description("프로젝트 모집 정보 (Collection)"),
+                                        partWithName("skills").description("프로젝트 스킬 (Collection)")
+                                ),
+                                responseFields(
+                                        fieldWithPath("value").type("Long").description("생성된 프로젝트 ID")
+                                )
+                        )
+                );
+
+        clearBannerForTest();
     }
 
     @Test

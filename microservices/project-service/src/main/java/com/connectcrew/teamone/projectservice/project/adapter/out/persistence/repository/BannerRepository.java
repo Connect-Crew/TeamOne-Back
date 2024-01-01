@@ -9,4 +9,6 @@ public interface BannerRepository extends ReactiveCrudRepository<BannerEntity, L
     Flux<BannerEntity> findAllByProject(Long project);
 
     Mono<BannerEntity> findFirstByProjectOrderByIdx(Long project);
+
+    Flux<BannerEntity> deleteAllByProject(Long project);
 }

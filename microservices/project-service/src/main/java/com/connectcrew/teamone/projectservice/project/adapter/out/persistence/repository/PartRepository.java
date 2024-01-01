@@ -6,10 +6,14 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
+
 public interface PartRepository extends ReactiveCrudRepository<PartEntity, Long> {
     Flux<PartEntity> findAllByProject(Long project);
 
     Mono<PartEntity> findByProjectAndPart(Long project, String part);
+
+    Flux<PartEntity> deleteAllByProjectAndPartNotIn(Long project, Collection<String> parts);
 
     @Query("SELECT p.* FROM part AS p JOIN member AS m ON p.id = m.part_id WHERE p.project = :project AND m.user = :user")
     Flux<PartEntity> findAllUserPartByProjectAndUser(Long project, Long user);

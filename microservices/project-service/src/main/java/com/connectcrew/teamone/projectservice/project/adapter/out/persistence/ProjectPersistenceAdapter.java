@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
@@ -204,5 +205,32 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
                     entity.setFavorite(favorite);
                     return projectRepository.save(entity).thenReturn(favorite);
                 });
+    }
+
+    @Override
+    @Transactional
+    public Mono<Project> update(Project project) {
+        List<String> parts = project.recruitStatuses().stream()
+                .map(RecruitStatus::part)
+                .map(MemberPart::name)
+                .toList();
+
+        return bannerRepository.deleteAllByProject(project.id())
+                .thenMany(partRepository.deleteAllByProjectAndPartNotIn(project.id(), parts))
+                .thenMany(categoryRepository.deleteAllByProject(project.id()))
+                .thenMany(skillRepository.deleteAllByProject(project.id()))
+                .then()
+                .then(projectRepository.save(ProjectEntity.from(project)))
+                .then(saveBanners(project, project.id()))
+                .then(saveParts(project, project.id()))
+                .then(saveCategories(project, project.id()))
+                .then(saveSkills(project, project.id()))
+                .onErrorResume(e -> {
+                    log.error("createProject - error: {}", e.getMessage(), e);
+                    return Mono.error(new RuntimeException(ProjectExceptionMessage.UPDATE_PROJECT_FAILED.toString()));
+                })
+                .thenReturn(project);
+
+
     }
 }
