@@ -22,6 +22,8 @@
 - link:project/create.html[프로젝트 모집글 작성하기 - /project/]
 - link:project/update.html[프로젝트 모집글 수정하기 - /project/\{projectId\}]
 - link:project/favorite.html[프로젝트 좋아요 설정 및 해지하기 - /project/favorite ]
+- link:project/getApplies.html[프로젝트 지원목록 조회 - /project/apply/\{projectId\}/\{part\}]
+- link:project/getApplyStatus.html[프로젝트 지원 상태 조회 - /project/apply/\{projectId\}]
 - link:project/apply.html[프로젝트 지원하기 - /project/apply]
 - link:project/report.html[프로젝트 신고하기 - /project/report]
 

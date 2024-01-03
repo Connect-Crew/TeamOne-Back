@@ -762,6 +762,83 @@ class ProjectControllerTest {
     }
 
     @Test
+    void getApplyTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllApplies(anyLong(), anyLong(), any(MemberPart.class))).thenReturn(Flux.just(
+                new Apply(0L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(1L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(2L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(3L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(4L, 0L, MemberPart.BACKEND, "지원 메시지")
+        ));
+
+        ParameterizedTypeReference<List<ApplyResponse>> resType = new ParameterizedTypeReference<>() {
+        };
+
+        webTestClient.get()
+                .uri("/project/apply/{projectId}/{part}", 0L, MemberPart.BACKEND)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(resType)
+                .consumeWith(document("project/apply-list",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("Project Id"),
+                                parameterWithName("part").description("Member Part")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("[].projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("[].part").type("String").description("지원 직군"),
+                                fieldWithPath("[].message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
+    @Test
+    void getApplyStatusTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllApplyStatus(anyLong(), anyLong())).thenReturn(Flux.just(
+                new ApplyStatus(MemberPart.BACKEND, 4L, 2L, 6L),
+                new ApplyStatus(MemberPart.IOS, 4L, 2L, 6L)
+        ));
+
+        ParameterizedTypeReference<SimpleMapResponse<MemberPart, ApplyStatusResponse>> resType = new ParameterizedTypeReference<>() {
+        };
+
+        webTestClient.get()
+                .uri("/project/apply/{projectId}", 0L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(resType)
+                .consumeWith(document("project/apply-status",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("Project Id")
+                        ),
+                        responseFields(
+                                fieldWithPath("BACKEND").type("ApplyStatusResponse").description("백엔드 지원 현황"),
+                                fieldWithPath("BACKEND.applies").type("Number").description("지원한 인원"),
+                                fieldWithPath("BACKEND.current").type("Number").description("현재 멤버 인원"),
+                                fieldWithPath("BACKEND.max").type("Number").description("최대 모집 인원"),
+                                fieldWithPath("IOS").type("ApplyStatusResponse").description("IOS 지원 현황"),
+                                fieldWithPath("IOS.applies").type("Number").description("지원한 인원"),
+                                fieldWithPath("IOS.current").type("Number").description("현재 멤버 인원"),
+                                fieldWithPath("IOS.max").type("Number").description("최대 모집 인원")
+
+                        )
+                ));
+    }
+
+    @Test
     void applyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));

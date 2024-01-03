@@ -1,0 +1,25 @@
+= 프로젝트 지원 상태 조회 - /project/apply/\{projectId\} (POST)
+
+link:../index.html[home으로 돌아가기]
+
+해당 프로젝트 파트의 지원 목록을 요청합니다.
+
+== Request
+
+include::{snippets}/project/apply-status/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/apply-status/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/project/apply-status/path-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/apply-status/http-response.adoc[]
+
+include::{snippets}/project/apply-status/response-fields.adoc[]
