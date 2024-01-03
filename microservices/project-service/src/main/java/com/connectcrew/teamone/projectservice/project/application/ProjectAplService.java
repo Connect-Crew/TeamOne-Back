@@ -51,13 +51,13 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
 
     @Override
     public Flux<ProjectItem> findAllByUserId(Long userId) {
-        log.trace("findAllByUserId - userId: {}", userId);
+        log.trace("findAllByUserId - leader: {}", userId);
         return findProjectOutput.findAllByUserId(userId);
     }
 
     @Override
     public Mono<Tuple2<Project, UserRelationWithProject>> findById(Long id, Long userId) {
-        log.trace("findById - id: {}, userId: {}", id, userId);
+        log.trace("findById - id: {}, leader: {}", id, userId);
         return findProjectOutput.findById(id)
                 .flatMap(project -> getUserRelationWithProject(id, userId)
                         .map(relation -> Tuples.of(project, relation)));

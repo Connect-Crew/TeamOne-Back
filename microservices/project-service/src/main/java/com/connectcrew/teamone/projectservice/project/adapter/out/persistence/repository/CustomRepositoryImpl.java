@@ -30,7 +30,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         SELECT p.*,
                GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories
         FROM project p
-                 LEFT JOIN part pt ON p.id = pt.project
+                 LEFT JOIN partId pt ON p.id = pt.project
                  LEFT JOIN category cat ON p.id = cat.project
                  LEFT JOIN skill sk ON p.id = sk.project
         WHERE p.id <= 10
@@ -44,7 +44,7 @@ public class CustomRepositoryImpl implements CustomRepository {
           # 온라인
           AND p.with_online = 1
           # 직무
-          AND pt.part = 'BACKEND' # or pt.part_category = 'DEVELOP'
+          AND pt.partId = 'BACKEND' # or pt.part_category = 'DEVELOP'
           # 상태
           AND p.state IN ('RECRUITING')
           # 카테고리
@@ -81,7 +81,7 @@ public class CustomRepositoryImpl implements CustomRepository {
             if (option.part().name().startsWith("TOTAL_")) {
                 optionSql.add(String.format("pt.part_category = '%s'", option.part().getCategory().name()));
             } else {
-                optionSql.add(String.format("pt.part = '%s'", option.part().name()));
+                optionSql.add(String.format("pt.partId = '%s'", option.part().name()));
             }
 
         }
@@ -114,7 +114,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                 "SELECT p.*," +
                         "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
                         "FROM project p " +
-                        "LEFT JOIN part pt ON p.id = pt.project " +
+                        "LEFT JOIN partId pt ON p.id = pt.project " +
                         "LEFT JOIN category cat ON p.id = cat.project " +
                         "LEFT JOIN skill sk ON p.id = sk.project " +
                         "%s " +
@@ -138,7 +138,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         SELECT p.*,
             GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories
         FROM project p
-            JOIN part pt ON p.id = pt.project
+            JOIN partId pt ON p.id = pt.project
             JOIN member m ON pt.id = m.part_id
             LEFT JOIN category cat ON p.id = cat.project
         WHERE m.user = 2
@@ -151,7 +151,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                 "SELECT p.*," +
                         "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
                         "FROM project p " +
-                        "JOIN part pt ON p.id = pt.project " +
+                        "JOIN partId pt ON p.id = pt.project " +
                         "JOIN member m ON pt.id = m.part_id " +
                         "LEFT JOIN category cat ON p.id = cat.project " +
                         "WHERE m.user = %d " +

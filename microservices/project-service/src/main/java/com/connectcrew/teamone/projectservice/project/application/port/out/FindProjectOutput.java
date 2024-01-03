@@ -23,4 +23,6 @@ public interface FindProjectOutput {
 
     Mono<RecruitStatus> findByProjectAndPart(Long project, MemberPart part);
 
+    Flux<RecruitStatus> findAllByProject(Long project);
+
 }

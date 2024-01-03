@@ -168,6 +168,12 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
                 .map(PartEntity::toDomain);
     }
 
+    @Override
+    public Flux<RecruitStatus> findAllByProject(Long project) {
+        return partRepository.findAllByProject(project)
+                .map(PartEntity::toDomain);
+    }
+
     private List<String> getBannerPaths(List<BannerEntity> banners) {
         return banners.stream()
                 .sorted(Comparator.comparingInt(BannerEntity::getIdx))

@@ -66,6 +66,21 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     }
 
     @Override
+    public Flux<Apply> findAllAppliesByProject(Long projectId) {
+        return partRepository.findAllByProject(projectId)
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
+                .flatMapMany(partMap -> applyRepository.findAllByProject(projectId)
+                        .map(apply -> apply.toDomain(partMap.get(apply.getPartId()))));
+    }
+
+    @Override
+    public Flux<Apply> findAllApplies(Long projectId, MemberPart part) {
+        return partRepository.findByProjectAndPart(projectId, part.name())
+                .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartId(projectId, partEntity.getId()))
+                .map(e -> e.toDomain(part));
+    }
+
+    @Override
     public Mono<Long> saveMember(Long userId, List<Long> parts) {
         List<MemberEntity> members = parts.stream().map(partId -> MemberEntity
                         .builder()
@@ -82,6 +97,6 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Mono<Apply> saveApply(Apply apply) {
         return applyRepository.save(ApplyEntity.from(apply))
-                .map(ApplyEntity::toDomain);
+                .map(e -> e.toDomain(apply.part()));
     }
 }

@@ -10,9 +10,11 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.F
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -46,6 +48,16 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     @Override
     public Mono<List<ProjectMember>> getProjectMemberList(Long projectId) {
         return findProjectOutput.findMembers(projectId);
+    }
+
+    @Override
+    public Flux<Apply> getApplies(Long userId, Long projectId, MemberPart part) {
+        return findProjectOutput.findAllApplies(userId, projectId, part);
+    }
+
+    @Override
+    public Flux<ApplyStatus> getApplyStatus(Long userId, Long projectId) {
+        return findProjectOutput.findAllApplyStatus(userId, projectId);
     }
 
 

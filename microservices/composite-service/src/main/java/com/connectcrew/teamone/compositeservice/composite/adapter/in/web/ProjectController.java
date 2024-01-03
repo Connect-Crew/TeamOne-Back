@@ -6,6 +6,8 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateChatRoomCommand;
+import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
+import com.connectcrew.teamone.compositeservice.composite.domain.ApplyStatus;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
 import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
@@ -32,6 +34,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -273,6 +276,25 @@ public class ProjectController {
                 .flatMap(newFavorite -> saveUserUseCase.setFavorite(id, FavoriteType.PROJECT, param.projectId())
                         .map(favorite -> new FavoriteResponse(param.projectId(), favorite, newFavorite)))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.favoriteProject", ErrorLevel.ERROR, ex));
+    }
+
+    @GetMapping("/apply/{projectId}")
+    private Mono<Map<MemberPart, ApplyStatusResponse>> getApplyStatus(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        return queryProjectUseCase.getApplyStatus(id, projectId)
+                .collectMap(ApplyStatus::part, ApplyStatus::toResponse);
+    }
+
+    @GetMapping("/apply/{projectId}/{part}")
+    private Mono<List<ApplyResponse>> getApplies(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId, @PathVariable MemberPart part) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        return queryProjectUseCase.getApplies(id, projectId, part)
+                .map(Apply::toResponse)
+                .collectList();
     }
 
     @PostMapping("/apply")

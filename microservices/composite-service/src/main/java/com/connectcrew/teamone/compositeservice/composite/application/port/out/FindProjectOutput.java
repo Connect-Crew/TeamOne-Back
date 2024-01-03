@@ -1,9 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.ProjectDetail;
-import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFilterOption;
-import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
-import com.connectcrew.teamone.compositeservice.composite.domain.ProjectMember;
+import com.connectcrew.teamone.compositeservice.composite.domain.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,4 +17,8 @@ public interface FindProjectOutput {
     Mono<ProjectDetail> find(Long projectId, Long userId);
 
     Mono<List<ProjectMember>> findMembers(Long projectId);
+
+    Flux<Apply> findAllApplies(Long userId, Long projectId, MemberPart part);
+
+    Flux<ApplyStatus> findAllApplyStatus(Long userId, Long projectId);
 }

@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.ApplyState;
 import lombok.*;
@@ -30,18 +31,19 @@ public class ApplyEntity {
         return ApplyEntity.builder()
                 .id(apply.id())
                 .project(apply.projectId())
-                .partId(apply.part())
+                .partId(apply.partId())
                 .user(apply.userId())
                 .message(apply.message())
                 .state(apply.state())
                 .build();
     }
 
-    public Apply toDomain() {
+    public Apply toDomain(MemberPart part) {
         return Apply.builder()
                 .id(id)
                 .projectId(project)
-                .part(partId)
+                .partId(partId)
+                .part(part)
                 .userId(user)
                 .message(message)
                 .state(state)

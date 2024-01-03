@@ -7,6 +7,7 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.F
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
 import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
@@ -101,6 +102,24 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                 .bodyToMono(type)
                 .onErrorResume(exHandler::handleException)
                 .map(members -> members.stream().map(MemberResponse::toDomain).toList());
+    }
+
+    @Override
+    public Flux<Apply> findAllApplies(Long userId, Long projectId, MemberPart part) {
+        return webClient.get()
+                .uri(String.format("%s/leader/applies?userId=%d&projectId=%d&part=%s", host, userId, projectId, part.name()))
+                .retrieve()
+                .bodyToFlux(Apply.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Flux<ApplyStatus> findAllApplyStatus(Long userId, Long projectId) {
+        return webClient.get()
+                .uri(String.format("%s/leader/applyStatus?userId=%d&projectId=%d", host, userId, projectId))
+                .retrieve()
+                .bodyToFlux(ApplyStatus.class)
+                .onErrorResume(exHandler::handleException);
     }
 
     @Override

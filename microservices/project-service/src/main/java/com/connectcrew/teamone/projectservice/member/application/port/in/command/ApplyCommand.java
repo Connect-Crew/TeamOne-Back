@@ -25,7 +25,8 @@ public record ApplyCommand(
         return Apply.builder()
                 .userId(userId)
                 .projectId(projectId)
-                .part(partId)
+                .partId(partId)
+                .part(part)
                 .message(message)
                 .state(ApplyState.WAITING)
                 .build();

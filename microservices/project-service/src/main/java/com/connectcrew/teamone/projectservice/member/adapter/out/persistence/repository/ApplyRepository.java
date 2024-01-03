@@ -8,5 +8,9 @@ import reactor.core.publisher.Mono;
 public interface ApplyRepository extends ReactiveCrudRepository<ApplyEntity, Long> {
     Mono<Boolean> existsByPartIdAndUser(Long partId, Long user);
 
+    Flux<ApplyEntity> findAllByProject(Long project);
+
     Flux<ApplyEntity> findAllByProjectAndUser(Long project, Long user);
+
+    Flux<ApplyEntity> findAllByProjectAndPartId(Long project, Long partId);
 }
