@@ -56,7 +56,7 @@ public class MemberControllerTest {
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(projectRepository.findById(anyLong())).thenReturn(Mono.just(ProjectEntity.builder().leader(1L).build()));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(0));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
@@ -86,7 +86,7 @@ public class MemberControllerTest {
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(false));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(0));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
@@ -107,7 +107,7 @@ public class MemberControllerTest {
     void applyNotfoundPartTest() {
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.empty());
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(0));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
@@ -137,7 +137,7 @@ public class MemberControllerTest {
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(0));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
@@ -167,7 +167,7 @@ public class MemberControllerTest {
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(true));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(1));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
@@ -197,7 +197,7 @@ public class MemberControllerTest {
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
-        when(memberRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
+        when(memberRepository.countByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(0));
         when(applyRepository.existsByPartIdAndUser(anyLong(), anyLong())).thenReturn(Mono.just(true));
         when(applyRepository.save(any(ApplyEntity.class))).thenReturn(Mono.just(ApplyEntity.builder().build()));
 
