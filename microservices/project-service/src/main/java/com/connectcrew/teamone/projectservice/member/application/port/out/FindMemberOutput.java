@@ -19,4 +19,8 @@ public interface FindMemberOutput {
 
     Flux<Apply> findAllAppliesByProject(Long projectId);
     Flux<Apply> findAllApplies(Long projectId, MemberPart part);
+
+    Mono<Apply> findApplyById(Long applyId);
+
+    Mono<Member> findByUserId(Long userId);
 }

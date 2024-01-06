@@ -13,4 +13,6 @@ public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, L
     Flux<MemberEntity> findAllByProject(@Param("project") Long project);
 
     Mono<Boolean> existsByPartIdAndUser(Long partId, Long user);
+
+    Flux<MemberEntity> findAllByUser(Long userId);
 }

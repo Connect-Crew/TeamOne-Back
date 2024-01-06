@@ -49,8 +49,8 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Flux<MemberPart> findAllUserPartByProjectAndUser(Long project, Long user) {
         return Flux.merge(
-                    partRepository.findAllUserPartByProjectAndUser(project, user),
-                    partRepository.findAllAppliedPartByProjectAndUser(project, user)
+                        partRepository.findAllUserPartByProjectAndUser(project, user),
+                        partRepository.findAllAppliedPartByProjectAndUser(project, user)
                 )
                 .map(part -> MemberPart.valueOf(part.getPart()));
     }
@@ -78,6 +78,34 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
         return partRepository.findByProjectAndPart(projectId, part.name())
                 .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartId(projectId, partEntity.getId()))
                 .map(e -> e.toDomain(part));
+    }
+
+    @Override
+    public Mono<Apply> findApplyById(Long applyId) {
+        return applyRepository.findById(applyId)
+                .flatMap(apply -> partRepository.findById(apply.getPartId())
+                        .map(part -> apply.toDomain(MemberPart.valueOf(part.getPart())))
+                );
+    }
+
+    @Override
+    public Mono<Member> findByUserId(Long userId) {
+        /*
+        Mono<Map<Long, MemberPart>> parts = partRepository.findAllByProject(project)
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()));
+        Mono<List<MemberEntity>> members = memberRepository.findAllByProject(project).collectList();
+
+        return Mono.zip(parts, members)
+                .map(tuple -> {
+                    Map<Long, MemberPart> partMap = tuple.getT1();
+                    Map<Long, MemberEntity> memberMap = tuple.getT2().stream().collect(Collectors.toMap(MemberEntity::getId, m -> m));
+
+                    return memberMap.values().stream()
+                            .collect(Collectors.groupingBy(MemberEntity::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
+                            .entrySet().stream().map(e -> new Member(e.getKey(), false, e.getValue(), memberMap.get(e.getKey()).getState())).toList();
+                });
+         */
+        return null;
     }
 
     @Override
