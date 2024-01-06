@@ -12,30 +12,30 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "member")
+@Table(name = "member_part")
 public class MemberPartEntity {
 
     @Id
     private Long id;
 
-    private Long memberId;
+    private Long member;
 
-    private Long partId;
+    private Long part;
 
     public MemberPart toDomain(Part part) {
         return new MemberPart(
                 id,
-                partId,
-                memberId,
+                this.part,
+                member,
                 part
         );
     }
 
-    public static MemberPartEntity from(MemberPart part) {
+    public static MemberPartEntity from(MemberPart part, Long memberId) {
         return MemberPartEntity.builder()
                 .id(part.id())
-                .memberId(part.memberId())
-                .partId(part.partId())
+                .member(memberId)
+                .part(part.partId())
                 .build();
     }
 }

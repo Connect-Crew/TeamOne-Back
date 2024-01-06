@@ -5,6 +5,8 @@ import com.connectcrew.teamone.api.projectservice.enums.ProjectGoal;
 import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.enums.Region;
 import com.connectcrew.teamone.api.projectservice.project.ProjectResponse;
+import com.connectcrew.teamone.projectservice.member.domain.Member;
+import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.Builder;
 
@@ -33,7 +35,7 @@ public record Project(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public ProjectResponse toResponse(UserRelationWithProject user) {
+    public ProjectResponse toResponse(Member leader, UserRelationWithProject user) {
         return ProjectResponse.builder()
                 .id(id)
                 .title(title)
@@ -47,7 +49,8 @@ public record Project(
                 .chatRoomId(chatRoomId)
                 .category(category.stream().map(Category::category).toList())
                 .goal(goal)
-                .leader(leader)
+                .leader(leader.user())
+                .leaderParts(leader.parts().stream().map(MemberPart::part).toList())
                 .introduction(introduction)
                 .favorite(favorite)
                 .recruitStatuses(parts.stream().map(r -> r.toResponse(user.applies().contains(r.part()) || user.members().contains(r.part()))).toList())

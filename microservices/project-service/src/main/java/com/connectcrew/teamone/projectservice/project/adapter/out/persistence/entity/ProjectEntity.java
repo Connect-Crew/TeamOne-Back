@@ -26,7 +26,7 @@ public class ProjectEntity {
 
     private String introduction;
 
-    private UUID chatRoomId;
+    private String chatRoomId;
 
     private Integer careerMin;
 
@@ -52,7 +52,7 @@ public class ProjectEntity {
                 .id(project.id())
                 .title(project.title())
                 .introduction(project.introduction())
-                .chatRoomId(project.chatRoomId())
+                .chatRoomId(project.chatRoomId().toString())
                 .careerMin(project.careerMin().getId())
                 .careerMax(project.careerMax().getId())
                 .leader(project.leader())
@@ -67,7 +67,6 @@ public class ProjectEntity {
     }
 
     public Project toDomain(List<Banner> banners, List<ProjectPart> parts, List<Skill> skills, List<Category> categories) {
-        System.out.println(state);
         return Project.builder()
                 .id(id)
                 .title(title)
@@ -79,7 +78,7 @@ public class ProjectEntity {
                 .state(ProjectState.valueOf(state))
                 .careerMin(Career.valueOf(careerMin))
                 .careerMax(Career.valueOf(careerMax))
-                .chatRoomId(chatRoomId)
+                .chatRoomId(UUID.fromString(chatRoomId))
                 .category(categories)
                 .goal(ProjectGoal.valueOf(goal))
                 .leader(leader)

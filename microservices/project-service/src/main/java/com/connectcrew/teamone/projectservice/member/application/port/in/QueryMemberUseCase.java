@@ -10,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface QueryMemberUseCase {
+    Mono<Member> findMemberByProjectAndUser(Long project, Long user);
     Flux<Member> findAllByProject(Long project);
 
     Mono<UserRelationWithProject> findUserRelationByProjectAndUser(Long projectId, Long userId);

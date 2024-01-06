@@ -9,6 +9,7 @@ import com.connectcrew.teamone.compositeservice.global.enums.Region;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record ProjectDetailResponse(
         Long id,
@@ -20,10 +21,11 @@ public record ProjectDetailResponse(
         ProjectState state,
         Career careerMin,
         Career careerMax,
-        String chatRoomId,
+        UUID chatRoomId,
         List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,
+        List<String> leaderParts,
         String introduction,
         Integer favorite,
         List<RecruitStatusResponse> recruitStatuses,
@@ -40,10 +42,11 @@ public record ProjectDetailResponse(
                 state,
                 careerMin,
                 careerMax,
-                chatRoomId,
+                chatRoomId.toString(),
                 category,
                 goal,
                 leader,
+                leaderParts,
                 introduction,
                 favorite,
                 recruitStatuses.stream().map(RecruitStatusResponse::toDomain).toList(),

@@ -9,6 +9,7 @@ import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMem
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.SaveMemberCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.UpdateMemberCommand;
+import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.UpdateProjectUseCase;
@@ -19,6 +20,7 @@ import com.connectcrew.teamone.projectservice.project.application.port.in.comman
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
+import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,9 +90,17 @@ public class ProjectController {
         return queryProjectUseCase.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("존재하지 않는 프로젝트입니다.")))
                 .doOnNext(project -> log.trace("findProject - project: {}", project))
-                .flatMap(project -> queryMemberUseCase.findUserRelationByProjectAndUser(id, userId)
-                        .doOnNext(relation -> log.trace("findProject - relation: {}", relation))
-                        .map(project::toResponse))
+                .flatMap(project -> {
+                    Mono<UserRelationWithProject> userRelation = queryMemberUseCase.findUserRelationByProjectAndUser(id, userId)
+                            .doOnNext(relation -> log.trace("findProject - relation: {}", relation));
+
+                    Mono<Member> leader = queryMemberUseCase.findMemberByProjectAndUser(id, project.leader())
+                            .doOnNext(l -> log.trace("findProject - leader: {}", l));
+
+                    return Mono.zip(userRelation, leader)
+                            .map(tuple -> project.toResponse(tuple.getT2(), tuple.getT1()));
+                })
+                .doOnNext(response -> log.trace("findProject - response: {}", response))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.findProject", ErrorLevel.ERROR, ex));
     }
 

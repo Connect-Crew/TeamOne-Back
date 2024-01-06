@@ -25,6 +25,7 @@ public record ProjectPart(
 
     public RecruitStatusResponse toResponse(boolean applied) {
         return RecruitStatusResponse.builder()
+                .category(part.getCategory())
                 .part(part)
                 .comment(comment)
                 .current(current)

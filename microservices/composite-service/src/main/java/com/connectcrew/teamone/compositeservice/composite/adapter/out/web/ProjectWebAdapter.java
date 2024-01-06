@@ -92,16 +92,16 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<List<ProjectMember>> findMembers(Long projectId) {
+    public Flux<ProjectMember> findMembers(Long projectId) {
         ParameterizedTypeReference<List<MemberResponse>> type = new ParameterizedTypeReference<>() {
         };
 
         return webClient.get()
-                .uri(String.format("%s/member/members?id=%d", host, projectId))
+                .uri(String.format("%s/members/%d", host, projectId))
                 .retrieve()
-                .bodyToMono(type)
+                .bodyToFlux(MemberResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(members -> members.stream().map(MemberResponse::toDomain).toList());
+                .map(MemberResponse::toDomain);
     }
 
     @Override

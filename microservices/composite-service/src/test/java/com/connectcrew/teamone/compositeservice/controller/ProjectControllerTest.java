@@ -333,6 +333,7 @@ class ProjectControllerTest {
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 0L,
+                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
                 "프로젝트 설명",
                 14,
                 initRecruits(false),
@@ -437,7 +438,7 @@ class ProjectControllerTest {
                 new ProjectMember(2L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
                 new ProjectMember(3L, false, List.of(MemberPart.IOS, MemberPart.AOS))
         );
-        when(projectWebAdapter.findMembers(anyLong())).thenReturn(Mono.just(members));
+        when(projectWebAdapter.findMembers(anyLong())).thenReturn(Flux.fromIterable(members));
         when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
         when(userWebAdapter.getProfile(0L)).thenReturn(Mono.just(new Profile(
                 0L,

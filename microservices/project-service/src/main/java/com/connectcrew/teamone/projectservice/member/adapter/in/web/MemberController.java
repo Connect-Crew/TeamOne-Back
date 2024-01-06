@@ -42,9 +42,12 @@ public class MemberController {
     public Flux<MemberResponse> getProjectMembers(@PathVariable Long projectId) {
         log.trace("getProjectMembers - projectId: {}", projectId);
         return queryProjectUseCase.findLeaderByProject(projectId)
+                .doOnNext(leaderId -> log.trace("getProjectMembers - leaderId: {}", leaderId))
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("존재하지 않는 프로젝트입니다.")))
                 .flatMapMany(leaderId -> queryMemberUseCase.findAllByProject(projectId)
-                        .map(member -> member.toResponse(member.user().equals(leaderId))))
+                        .map(member -> member.toResponse(member.user().equals(leaderId)))
+                )
+                .doOnNext(member -> log.trace("getProjectMembers - member: {}", member))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("MemberController.getProjectMembers", ErrorLevel.ERROR, ex));
     }
 
@@ -63,14 +66,14 @@ public class MemberController {
     }
 
     @GetMapping("/applyStatus")
-    Flux<ApplyStatusResponse> getApplyList(Long projectId, Long userId) {
+    public Flux<ApplyStatusResponse> getApplyList(Long projectId, Long userId) {
         log.trace("getApplyList - projectId: {}, userId: {}", projectId, userId);
         return queryMemberUseCase.findAllApplyStatus(new ProjectApplyStatusQuery(projectId, userId))
                 .map(ApplyStatus::toResponse);
     }
 
     @GetMapping("/applies")
-    Flux<ApplyResponse> getPartApplyList(Long projectId, Part part, Long userId) {
+    public Flux<ApplyResponse> getPartApplyList(Long projectId, Part part, Long userId) {
         log.trace("getPartApplyList - projectId: {}, part: {}, userId: {}", projectId, part, userId);
         return queryMemberUseCase.findAllApplies(new ProjectApplyQuery(projectId, userId, part))
                 .map(Apply::toResponse);
@@ -78,7 +81,7 @@ public class MemberController {
 
     @PostMapping("/apply/{applyId}/leader/{leaderId}/accept")
     @Transactional
-    Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
         log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, leaderId);
         return updateMemberUseCase.accept(applyId, leaderId)
                 .map(Apply::toResponse);
@@ -86,7 +89,7 @@ public class MemberController {
 
     @DeleteMapping("/apply/{applyId}/leader/{leaderId}/reject")
     @Transactional
-    Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, leaderId);
         return updateMemberUseCase.reject(applyId, leaderId)
                 .map(Apply::toResponse);

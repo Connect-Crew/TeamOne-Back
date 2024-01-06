@@ -27,7 +27,7 @@ public record ProjectDetailResponse(
         List<String> skills
 ) {
 
-    public ProjectDetailResponse(ProjectDetail detail, List<String> banners, Boolean myFavorite, ProfileResponse loader) {
+    public ProjectDetailResponse(ProjectDetail detail, List<String> banners, Boolean myFavorite, ProfileResponse leader) {
         this(
                 detail.id(),
                 detail.title(),
@@ -40,7 +40,7 @@ public record ProjectDetailResponse(
                 detail.careerMax().getDescription(),
                 detail.category().stream().map(ProjectCategory::getDescription).toList(),
                 detail.goal().getDescription(),
-                loader,
+                leader,
                 detail.introduction(),
                 detail.favorite(),
                 myFavorite,

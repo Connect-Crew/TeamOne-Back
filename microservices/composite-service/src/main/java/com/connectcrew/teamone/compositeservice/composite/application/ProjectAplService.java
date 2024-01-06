@@ -46,7 +46,7 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     }
 
     @Override
-    public Mono<List<ProjectMember>> getProjectMemberList(Long projectId) {
+    public Flux<ProjectMember> getProjectMemberList(Long projectId) {
         return findProjectOutput.findMembers(projectId);
     }
 

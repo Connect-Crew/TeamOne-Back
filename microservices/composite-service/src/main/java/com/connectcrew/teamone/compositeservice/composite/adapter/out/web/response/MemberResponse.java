@@ -6,13 +6,13 @@ import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPar
 import java.util.List;
 
 public record MemberResponse(
-        Long memberId,
+        Long userId,
         Boolean isLeader,
         List<MemberPart> parts
 ) {
     public ProjectMember toDomain() {
         return new ProjectMember(
-                memberId,
+                userId,
                 isLeader,
                 parts
         );

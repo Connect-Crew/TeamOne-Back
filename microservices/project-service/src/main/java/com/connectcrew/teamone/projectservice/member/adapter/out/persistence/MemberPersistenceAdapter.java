@@ -19,7 +19,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Repository
@@ -36,8 +38,8 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
         return partRepository.findAllByProject(project)
                 .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
                 .flatMapMany(idPartMap -> memberRepository.findAllByProjectId(project)
-                        .flatMap(member -> memberPartRepository.findAllByMemberId(member.getId())
-                                .map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPartId())))
+                        .flatMap(member -> memberPartRepository.findAllByMember(member.getId())
+                                .map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart())))
                                 .collectList()
                                 .map(member::toDomain)
                         ));
@@ -46,10 +48,10 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Mono<Member> findByProjectAndUser(Long project, Long user) {
         return memberRepository.findByProjectIdAndUser(project, user)
-                .flatMap(member -> memberPartRepository.findAllByMemberId(member.getId()).collectList()
-                        .flatMap(parts -> partRepository.findAllById(parts.stream().map(MemberPartEntity::getPartId).toList())
+                .flatMap(member -> memberPartRepository.findAllByMember(member.getId()).collectList()
+                        .flatMap(parts -> partRepository.findAllById(parts.stream().map(MemberPartEntity::getPart).toList())
                                 .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
-                                .map(idPartMap -> member.toDomain(parts.stream().map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPartId()))).toList()))
+                                .map(idPartMap -> member.toDomain(parts.stream().map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart()))).toList()))
                         )
                 );
     }
@@ -66,7 +68,8 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
 
     @Override
     public Mono<Boolean> existsMemberByPartAndUser(Long partId, Long user) {
-        return memberRepository.existsByPartIdAndUser(partId, user);
+        return memberRepository.countByPartIdAndUser(partId, user)
+                .map(count -> count > 0);
     }
 
     @Override
@@ -104,16 +107,25 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
                 .filter(Objects::nonNull)
                 .toList();
 
+        Map<Long, Part> partMap = new HashMap<>();
+        for (MemberPart part : member.parts()) {
+            partMap.put(part.partId(), part.part());
+        }
+
         // 삭제된 part 제거
-        return memberPartRepository.deleteAllByMemberIdAndIdNotIn(member.id(), memberPartIds)
+        return memberPartRepository.deleteAllByMemberAndIdNotIn(member.id(), memberPartIds)
                 // member 저장
                 .then(memberRepository.save(MemberEntity.from(member))
-                        .flatMap(memberEntity -> Flux.fromIterable(member.parts())
-                                .flatMap(part -> memberPartRepository.save(MemberPartEntity.from(part))
-                                        .map(memberPartEntity -> memberPartEntity.toDomain(part.part())))
-                                .collectList()
-                                .map(memberEntity::toDomain)
-                        )
+                        .flatMap(memberEntity -> {
+                            List<MemberPartEntity> partEntities = member.parts().stream().
+                                    map(part -> MemberPartEntity.from(part, memberEntity.getId()))
+                                    .toList();
+
+                            return memberPartRepository.saveAll(partEntities)
+                                    .map(memberPartEntity -> memberPartEntity.toDomain(partMap.get(memberPartEntity.getPart())))
+                                    .collectList()
+                                    .map(memberEntity::toDomain);
+                        })
                 );
     }
 

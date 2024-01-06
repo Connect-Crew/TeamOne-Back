@@ -176,8 +176,7 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
                 .onErrorResume(e -> {
                     log.error("createProject - error: {}", e.getMessage(), e);
                     return Mono.error(new RuntimeException(ProjectExceptionMessage.UPDATE_PROJECT_FAILED.toString()));
-                })
-                .thenReturn(project);
+                });
     }
 
     @Override

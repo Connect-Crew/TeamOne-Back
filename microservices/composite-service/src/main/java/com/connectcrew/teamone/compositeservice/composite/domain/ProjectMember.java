@@ -5,7 +5,7 @@ import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPar
 import java.util.List;
 
 public record ProjectMember(
-        Long memberId,
+        Long userId,
         Boolean isLeader,
         List<MemberPart> parts
 ) {

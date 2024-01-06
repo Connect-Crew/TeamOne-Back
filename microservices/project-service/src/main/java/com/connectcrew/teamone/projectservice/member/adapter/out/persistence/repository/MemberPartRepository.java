@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MemberPartRepository extends ReactiveCrudRepository<MemberPartEntity, Long> {
 
-    Flux<MemberPartEntity> findAllByMemberId(Long memberId);
+    Flux<MemberPartEntity> findAllByMember(Long memberId);
 
-    Flux<MemberPartEntity> deleteAllByMemberIdAndIdNotIn(Long member, List<Long> ids);
+    Flux<Long> deleteAllByMemberAndIdNotIn(Long member, List<Long> ids);
 }

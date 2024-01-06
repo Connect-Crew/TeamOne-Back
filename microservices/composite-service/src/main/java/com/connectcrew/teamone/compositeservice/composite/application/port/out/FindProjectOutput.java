@@ -5,8 +5,6 @@ import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPar
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface FindProjectOutput {
     Mono<String> findProjectThumbnail(Long id);
 
@@ -16,7 +14,7 @@ public interface FindProjectOutput {
 
     Mono<ProjectDetail> find(Long projectId, Long userId);
 
-    Mono<List<ProjectMember>> findMembers(Long projectId);
+    Flux<ProjectMember> findMembers(Long projectId);
 
     Flux<Apply> findAllApplies(Long userId, Long projectId, MemberPart part);
 

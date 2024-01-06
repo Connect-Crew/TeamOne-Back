@@ -25,6 +25,7 @@ public record ProjectDetail(
         List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,
+        List<String> leaderParts,
         String introduction,
         Integer favorite,
         List<RecruitStatus> recruitStatuses,

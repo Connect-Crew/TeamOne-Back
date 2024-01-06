@@ -31,7 +31,6 @@ public class UserController {
     @PostConstruct
     public void init() {
         JwtToken token = jwtProvider.createToken("123456", 2L, "TestUser", Role.USER);
-        System.out.println(token);
         log.debug("Test token for test : {}", token != null ? token.accessToken() : null);
     }
 

@@ -117,7 +117,10 @@ public class ProjectController {
         Long id = claim.id();
 
         return queryProjectUseCase.find(projectId, id)
-                .flatMap(project -> queryProfileUseCase.getFullProfile(project.leader()).map(profile -> Tuples.of(project, profile)))
+                .flatMap(project -> queryProfileUseCase.getFullProfile(project.leader())
+                        .map(l -> l.update(project.leaderParts()))
+                        .map(profile -> Tuples.of(project, profile))
+                )
                 .flatMap(tuple -> queryUserUseCase.isFavorite(id, FavoriteType.PROJECT, projectId).map(favorite -> Tuples.of(tuple.getT1(), favorite, tuple.getT2())))
                 .map(tuple -> {
                     List<String> banners = tuple.getT1().banners().stream().map(FileCategory.BANNER::getUrlPath).toList();
@@ -129,8 +132,8 @@ public class ProjectController {
     @GetMapping("/members/{projectId}")
     private Mono<List<ProjectMemberResponse>> getProjectMembers(@PathVariable Long projectId) {
         return queryProjectUseCase.getProjectMemberList(projectId)
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(member -> queryProfileUseCase.getFullProfile(member.memberId())
+                .doOnNext(m -> log.trace("getProjectMembers - member: {}", m))
+                .flatMap(member -> queryProfileUseCase.getFullProfile(member.userId())
                         .map(ProfileResponse::from)
                         .map(profileRes -> new ProjectMemberResponse(member, profileRes)))
                 .collectList()

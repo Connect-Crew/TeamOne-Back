@@ -30,7 +30,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         SELECT p.*,
                GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories
         FROM project p
-                 LEFT JOIN partId pt ON p.id = pt.project
+                 LEFT JOIN part pt ON p.id = pt.project
                  LEFT JOIN category cat ON p.id = cat.project
                  LEFT JOIN skill sk ON p.id = sk.project
         WHERE p.id <= 10
@@ -114,7 +114,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                 "SELECT p.*," +
                         "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
                         "FROM project p " +
-                        "LEFT JOIN partId pt ON p.id = pt.project " +
+                        "LEFT JOIN part pt ON p.id = pt.project " +
                         "LEFT JOIN category cat ON p.id = cat.project " +
                         "LEFT JOIN skill sk ON p.id = sk.project " +
                         "%s " +
@@ -124,8 +124,6 @@ public class CustomRepositoryImpl implements CustomRepository {
                 whereSql,
                 option.size()
         );
-
-        System.out.println(sql);
 
         return dc.sql(sql)
                 .map((row, meta) -> rowToEntity(row))
@@ -138,7 +136,7 @@ public class CustomRepositoryImpl implements CustomRepository {
         SELECT p.*,
             GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories
         FROM project p
-            JOIN partId pt ON p.id = pt.project
+            JOIN part pt ON p.id = pt.project
             JOIN member m ON pt.id = m.part_id
             LEFT JOIN category cat ON p.id = cat.project
         WHERE m.user = 2
@@ -151,7 +149,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                 "SELECT p.*," +
                         "GROUP_CONCAT(DISTINCT cat.name ORDER BY cat.name ASC) AS categories " +
                         "FROM project p " +
-                        "JOIN partId pt ON p.id = pt.project " +
+                        "JOIN part pt ON p.id = pt.project " +
                         "JOIN member m ON pt.id = m.part_id " +
                         "LEFT JOIN category cat ON p.id = cat.project " +
                         "WHERE m.user = %d " +

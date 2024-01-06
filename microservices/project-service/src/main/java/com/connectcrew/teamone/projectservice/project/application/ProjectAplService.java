@@ -82,7 +82,7 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                 .switchIfEmpty(Mono.error(new NotFoundException("프로젝트를 찾을 수 없습니다. request: " + command)))
                 .flatMap(title -> findProjectOutput.existsReportByProjectAndUser(command.projectId(), command.userId()).map(exists -> Tuples.of(title, exists)))
                 .flatMap(tuples -> {
-                    if (tuples.getT2()) return Mono.error(new IllegalArgumentException("이미 신고한 프로젝트입니다. request: " + command));
+                    if (tuples.getT2()) return Mono.error(new IllegalArgumentException("이미 신고한 프로젝트입니다."));
                     return Mono.just(tuples.getT1());
                 })
                 .flatMap(title -> saveProjectOutput.report(command.toDomain(title)))

@@ -22,6 +22,7 @@ public record ProjectResponse(
         List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,
+        List<Part> leaderParts,
         String introduction,
         Integer favorite,
         List<RecruitStatusResponse> recruitStatuses,

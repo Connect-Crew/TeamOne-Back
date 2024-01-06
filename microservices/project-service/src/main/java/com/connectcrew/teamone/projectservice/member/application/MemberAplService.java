@@ -44,6 +44,11 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     private final SaveMemberOutput saveMemberOutput;
 
     @Override
+    public Mono<Member> findMemberByProjectAndUser(Long project, Long user) {
+        return findMemberOutput.findByProjectAndUser(project, user);
+    }
+
+    @Override
     public Flux<Member> findAllByProject(Long project) {
         return findMemberOutput.findAllByProject(project);
     }
@@ -64,6 +69,7 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     public Mono<Member> saveMember(SaveMemberCommand command) {
+        log.trace("saveMember - command: {}", command);
         return findProjectOutput.findAllProjectPartByProject(command.projectId())
                 .collectMap(ProjectPart::part, ProjectPart::id)
                 .flatMap(partIdMap -> saveMemberOutput.save(command.toDomain(partIdMap)));

@@ -24,4 +24,17 @@ public record FullProfile(
                 representProjects
         );
     }
+
+    public FullProfile update(List<String> parts) {
+        return new FullProfile(
+                this.id,
+                this.nickname,
+                this.profile,
+                this.introduction,
+                this.temperature,
+                this.responseRate,
+                parts,
+                this.representProjects
+        );
+    }
 }

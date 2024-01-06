@@ -16,7 +16,7 @@ public interface QueryProjectUseCase {
 
     Mono<ProjectDetail> find(Long id, Long userId);
 
-    Mono<List<ProjectMember>> getProjectMemberList(Long projectId);
+    Flux<ProjectMember> getProjectMemberList(Long projectId);
 
     Flux<Apply> getApplies(Long userId, Long projectId, MemberPart part);
 
