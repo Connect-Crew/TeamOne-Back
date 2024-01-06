@@ -1,11 +1,11 @@
-package com.connectcrew.teamone.projectservice.leader.domain;
+package com.connectcrew.teamone.projectservice.member.domain;
 
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusResponse;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 
 public record ApplyStatus(
-        MemberPart part,
+        Part part,
         int applies,
         int current,
         int max
@@ -15,7 +15,7 @@ public record ApplyStatus(
         return new ApplyStatusResponse(applies, current, max);
     }
 
-    public static ApplyStatus of(RecruitStatus recruitStatus, int applies) {
+    public static ApplyStatus of(ProjectPart recruitStatus, int applies) {
         return new ApplyStatus(
                 recruitStatus.part(),
                 applies,

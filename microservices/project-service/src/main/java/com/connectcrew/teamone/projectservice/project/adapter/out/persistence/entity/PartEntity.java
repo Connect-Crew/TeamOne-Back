@@ -1,8 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
-import com.connectcrew.teamone.projectservice.project.domain.Project;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -26,27 +25,31 @@ public class PartEntity {
     private Integer collected;
     private Integer targetCollect;
 
-    public RecruitStatus toDomain() {
-        return RecruitStatus.builder()
+    public ProjectPart toDomain() {
+        return ProjectPart.builder()
                 .id(id)
-                .part(MemberPart.valueOf(part))
+                .part(Part.valueOf(part))
                 .comment(comment)
                 .current(collected)
                 .max(targetCollect)
                 .build();
     }
 
-    public static List<PartEntity> from(Project project, Long projectId) {
-        return project.recruitStatuses().stream()
-                .map(recruitStatus -> PartEntity.builder()
-                        .id(recruitStatus.id())
-                        .project(projectId)
-                        .partCategory(recruitStatus.part().getCategory().name())
-                        .part(recruitStatus.part().name())
-                        .comment(recruitStatus.comment())
-                        .collected(recruitStatus.current())
-                        .targetCollect(recruitStatus.max())
-                        .build())
+    public static PartEntity from(ProjectPart part, Long projectId) {
+        return PartEntity.builder()
+                .id(part.id())
+                .project(projectId)
+                .partCategory(part.part().getCategory().name())
+                .part(part.part().name())
+                .comment(part.comment())
+                .collected(part.current())
+                .targetCollect(part.max())
+                .build();
+    }
+
+    public static List<PartEntity> from(List<ProjectPart> parts, Long projectId) {
+        return parts.stream()
+                .map(part -> from(part, projectId))
                 .toList();
     }
 }

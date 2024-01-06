@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.projectservice.project.domain.Report;
-import com.connectcrew.teamone.projectservice.project.domain.ReportState;
+import com.connectcrew.teamone.projectservice.project.domain.enums.ReportState;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -29,5 +29,9 @@ public class ReportEntity {
                 .reason(report.reason())
                 .state(report.state())
                 .build();
+    }
+
+    public Report toDomain(String title) {
+        return new Report(id, user, project, title, reason, state);
     }
 }

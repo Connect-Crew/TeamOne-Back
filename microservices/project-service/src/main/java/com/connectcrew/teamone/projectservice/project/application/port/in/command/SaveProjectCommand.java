@@ -2,29 +2,30 @@ package com.connectcrew.teamone.projectservice.project.application.port.in.comma
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.api.projectservice.project.UpdateProjectRequest;
-import com.connectcrew.teamone.projectservice.member.domain.Member;
-import com.connectcrew.teamone.projectservice.project.domain.*;
+import com.connectcrew.teamone.api.projectservice.project.CreateProjectRequest;
+import com.connectcrew.teamone.projectservice.project.domain.Banner;
+import com.connectcrew.teamone.projectservice.project.domain.Category;
+import com.connectcrew.teamone.projectservice.project.domain.Project;
+import com.connectcrew.teamone.projectservice.project.domain.Skill;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.connectcrew.teamone.projectservice.global.constants.PatternConstanst.UUID_PATTERNS;
 
-public record UpdateProjectCommand(
-        Long projectId,
-        Long userId,
+public record SaveProjectCommand(
         String title,
         List<String> banners,
         Region region,
         Boolean online,
         ProjectState state,
+        UUID chatRoomId,
         Career careerMin,
         Career careerMax,
+        Long leader,
         List<Part> leaderParts,
         List<ProjectCategory> category,
         ProjectGoal goal,
@@ -32,18 +33,17 @@ public record UpdateProjectCommand(
         List<CreateRecruitCommand> recruits,
         List<String> skills
 ) {
-
-    public static UpdateProjectCommand from(UpdateProjectRequest request) {
-        return new UpdateProjectCommand(
-                request.projectId(),
-                request.userId(),
+    public static SaveProjectCommand from(CreateProjectRequest request) {
+        return new SaveProjectCommand(
                 request.title(),
                 request.banners(),
                 request.region(),
                 request.online(),
                 request.state(),
+                request.chatRoomId(),
                 request.careerMin(),
                 request.careerMax(),
+                request.leader(),
                 request.leaderParts(),
                 request.category(),
                 request.goal(),
@@ -53,57 +53,24 @@ public record UpdateProjectCommand(
         );
     }
 
-    public Project toDomain(Project origin, Member originLeader) {
-
-        Map<String, Long> bannerIdMap = origin.banners().stream()
-                .collect(Collectors.toMap(Banner::path, Banner::id));
-
-        Map<ProjectCategory, Long> categoryIdMap = origin.category().stream()
-                .collect(Collectors.toMap(Category::category, Category::id));
-
-        Map<String, Long> skillIdMap = origin.skills().stream()
-                .collect(Collectors.toMap(Skill::skill, Skill::id));
-
-        Map<Part, ProjectPart> partProjectPartMap = origin.parts().stream()
-                .collect(Collectors.toMap(ProjectPart::part, p -> p));
-
-        List<ProjectPart> updatedParts = recruits.stream().map(r -> {
-                    if (partProjectPartMap.containsKey(r.part())) {
-                        ProjectPart projectPart = partProjectPartMap.get(r.part());
-
-                        int current = projectPart.current();
-                        if (originLeader.containPart(r.part()) && !leaderParts.contains(r.part())) {
-                            current--; // 기존에는 담당 파트였지만, 이번에는 담당 파트가 아닌 경우
-                        } else if (!originLeader.containPart(r.part()) && leaderParts.contains(r.part())) {
-                            current++; // 기존에는 담당 파트가 아니었지만, 이번에는 담당 파트인 경우
-                        }
-
-                        projectPart.update(r.comment(), current, r.max());
-                        return projectPart;
-                    } else {
-                        return r.toDomain(leaderParts.contains(r.part()));
-                    }
-                })
-                .toList();
-
+    public Project toDomain() {
         return Project.builder()
-                .id(origin.id())
                 .title(title)
-                .banners(banners.stream().map(b -> new Banner(bannerIdMap.getOrDefault(b, null), b)).toList())
+                .banners(banners.stream().map(b -> new Banner(null, b)).toList())
                 .region(region)
                 .online(online)
                 .state(state)
-                .chatRoomId(origin.chatRoomId())
+                .chatRoomId(chatRoomId)
                 .careerMin(careerMin)
                 .careerMax(careerMax)
-                .leader(origin.leader())
-                .category(category.stream().map(c -> new Category(categoryIdMap.getOrDefault(c, null), c)).toList())
+                .leader(leader)
+                .category(category.stream().map(c -> new Category(null, c)).toList())
                 .goal(goal)
                 .introduction(introduction)
-                .parts(updatedParts)
-                .favorite(origin.favorite())
-                .skills(skills.stream().map(s -> new Skill(skillIdMap.getOrDefault(s, null), s)).toList())
-                .createdAt(origin.createdAt())
+                .parts(recruits.stream().map(r -> r.toDomain(leaderParts.contains(r.part()))).toList())
+                .favorite(0)
+                .skills(skills.stream().map(s -> new Skill(null, s)).toList())
+                .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
     }

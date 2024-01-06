@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.projectservice.project.application.port.out;
 
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectOption;
 import reactor.core.publisher.Flux;
@@ -17,12 +17,12 @@ public interface FindProjectOutput {
 
     Mono<Long> findLeaderById(Long projectId);
 
-    Mono<String> findProjectThumbnail(Long id);
+    Mono<String> findTitleById(Long projectId);
 
-    Mono<Boolean> existsProjectById(Long id);
+    Mono<String> findThumbnail(Long projectId);
 
-    Mono<RecruitStatus> findByProjectAndPart(Long project, MemberPart part);
-
-    Flux<RecruitStatus> findAllByProject(Long project);
+    Mono<Boolean> existsById(Long projectId);
+    Flux<ProjectPart> findAllProjectPartByProject(Long project);
+    Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, Part part);
 
 }

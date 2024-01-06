@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
-import com.connectcrew.teamone.projectservice.member.domain.ApplyState;
+import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -38,7 +38,7 @@ public class ApplyEntity {
                 .build();
     }
 
-    public Apply toDomain(MemberPart part) {
+    public Apply toDomain(Part part) {
         return Apply.builder()
                 .id(id)
                 .projectId(project)

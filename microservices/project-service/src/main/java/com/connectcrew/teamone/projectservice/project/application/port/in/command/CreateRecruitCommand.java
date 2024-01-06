@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.projectservice.project.application.port.in.command;
 
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.api.projectservice.project.CreateRecruitRequest;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 
 public record CreateRecruitCommand(
-        MemberPart part,
+        Part part,
         String comment,
         Integer max
 ) {
@@ -18,8 +18,17 @@ public record CreateRecruitCommand(
         );
     }
 
-    public RecruitStatus toDomain(RecruitStatus origin) {
-        return new RecruitStatus(
+    public ProjectPart toDomain(boolean leaderParts) {
+        return ProjectPart.builder()
+                .part(part)
+                .comment(comment)
+                .current(leaderParts ? 1 : 0)
+                .max(max)
+                .build();
+    }
+
+    public ProjectPart toDomain(ProjectPart origin) {
+        return new ProjectPart(
                 origin.id(),
                 origin.part(),
                 comment,

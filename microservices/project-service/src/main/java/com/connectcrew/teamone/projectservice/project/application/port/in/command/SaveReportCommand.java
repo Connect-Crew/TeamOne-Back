@@ -3,20 +3,20 @@ package com.connectcrew.teamone.projectservice.project.application.port.in.comma
 import com.connectcrew.teamone.api.projectservice.project.ReportRequest;
 import com.connectcrew.teamone.projectservice.project.domain.Report;
 
-public record ReportCommand(
+public record SaveReportCommand(
         Long userId,
         Long projectId,
         String reason
 ) {
-    public static ReportCommand from(ReportRequest request) {
-        return new ReportCommand(
+    public static SaveReportCommand from(ReportRequest request) {
+        return new SaveReportCommand(
                 request.userId(),
                 request.projectId(),
                 request.reason()
         );
     }
 
-    public Report toDomain() {
-        return new Report(userId, projectId, reason);
+    public Report toDomain(String projectTitle) {
+        return new Report(userId, projectId, projectTitle, reason);
     }
 }

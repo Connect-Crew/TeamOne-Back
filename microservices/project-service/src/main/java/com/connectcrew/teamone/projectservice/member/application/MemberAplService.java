@@ -1,27 +1,41 @@
 package com.connectcrew.teamone.projectservice.member.application;
 
+import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.ApplyCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.SaveMemberCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.UpdateMemberCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyQuery;
+import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyStatusQuery;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
+import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.ApplyStatus;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
+import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
+import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase {
+public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase, SaveMemberUseCase {
 
     private final FindProjectOutput findProjectOutput;
 
@@ -30,30 +44,47 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     private final SaveMemberOutput saveMemberOutput;
 
     @Override
-    public Mono<List<Member>> findAllByProject(Long project) {
+    public Flux<Member> findAllByProject(Long project) {
         log.trace("findAllByProject - project: {}", project);
-        return findProjectOutput.findById(project)
-                .flatMap(p -> findMemberOutput.findAllByProject(project)
-                        .map(members -> members.stream()
-                                .map(member -> member.setLeader(Objects.equals(p.leader(), member.memberId())))
-                                .toList()));
+        return findMemberOutput.findAllByProject(project);
     }
 
     @Override
-    public Mono<Boolean> apply(ApplyCommand command) {
-        return checkProjectExits(command.projectId())
-                .then(findProjectOutput.findByProjectAndPart(command.projectId(), command.part()))
-                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
-                .flatMap(this::checkNumberOfMember)
-                .flatMap(recruit -> checkAlreadyPartMember(recruit, command.userId()))
-                .flatMap(recruit -> checkAlreadyApply(recruit, command.userId()))
-                .flatMap(recruit -> saveMemberOutput.saveApply(command.toDomain(recruit.id())))
-                .thenReturn(true);
+    public Mono<UserRelationWithProject> findUserRelationByProjectAndUser(Long projectId, Long userId) {
+        Mono<List<Part>> membersParts = findMemberOutput.findByProjectAndUser(projectId, userId)
+                .map(m -> m.parts().stream().map(MemberPart::part).toList());
+
+        Mono<List<Part>> applyParts = findMemberOutput.findAllByProjectAndUser(projectId, userId)
+                .map(Apply::part)
+                .collectList();
+
+        return Mono.zip(membersParts, applyParts)
+                .map(tuple -> new UserRelationWithProject(projectId, userId, tuple.getT1(), tuple.getT2()));
 
     }
 
+    @Override
+    public Mono<Member> saveMember(SaveMemberCommand command) {
+        return findProjectOutput.findAllProjectPartByProject(command.projectId())
+                .collectMap(ProjectPart::part, ProjectPart::id)
+                .flatMap(partIdMap -> saveMemberOutput.save(command.toDomain(partIdMap)));
+    }
+
+        @Override
+        public Mono<Boolean> apply(ApplyCommand command) {
+            return checkProjectExits(command.projectId())
+                    .then(findProjectOutput.findProjectPartByProjectAndPart(command.projectId(), command.part()))
+                    .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
+                    .flatMap(this::checkNumberOfMember)
+                    .flatMap(part -> checkAlreadyPartMember(part, command.userId()))
+                    .flatMap(part -> checkAlreadyApply(part, command.userId()))
+                    .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())))
+                    .thenReturn(true);
+
+        }
+
     private Mono<Boolean> checkProjectExits(Long projectId) {
-        return findProjectOutput.existsProjectById(projectId)
+        return findProjectOutput.existsById(projectId)
                 .flatMap(exists -> {
                     if (!exists)
                         return Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString()));
@@ -61,30 +92,95 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                 });
     }
 
-    private Mono<RecruitStatus> checkNumberOfMember(RecruitStatus recruitStatus) {
-        if (recruitStatus.current() >= recruitStatus.max())
+    private Mono<ProjectPart> checkNumberOfMember(ProjectPart part) {
+        if (part.current() >= part.max())
             return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString()));
-        return Mono.just(recruitStatus);
+        return Mono.just(part);
     }
 
     /**
      * 이미 해당 part의 member인지 확인
      */
-    private Mono<RecruitStatus> checkAlreadyPartMember(RecruitStatus recruitStatus, Long userId) {
-        return findMemberOutput.existsMemberByPartAndUser(recruitStatus.id(), userId)
+    private Mono<ProjectPart> checkAlreadyPartMember(ProjectPart part, Long userId) {
+        return findMemberOutput.existsMemberByPartAndUser(part.id(), userId)
                 .flatMap(exists -> {
                     if (exists)
                         return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_PART_MEMBER.toString()));
-                    return Mono.just(recruitStatus);
+                    return Mono.just(part);
                 });
     }
 
-    private Mono<RecruitStatus> checkAlreadyApply(RecruitStatus recruitStatus, Long userId) {
-        return findMemberOutput.existsApplyByPartAndUser(recruitStatus.id(), userId)
+    private Mono<ProjectPart> checkAlreadyApply(ProjectPart part, Long userId) {
+        return findMemberOutput.existsApplyByPartAndUser(part.id(), userId)
                 .flatMap(exists -> {
                     if (exists)
                         return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_APPLY.toString()));
-                    return Mono.just(recruitStatus);
+                    return Mono.just(part);
                 });
+    }
+
+    @Override
+    public Mono<Member> updateMember(UpdateMemberCommand command) {
+        return findProjectOutput.findById(command.projectId())
+                .map(project -> project.parts().stream().collect(Collectors.toMap(ProjectPart::part, ProjectPart::id)))
+                .flatMap(partIdMap -> findMemberOutput.findByProjectAndUser(command.projectId(), command.userId())
+                        .map(member -> member.update(partIdMap, command.parts()))
+                        .flatMap(saveMemberOutput::save)
+                );
+    }
+
+
+
+    @Override
+    public Flux<Apply> findAllApplies(ProjectApplyQuery query) {
+        return findProjectOutput.findLeaderById(query.projectId())
+                .flatMapMany(leader -> {
+                    if (!leader.equals(query.leader()))
+                        return Flux.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
+
+                    return findMemberOutput.findAllApplyByProjectAndPart(query.projectId(), query.part());
+                });
+    }
+
+    @Override
+    public Flux<ApplyStatus> findAllApplyStatus(ProjectApplyStatusQuery query) {
+        return findMemberOutput.findAllApplyByProject(query.projectId())
+                .collectList()
+                .map(applyList -> applyList.stream().collect(Collectors.groupingBy(Apply::part)))
+                .flatMapMany(applyMap -> findProjectOutput.findAllProjectPartByProject(query.projectId())
+                        .map(recruitStatus -> ApplyStatus.of(recruitStatus, applyMap.getOrDefault(recruitStatus.part(), List.of()).size()))
+                );
+    }
+
+    @Override
+    @Transactional
+    public Mono<Apply> accept(Long applyId, Long leaderId) {
+        return findMemberOutput.findApplyById(applyId)
+                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원을 찾을 수 없습니다.")))
+                .flatMap(apply -> findProjectOutput.findLeaderById(apply.projectId()).map(leader -> Tuples.of(leader, apply)))
+                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원이 있는 프로젝트를 찾을 수 없습니다.")))
+                .flatMap(tuple -> {
+                    if (!tuple.getT1().equals(leaderId))
+                        return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
+
+                    return Mono.just(tuple.getT2());
+                })
+                .flatMap(saveMemberOutput::saveApply);
+        // TODO UPDATE APPLY STATUS AND ADD MEMBER
+    }
+
+    @Override
+    public Mono<Apply> reject(Long applyId, Long leaderId) {
+        return findMemberOutput.findApplyById(applyId)
+                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원을 찾을 수 없습니다.")))
+                .flatMap(apply -> findProjectOutput.findLeaderById(apply.projectId()).map(leader -> Tuples.of(leader, apply)))
+                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원이 있는 프로젝트를 찾을 수 없습니다.")))
+                .flatMap(tuple -> {
+                    if (!tuple.getT1().equals(leaderId))
+                        return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
+
+                    return Mono.just(tuple.getT2());
+                });
+        // TODO UPDATE APPLY STATUS
     }
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record ProjectResponse(
@@ -17,7 +18,7 @@ public record ProjectResponse(
         ProjectState state,
         Career careerMin,
         Career careerMax,
-        String chatRoomId,
+        UUID chatRoomId,
         List<ProjectCategory> category,
         ProjectGoal goal,
         Long leader,

@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.projectservice.leader.application.port.in.query;
+package com.connectcrew.teamone.projectservice.member.application.port.in.query;
 
 public record ProjectApplyStatusQuery(
         Long projectId,

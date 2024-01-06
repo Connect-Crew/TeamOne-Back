@@ -1,46 +1,48 @@
 package com.connectcrew.teamone.projectservice.project.application;
 
+import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
-import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
-import com.connectcrew.teamone.projectservice.project.application.port.in.CreateProjectUseCase;
+import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
+import com.connectcrew.teamone.projectservice.project.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.UpdateProjectUseCase;
-import com.connectcrew.teamone.projectservice.project.application.port.in.command.*;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.FavoriteCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.SaveProjectCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.SaveReportCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.UpdateProjectCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.SendReportMessageOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
+import com.connectcrew.teamone.projectservice.project.domain.Report;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseCase, UpdateProjectUseCase {
-    private static final String UUID_PATTERNS = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
+public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCase, UpdateProjectUseCase {
+
     private final FindProjectOutput findProjectOutput;
     private final SaveProjectOutput saveProjectOutput;
     private final UpdateProjectOutput updateProjectOutput;
     private final FindMemberOutput findMemberOutput;
-    private final SaveMemberOutput saveMemberOutput;
     private final SendReportMessageOutput sendReportMessageOutput;
 
     @Override
@@ -56,216 +58,87 @@ public class ProjectAplService implements QueryProjectUseCase, CreateProjectUseC
     }
 
     @Override
-    public Mono<Tuple2<Project, UserRelationWithProject>> findById(Long id, Long userId) {
-        log.trace("findById - id: {}, leader: {}", id, userId);
-        return findProjectOutput.findById(id)
-                .flatMap(project -> getUserRelationWithProject(id, userId)
-                        .map(relation -> Tuples.of(project, relation)));
+    public Mono<String> findProjectThumbnail(Long projectId) {
+        return findProjectOutput.findThumbnail(projectId);
     }
 
     @Override
-    public Mono<String> findProjectThumbnail(Long id) {
-        return findProjectOutput.findProjectThumbnail(id);
-    }
-
-    @NotNull
-    private Mono<UserRelationWithProject> getUserRelationWithProject(Long id, Long userId) {
-        return findMemberOutput.findAllUserPartByProjectAndUser(id, userId)
-                .collect(Collectors.toSet())
-                .map(UserRelationWithProject::from);
+    public Mono<Long> findLeaderByProject(Long projectId) {
+        return findProjectOutput.findLeaderById(projectId);
     }
 
     @Override
-    @Transactional
-    public Mono<Long> create(CreateProjectCommand command) {
-        log.trace("create - command: {}", command);
-        return validateCommand(command)
-                .then(saveProjectOutput.create(command.toDomain()))
-                .flatMap(project -> saveMemberOutput.saveMember(command.leader(), getPartIds(project.recruitStatuses(), command.leaderParts())).thenReturn(project.id()));
-    }
-
-    private Mono<CreateProjectCommand> validateCommand(CreateProjectCommand command) {
-        // 1. title은 2글자 이상 30글자 이하
-        if (command.title().length() < 2)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_2_OVER.toString()));
-        if (command.title().length() > 30)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString()));
-
-        // 2. banner는 최대 3개. 경로, 이름, 확장자가 유효한지 검사
-        if (command.banners() != null && command.banners().size() > 3)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.BANNER_MAX_3.toString()));
-
-        if (command.banners() != null) {
-            for (String banner : command.banners()) {
-                String[] fileNameAndExtensions = banner.split("\\.");
-                String filename = fileNameAndExtensions[0];
-                String extension = fileNameAndExtensions[1];
-                if (!Pattern.matches(UUID_PATTERNS, filename)) {
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString()));
-                }
-
-                if (!extension.equals("jpg") && !extension.equals("png") && !extension.equals("jpeg")) {
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString()));
-                }
-            }
-        }
-
-        // 4. careerMin은 careerMax보다 이전 값이어야 함.
-        if (command.careerMin().getId() > command.careerMax().getId())
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CAREER_MIN_BEFORE_MAX.toString()));
-
-        // 5. chatRoomId는 UUID
-        if (!Pattern.matches(UUID_PATTERNS, command.chatRoomId()))
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_CHATROOM_ID.toString()));
-
-        // 6. category는 최소 1개 최대 3개
-        if (command.category().size() < 1)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MIN_1.toString()));
-
-        if (command.category().size() > 3)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MAX_3.toString()));
-
-        // 7. introduction은 1000글자 이하
-        if (command.introduction().length() > 1000)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.INTRODUCTION_LENGTH_1000_UNDER.toString()));
-
-        // 8. recruit 조건 검사 (comment는 최대 30글자, max는 0 이상인지, 모든 recruit의 max의 합이 10 이하인지)
-        int recruitMaxSum = 0;
-        for (CreateRecruitCommand recruit : command.recruits()) {
-            if (recruit.comment().length() > 30)
-                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_COMMENT_LENGTH_30_UNDER.toString()));
-
-            if (recruit.max() < 0)
-                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_0_OVER.toString()));
-
-            recruitMaxSum += recruit.max();
-        }
-        if (recruitMaxSum > 30)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_30_UNDER.toString()));
-
-        return Mono.just(command);
-    }
-
-    private List<Long> getPartIds(List<RecruitStatus> recruits, List<MemberPart> parts) {
-        return recruits.stream()
-                .filter(recruit -> parts.contains(recruit.part()))
-                .map(RecruitStatus::id)
-                .toList();
+    public Mono<Project> findById(Long projectId) {
+        return findProjectOutput.findById(projectId);
     }
 
     @Override
-    public Mono<Boolean> report(ReportCommand command) {
-        return saveProjectOutput.report(command.toDomain())
-                .doOnNext(sendReportMessageOutput::send)
-                .thenReturn(true);
+    public Mono<Project> saveProject(SaveProjectCommand command) {
+        return command.validate()
+                .then(saveProjectOutput.save(command.toDomain()));
     }
 
     @Override
-    public Mono<Integer> update(FavoriteCommand command) {
-        return updateProjectOutput.updateFavorite(command.project(), command.favorite() ? 1 : -1);
-
+    public Mono<Report> saveReport(SaveReportCommand command) {
+        return findProjectOutput.findTitleById(command.projectId())
+                .flatMap(title -> saveProjectOutput.report(command.toDomain(title)))
+                .doOnNext(sendReportMessageOutput::send);
     }
 
     @Override
-    public Mono<Long> update(UpdateProjectCommand command) {
-        log.trace("update - command: {}", command);
-        return findProjectOutput.findById(command.projectId())
-                .flatMap(project -> {
-                    if (project.leader().equals(command.userId())) return Mono.just(project);
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
+    public Mono<Integer> updateFavorite(FavoriteCommand command) {
+        return updateProjectOutput.favorite(command.project(), command.favorite() ? 1 : -1);
+    }
+
+    @Override
+    public Mono<Project> updateProject(UpdateProjectCommand command) {
+        Mono<Project> project = findProjectOutput.findById(command.projectId());
+        Mono<Member> leader = findMemberOutput.findByProjectAndUser(command.projectId(), command.userId());
+
+        return Mono.zip(project, leader)
+                .flatMap(tuple -> {
+                    if (tuple.getT1().leader().equals(tuple.getT2().id())) return Mono.just(tuple);
+                    return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
                 })
-                .flatMap(project -> validateCommand(command).thenReturn(project))
-                .flatMap(project -> validateUpdatedPart(command, project))
-                .flatMap(project -> updateProjectOutput.update(command.toDomain(project)))
-                .thenReturn(command.projectId());
+                .flatMap(tuple -> command.validate().thenReturn(tuple))
+                .map(tuple -> Tuples.of(tuple.getT1(), tuple.getT2(), command.toDomain(tuple.getT1(), tuple.getT2())))
+                // 유효성 검사
+                .flatMap(tuple -> validateUpdatedPart(tuple.getT1(), tuple.getT2(), tuple.getT3(), command.leaderParts()))
+                .flatMap(saveProjectOutput::save);
     }
 
     @NotNull
-    private Mono<Project> validateUpdatedPart(UpdateProjectCommand command, Project project) {
-        Map<MemberPart, Integer> memberCountMap = project.recruitStatuses().stream()
-                .collect(Collectors.toMap(RecruitStatus::part, RecruitStatus::current));
+    private Mono<Project> validateUpdatedPart(Project origin, Member originLeader, Project updated, List<Part> updatedLeaderParts) {
+        Set<Long> originPartIds = origin.parts().stream()
+                .map(ProjectPart::id)
+                .collect(Collectors.toSet());
 
-        for (CreateRecruitCommand recruit : command.recruits()) {
-            if (!memberCountMap.containsKey(recruit.part())) continue; // 새로 추가된 파트
+        Set<Long> updatedPartIds = updated.parts().stream()
+                .map(ProjectPart::id)
+                .collect(Collectors.toSet());
 
-            if (memberCountMap.get(recruit.part()) > recruit.max()) { // 현재 인원이 max보다 많은지 검사
+        Set<Long> deletedPartIds = originPartIds.stream()
+                .filter(id -> !updatedPartIds.contains(id))
+                .collect(Collectors.toSet());
+
+        // 삭제된 파트에 현재 인원이 있는지 검사
+        for (ProjectPart part : origin.parts()) {
+            if (!deletedPartIds.contains(part.id())) continue;
+            if (part.current() <= 0) continue;
+            // 인원이 1명있고, 리더이며, 직무를 수정한 경우
+            if (part.current() == 1 && originLeader.containPart(part.part()) && !updatedLeaderParts.contains(part.part()))
+                continue;
+
+
+            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PART.toString()));
+        }
+
+        for (ProjectPart part : updated.parts()) {
+            if (part.current() > part.max()) { // 현재 인원이 max보다 많은지 검사
                 return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.MAX_LESS_THAN_CURRENT.toString()));
             }
         }
 
-        // 삭제된 파트에 현재 인원이 있는지 검사
-        if (!getRemovedPart(command.recruits(), project.recruitStatuses()).isEmpty())
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PART.toString()));
-
-        return Mono.just(project);
-    }
-
-    private Set<MemberPart> getRemovedPart(List<CreateRecruitCommand> commands, List<RecruitStatus> recruits) {
-        Set<MemberPart> newParts = commands.stream()
-                .map(CreateRecruitCommand::part)
-                .collect(Collectors.toSet());
-
-        return recruits.stream()
-                .map(RecruitStatus::part)
-                .filter(part -> !newParts.contains(part))
-                .collect(Collectors.toSet());
-    }
-
-    private Mono<UpdateProjectCommand> validateCommand(UpdateProjectCommand command) {
-        // 1. title은 2글자 이상 30글자 이하
-        if (command.title().length() < 2)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_2_OVER.toString()));
-        if (command.title().length() > 30)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString()));
-
-        // 2. banner는 최대 3개. 경로, 이름, 확장자가 유효한지 검사
-        if (command.banners() != null && command.banners().size() > 3)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.BANNER_MAX_3.toString()));
-
-        if (command.banners() != null) {
-            for (String banner : command.banners()) {
-                String[] fileNameAndExtensions = banner.split("\\.");
-                String filename = fileNameAndExtensions[0];
-                String extension = fileNameAndExtensions[1];
-                if (!Pattern.matches(UUID_PATTERNS, filename)) {
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_NAME.toString()));
-                }
-
-                if (!extension.equals("jpg") && !extension.equals("png") && !extension.equals("jpeg")) {
-                    return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ILLEGAL_BANNER_EXTENSION.toString()));
-                }
-            }
-        }
-
-        // 4. careerMin은 careerMax보다 이전 값이어야 함.
-        if (command.careerMin().getId() > command.careerMax().getId())
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CAREER_MIN_BEFORE_MAX.toString()));
-
-        // 6. category는 최소 1개 최대 3개
-        if (command.category().size() < 1)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MIN_1.toString()));
-
-        if (command.category().size() > 3)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.CATEGORY_MAX_3.toString()));
-
-        // 7. introduction은 1000글자 이하
-        if (command.introduction().length() > 1000)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.INTRODUCTION_LENGTH_1000_UNDER.toString()));
-
-        // 8. recruit 조건 검사 (comment는 최대 30글자, max는 0 이상인지, 모든 recruit의 max의 합이 10 이하인지)
-        int recruitMaxSum = 0;
-        for (CreateRecruitCommand recruit : command.recruits()) {
-            if (recruit.comment().length() > 30)
-                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_COMMENT_LENGTH_30_UNDER.toString()));
-
-            if (recruit.max() < 0)
-                return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_0_OVER.toString()));
-
-            recruitMaxSum += recruit.max();
-        }
-        if (recruitMaxSum > 30)
-            return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.RECRUIT_MAX_SUM_30_UNDER.toString()));
-
-        return Mono.just(command);
+        return Mono.just(updated);
     }
 }

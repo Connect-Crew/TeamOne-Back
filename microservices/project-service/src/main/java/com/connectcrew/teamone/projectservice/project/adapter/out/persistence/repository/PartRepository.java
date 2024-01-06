@@ -13,7 +13,7 @@ public interface PartRepository extends ReactiveCrudRepository<PartEntity, Long>
 
     Mono<PartEntity> findByProjectAndPart(Long project, String part);
 
-    Flux<PartEntity> deleteAllByProjectAndPartNotIn(Long project, Collection<String> parts);
+    Flux<PartEntity> deleteAllByProjectAndIdNotIn(Long project, Collection<Long> ids);
 
     @Query("SELECT p.* FROM part AS p JOIN member AS m ON p.id = m.part_id WHERE p.project = :project AND m.user = :user")
     Flux<PartEntity> findAllUserPartByProjectAndUser(Long project, Long user);

@@ -2,11 +2,10 @@ package com.connectcrew.teamone.projectservice.project.domain.vo;
 
 import com.connectcrew.teamone.api.projectservice.enums.*;
 import com.connectcrew.teamone.api.projectservice.project.ProjectItemResponse;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Builder
@@ -23,7 +22,7 @@ public record ProjectItem(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
-        List<RecruitStatus> recruitStatus
+        List<ProjectPart> recruitStatus
 ) {
     public ProjectItemResponse toResponse() {
         return ProjectItemResponse.builder()
@@ -43,21 +42,21 @@ public record ProjectItem(
                 .build();
     }
 
-    public ProjectItemResponse toResponse(Collection<MemberPart> applies) {
-        return ProjectItemResponse.builder()
-                .id(id)
-                .title(title)
-                .thumbnail(thumbnail)
-                .region(region)
-                .online(online)
-                .careerMin(careerMin)
-                .careerMax(careerMax)
-                .createdAt(createdAt)
-                .state(state)
-                .favorite(favorite)
-                .category(category)
-                .goal(goal)
-                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(applies.contains(r.part()))).toList())
-                .build();
-    }
+//    public ProjectItemResponse toResponse(Collection<Part> applies) {
+//        return ProjectItemResponse.builder()
+//                .id(id)
+//                .title(title)
+//                .thumbnail(thumbnail)
+//                .region(region)
+//                .online(online)
+//                .careerMin(careerMin)
+//                .careerMax(careerMax)
+//                .createdAt(createdAt)
+//                .state(state)
+//                .favorite(favorite)
+//                .category(category)
+//                .goal(goal)
+//                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(applies.contains(r.part()))).toList())
+//                .build();
+//    }
 }

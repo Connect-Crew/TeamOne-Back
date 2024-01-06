@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.projectservice.project.domain.Project;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
+import com.connectcrew.teamone.projectservice.project.domain.Category;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -20,12 +21,21 @@ public class CategoryEntity {
     private Long project;
     private String name;
 
-    public static List<CategoryEntity> from(Project project, Long projectId) {
-        return project.category().stream()
-                .map(category -> CategoryEntity.builder()
-                        .project(projectId)
-                        .name(category.name())
-                        .build())
+    public Category toDomain() {
+        return new Category(id, ProjectCategory.valueOf(name));
+    }
+
+    public static CategoryEntity from(Category category, Long projectId) {
+        return CategoryEntity.builder()
+                .id(category.id())
+                .project(projectId)
+                .name(category.category().name())
+                .build();
+    }
+
+    public static List<CategoryEntity> from(List<Category> categories, Long projectId) {
+        return categories.stream()
+                .map(category -> from(category, projectId))
                 .toList();
     }
 }

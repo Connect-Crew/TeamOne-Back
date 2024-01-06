@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberPart {
+public enum Part {
     TOTAL_DEVELOP(MemberPartCategory.DEVELOP, "개발 전체"),
     AOS(MemberPartCategory.DEVELOP, "AOS 개발자"),
     IOS(MemberPartCategory.DEVELOP, "IOS 개발자"),

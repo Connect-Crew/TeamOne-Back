@@ -11,7 +11,7 @@ public record ProjectOption(
         Career career,
         List<Region> region,
         Boolean online,
-        MemberPart part,
+        Part part,
         List<String> skills,
         List<ProjectState> states,
         List<ProjectCategory> category,

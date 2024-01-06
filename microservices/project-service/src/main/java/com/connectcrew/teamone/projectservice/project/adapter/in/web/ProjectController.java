@@ -3,16 +3,23 @@ package com.connectcrew.teamone.projectservice.project.adapter.in.web;
 import com.connectcrew.teamone.api.projectservice.project.*;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.projectservice.project.application.port.in.CreateProjectUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMemberUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.SaveMemberCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.UpdateMemberCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
+import com.connectcrew.teamone.projectservice.project.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.projectservice.project.application.port.in.UpdateProjectUseCase;
-import com.connectcrew.teamone.projectservice.project.application.port.in.command.CreateProjectCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.FavoriteCommand;
-import com.connectcrew.teamone.projectservice.project.application.port.in.command.ReportCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.SaveProjectCommand;
+import com.connectcrew.teamone.projectservice.project.application.port.in.command.SaveReportCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.command.UpdateProjectCommand;
 import com.connectcrew.teamone.projectservice.project.application.port.in.query.ProjectQuery;
+import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,9 +29,13 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ProjectController {
     private final QueryProjectUseCase queryProjectUseCase;
-    private final CreateProjectUseCase createProjectUseCase;
+    private final SaveProjectUseCase saveProjectUseCase;
     private final UpdateProjectUseCase updateProjectUseCase;
+    private final QueryMemberUseCase queryMemberUseCase;
+    private final SaveMemberUseCase saveMemberUseCase;
+    private final UpdateMemberUseCase updateMemberUseCase;
     private final SendErrorNotificationUseCase sendErrorNotificationUseCase;
+
 
     @GetMapping("/list")
     public Flux<ProjectItemResponse> getProjectList(ProjectFilterOptionRequest option) {
@@ -41,21 +52,27 @@ public class ProjectController {
     }
 
     @PostMapping("/")
+    @Transactional
     public Mono<Long> createProject(@RequestBody CreateProjectRequest request) {
-        return createProjectUseCase.create(CreateProjectCommand.from(request))
+        return saveProjectUseCase.saveProject(SaveProjectCommand.from(request))
+                .flatMap(project -> saveMemberUseCase.saveMember(new SaveMemberCommand(project.leader(), project.id(), request.leaderParts())).thenReturn(project))
+                .map(Project::id)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
     }
 
     @PutMapping("/")
+    @Transactional
     public Mono<Long> updateProject(@RequestBody UpdateProjectRequest request) {
-        return updateProjectUseCase.update(UpdateProjectCommand.from(request))
+        return updateProjectUseCase.updateProject(UpdateProjectCommand.from(request))
+                .flatMap(project -> updateMemberUseCase.updateMember(new UpdateMemberCommand(request.projectId(), project.leader(), request.leaderParts())).thenReturn(project))
+                .map(Project::id)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateProject", ErrorLevel.ERROR, ex));
     }
 
     @GetMapping("/")
     public Mono<ProjectResponse> findProject(Long id, Long userId) {
-        return queryProjectUseCase.findById(id, userId)
-                .map(tuple -> tuple.getT1().toResponse(tuple.getT2()))
+        return queryProjectUseCase.findById(id)
+                .flatMap(project -> queryMemberUseCase.findUserRelationByProjectAndUser(id, userId).map(project::toResponse))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.findProject", ErrorLevel.ERROR, ex));
     }
 
@@ -67,13 +84,14 @@ public class ProjectController {
 
     @PostMapping("/report")
     public Mono<Boolean> reportProject(@RequestBody ReportRequest request) {
-        return createProjectUseCase.report(ReportCommand.from(request))
+        return saveProjectUseCase.saveReport(SaveReportCommand.from(request))
+                .thenReturn(true)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.reportProject", ErrorLevel.ERROR, ex));
     }
 
     @PostMapping("/favorite")
     public Mono<Integer> updateFavorite(@RequestBody ProjectFavoriteRequest request) {
-        return updateProjectUseCase.update(FavoriteCommand.from(request))
+        return updateProjectUseCase.updateFavorite(FavoriteCommand.from(request))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateFavorite", ErrorLevel.ERROR, ex));
     }
 }

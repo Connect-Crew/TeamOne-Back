@@ -1,14 +1,14 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.projectservice.project.domain.Project;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.projectservice.project.domain.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Getter
@@ -26,7 +26,7 @@ public class ProjectEntity {
 
     private String introduction;
 
-    private String chatRoomId;
+    private UUID chatRoomId;
 
     private Integer careerMin;
 
@@ -39,6 +39,7 @@ public class ProjectEntity {
     private String region;
 
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     private String state;
 
@@ -58,13 +59,14 @@ public class ProjectEntity {
                 .withOnline(project.online())
                 .region(project.region().name())
                 .createdAt(project.createdAt())
+                .updatedAt(project.updatedAt())
                 .state(project.state().name())
                 .goal(project.goal().name())
                 .favorite(project.favorite())
                 .build();
     }
 
-    public Project toDomain(List<String> banners, List<RecruitStatus> recruitStatuses, List<String> skills, List<ProjectCategory> categories) {
+    public Project toDomain(List<Banner> banners, List<ProjectPart> parts, List<Skill> skills, List<Category> categories) {
         System.out.println(state);
         return Project.builder()
                 .id(id)
@@ -73,6 +75,7 @@ public class ProjectEntity {
                 .region(Region.valueOf(region))
                 .online(withOnline)
                 .createdAt(createdAt)
+                .updatedAt(updatedAt)
                 .state(ProjectState.valueOf(state))
                 .careerMin(Career.valueOf(careerMin))
                 .careerMax(Career.valueOf(careerMax))
@@ -82,7 +85,7 @@ public class ProjectEntity {
                 .leader(leader)
                 .introduction(introduction)
                 .favorite(favorite)
-                .recruitStatuses(recruitStatuses)
+                .parts(parts)
                 .skills(skills)
                 .build();
     }

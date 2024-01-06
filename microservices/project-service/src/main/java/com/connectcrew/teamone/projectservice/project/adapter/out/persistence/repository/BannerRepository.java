@@ -5,10 +5,12 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
+
 public interface BannerRepository extends ReactiveCrudRepository<BannerEntity, Long> {
     Flux<BannerEntity> findAllByProject(Long project);
 
     Mono<BannerEntity> findFirstByProjectOrderByIdx(Long project);
 
-    Flux<BannerEntity> deleteAllByProject(Long project);
+    Flux<BannerEntity> deleteAllByProjectAndIdNotIn(Long project, Collection<Long> ids);
 }
