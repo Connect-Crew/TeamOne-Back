@@ -22,6 +22,7 @@ public interface FindProjectOutput {
     Mono<String> findThumbnail(Long projectId);
 
     Mono<Boolean> existsById(Long projectId);
+    Mono<Boolean> existsReportByProjectAndUser(Long project, Long user);
     Flux<ProjectPart> findAllProjectPartByProject(Long project);
     Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, Part part);
 

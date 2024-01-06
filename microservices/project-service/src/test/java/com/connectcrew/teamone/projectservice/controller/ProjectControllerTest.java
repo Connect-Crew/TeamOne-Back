@@ -3,11 +3,11 @@ package com.connectcrew.teamone.projectservice.controller;
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.projectservice.project.ReportRequest;
 import com.connectcrew.teamone.projectservice.config.TestConfig;
-import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
-import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
 import com.connectcrew.teamone.projectservice.project.adapter.in.web.ProjectController;
+import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.ProjectEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.ReportEntity;
-import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
+import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.ProjectRepository;
+import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.ReportRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,33 +33,16 @@ class ProjectControllerTest {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private BannerRepository bannerRepository;
-
-    @Autowired
-    private PartRepository partRepository;
-
-    @Autowired
-    private ApplyRepository applyRepository;
-
-    @Autowired
-    private SkillRepository skillRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private ReportRepository reportRepository;
-
-    @Autowired
-    private CustomRepository customRepository;
 
     // report
     @Test
     void reportTest() {
-        when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
+        ProjectEntity project = ProjectEntity.builder()
+                .title("testTitle")
+                .build();
+
+        when(projectRepository.findById(anyLong())).thenReturn(Mono.just(project));
         when(reportRepository.existsByProjectAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(reportRepository.save(any(ReportEntity.class))).thenReturn(Mono.just(ReportEntity.builder().build()));
 
@@ -77,7 +60,7 @@ class ProjectControllerTest {
 
     @Test
     void reportNotfoundProjectTest() {
-        when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(false));
+        when(projectRepository.findById(anyLong())).thenReturn(Mono.empty());
         when(reportRepository.existsByProjectAndUser(anyLong(), anyLong())).thenReturn(Mono.just(false));
         when(reportRepository.save(any(ReportEntity.class))).thenReturn(Mono.just(ReportEntity.builder().build()));
 
@@ -95,7 +78,11 @@ class ProjectControllerTest {
 
     @Test
     void reportAlreadyReportTest() {
-        when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
+        ProjectEntity project = ProjectEntity.builder()
+                .title("testTitle")
+                .build();
+
+        when(projectRepository.findById(anyLong())).thenReturn(Mono.just(project));
         when(reportRepository.existsByProjectAndUser(anyLong(), anyLong())).thenReturn(Mono.just(true));
         when(reportRepository.save(any(ReportEntity.class))).thenReturn(Mono.just(ReportEntity.builder().build()));
 

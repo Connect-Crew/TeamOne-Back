@@ -45,7 +45,6 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     public Flux<Member> findAllByProject(Long project) {
-        log.trace("findAllByProject - project: {}", project);
         return findMemberOutput.findAllByProject(project);
     }
 
@@ -71,15 +70,14 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     }
 
         @Override
-        public Mono<Boolean> apply(ApplyCommand command) {
+        public Mono<Apply> apply(ApplyCommand command) {
             return checkProjectExits(command.projectId())
                     .then(findProjectOutput.findProjectPartByProjectAndPart(command.projectId(), command.part()))
                     .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
                     .flatMap(this::checkNumberOfMember)
                     .flatMap(part -> checkAlreadyPartMember(part, command.userId()))
                     .flatMap(part -> checkAlreadyApply(part, command.userId()))
-                    .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())))
-                    .thenReturn(true);
+                    .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())));
 
         }
 

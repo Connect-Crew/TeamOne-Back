@@ -98,6 +98,11 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
     }
 
     @Override
+    public Mono<Boolean> existsReportByProjectAndUser(Long project, Long user) {
+        return reportRepository.existsByProjectAndUser(project, user);
+    }
+
+    @Override
     public Flux<ProjectPart> findAllProjectPartByProject(Long project) {
         return partRepository.findAllByProject(project)
                 .map(PartEntity::toDomain);

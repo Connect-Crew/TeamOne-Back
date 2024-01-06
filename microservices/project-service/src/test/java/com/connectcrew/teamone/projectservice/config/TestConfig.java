@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.config;
 
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberPartRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import io.r2dbc.spi.ConnectionFactory;
@@ -76,4 +77,7 @@ public class TestConfig {
 
     @MockBean
     MemberRepository memberRepository;
+
+    @MockBean
+    MemberPartRepository memberPartRepository;
 }

@@ -34,30 +34,14 @@ public class MemberControllerTest {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private BannerRepository bannerRepository;
-
-    @Autowired
     private PartRepository partRepository;
 
     @Autowired
     private ApplyRepository applyRepository;
 
     @Autowired
-    private SkillRepository skillRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private ReportRepository reportRepository;
-
-    @Autowired
-    private CustomRepository customRepository;
-
-    // apply
     @Test
     void applyTest() {
         PartEntity part = PartEntity.builder()

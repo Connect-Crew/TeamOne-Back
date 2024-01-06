@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.application;
 
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
+import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.Part;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
@@ -21,7 +22,6 @@ import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.Report;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
-import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -47,13 +47,11 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
 
     @Override
     public Flux<ProjectItem> findAllByQuery(ProjectQuery query) {
-        log.trace("findAllByQuery - query: {}", query);
         return findProjectOutput.findAllByQuery(query.toOption());
     }
 
     @Override
     public Flux<ProjectItem> findAllByUserId(Long userId) {
-        log.trace("findAllByUserId - leader: {}", userId);
         return findProjectOutput.findAllByUserId(userId);
     }
 
@@ -81,6 +79,12 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
     @Override
     public Mono<Report> saveReport(SaveReportCommand command) {
         return findProjectOutput.findTitleById(command.projectId())
+                .switchIfEmpty(Mono.error(new NotFoundException("프로젝트를 찾을 수 없습니다. request: " + command)))
+                .flatMap(title -> findProjectOutput.existsReportByProjectAndUser(command.projectId(), command.userId()).map(exists -> Tuples.of(title, exists)))
+                .flatMap(tuples -> {
+                    if (tuples.getT2()) return Mono.error(new IllegalArgumentException("이미 신고한 프로젝트입니다. request: " + command));
+                    return Mono.just(tuples.getT1());
+                })
                 .flatMap(title -> saveProjectOutput.report(command.toDomain(title)))
                 .doOnNext(sendReportMessageOutput::send);
     }
@@ -92,8 +96,10 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
 
     @Override
     public Mono<Project> updateProject(UpdateProjectCommand command) {
-        Mono<Project> project = findProjectOutput.findById(command.projectId());
-        Mono<Member> leader = findMemberOutput.findByProjectAndUser(command.projectId(), command.userId());
+        Mono<Project> project = findProjectOutput.findById(command.projectId())
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        Mono<Member> leader = findMemberOutput.findByProjectAndUser(command.projectId(), command.userId())
+                .switchIfEmpty(Mono.error(new NotFoundException("리더 정보를 찾을 수 없습니다.")));
 
         return Mono.zip(project, leader)
                 .flatMap(tuple -> {
@@ -102,7 +108,6 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                 })
                 .flatMap(tuple -> command.validate().thenReturn(tuple))
                 .map(tuple -> Tuples.of(tuple.getT1(), tuple.getT2(), command.toDomain(tuple.getT1(), tuple.getT2())))
-                // 유효성 검사
                 .flatMap(tuple -> validateUpdatedPart(tuple.getT1(), tuple.getT2(), tuple.getT3(), command.leaderParts()))
                 .flatMap(saveProjectOutput::save);
     }
