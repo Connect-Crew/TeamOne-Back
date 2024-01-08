@@ -18,8 +18,10 @@ public record Report(
 
     public ReportNotification toNotification() {
         return new ReportNotification(
+                id,
                 userId,
                 projectId,
+                projectTitle,
                 reason
         );
     }

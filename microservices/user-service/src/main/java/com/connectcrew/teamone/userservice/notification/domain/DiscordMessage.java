@@ -10,7 +10,7 @@ public record DiscordMessage(
 ) {
 
     public String toMessage() {
-        return String.format("### [%s] %s\n```%s```\n\n", level, title, message);
+        return String.format("### [%s]\t%s\n```%s```\n\n", level, title, message);
     }
 
 }

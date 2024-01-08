@@ -7,6 +7,7 @@ import com.connectcrew.teamone.api.userservice.notification.report.ReportNotific
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
+import com.connectcrew.teamone.userservice.profile.application.in.QueryProfileUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationEventListener {
     private final ObjectMapper objectMapper;
+
     private final SendMessageUseCase sendMessageUseCase;
+    private final QueryProfileUseCase queryProfileUseCase;
 
     @KafkaListener(topics = KafkaEventTopic.PushNotification, groupId = "user-service")
     public void consumePushNotificationEvent(String body) {
@@ -47,7 +50,10 @@ public class NotificationEventListener {
         try {
             ReportNotification event = objectMapper.readValue(body, ReportNotification.class);
 
-            sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event)).subscribe();
+            queryProfileUseCase.findUserNameByUserId(event.userId())
+                            .flatMap(nickname -> sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event, nickname))).subscribe();
+
+
         } catch (Exception e) {
             log.error("consumeErrorNotificationEvent error", e);
         }
