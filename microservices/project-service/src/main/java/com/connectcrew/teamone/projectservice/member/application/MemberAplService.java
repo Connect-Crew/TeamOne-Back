@@ -56,11 +56,13 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     @Override
     public Mono<UserRelationWithProject> findUserRelationByProjectAndUser(Long projectId, Long userId) {
         Mono<List<Part>> membersParts = findMemberOutput.findByProjectAndUser(projectId, userId)
-                .map(m -> m.parts().stream().map(MemberPart::part).toList());
+                .map(m -> m.parts().stream().map(MemberPart::part).toList())
+                .defaultIfEmpty(List.of());
 
         Mono<List<Part>> applyParts = findMemberOutput.findAllByProjectAndUser(projectId, userId)
                 .map(Apply::part)
-                .collectList();
+                .collectList()
+                .defaultIfEmpty(List.of());
 
         return Mono.zip(membersParts, applyParts)
                 .map(tuple -> new UserRelationWithProject(projectId, userId, tuple.getT1(), tuple.getT2()));
