@@ -213,6 +213,7 @@ public class ProjectController {
             @RequestHeader(JwtProvider.AUTH_HEADER) String token,
             @PathVariable Long projectId,
             @RequestPart(value = "banner", required = false) Flux<FilePart> banner,
+            @RequestPart(required = false) Flux<String> removeBanners,
             @RequestPart String title,
             @RequestPart String region,
             @RequestPart String online,
@@ -260,6 +261,7 @@ public class ProjectController {
                         .recruits(tuple.getT3())
                         .skills(tuple.getT4().stream().map(this::removeQuotation).toList())
                         .build())
+                .flatMap(request -> removeRemovedBanners(removeBanners).thenReturn(request))
                 .flatMap(request -> saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
                         .doOnNext(bannerPaths -> log.trace("modifyProject - bannerPaths: {}", bannerPaths))
                         .flatMap(bannerPaths -> updateProjectUseCase.update(request.toCommand(bannerPaths))
@@ -267,6 +269,17 @@ public class ProjectController {
                         // TODO 프로젝트 글 작성 실패시 채팅방 삭제
                         .map(SimpleLongResponse::new))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
+    }
+
+    private Mono<Boolean> removeRemovedBanners(Flux<String> removeBanners) {
+        // TODO 수정하는 프로젝트의 Banner인지 확인
+        return removeBanners
+                .map(path -> {
+                    String[] splitedPath = path.split("/");
+                    return splitedPath[splitedPath.length - 1];
+                })
+                .collectList()
+                .flatMap(removeBannerPaths -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, removeBannerPaths));
     }
 
 

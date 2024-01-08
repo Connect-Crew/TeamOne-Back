@@ -645,6 +645,8 @@ class ProjectControllerTest {
         MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
         multipartData.add("banner", new ClassPathResource("banner1.png"));
         multipartData.add("banner", new ClassPathResource("banner2.png"));
+        multipartData.add("removeBanners", "banner3.png");
+        multipartData.add("removeBanners", "banner4.png");
         multipartData.add("title", "프로젝트 제목");
         multipartData.add("region", Region.SEOUL.name());
         multipartData.add("online", true);
@@ -684,6 +686,7 @@ class ProjectControllerTest {
                                 ),
                                 requestParts(
                                         partWithName("banner").optional().description("프로젝트 배너 이미지 최대 3개로 .jpg, .png, .jpeg 확장자만 허용합니다."),
+                                        partWithName("removeBanners").optional().description("삭제할 프로젝트 배너 이미지로 \"이름.확장자\" 형식으로 입력합니다."),
                                         partWithName("title").description("프로젝트 제목"),
                                         partWithName("region").description("프로젝트 지역"),
                                         partWithName("online").description("온라인 여부"),
