@@ -155,7 +155,7 @@ public class ProjectController {
             @RequestPart String goal,
             @RequestPart String introduction,
             @RequestPart Flux<String> recruits,
-            @RequestPart Flux<String> skills
+            @RequestPart(required = false) Flux<String> skills
     ) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
@@ -171,7 +171,7 @@ public class ProjectController {
                                 throw new RuntimeException(e);
                             }
                         }).collectList(),
-                        skills.collectList()
+                        skills.collectList().defaultIfEmpty(List.of())
                 )
                 .doOnNext(tuple -> log.trace("createProject - title: {}, region: {}, online: {}, state: {}, careerMin: {}, careerMax: {}, leaderParts: {}, category: {}, goal: {}, introduction: {}, recruits: {}, skills: {}",
                         title, region, online, state, careerMin, careerMax, tuple.getT1(), tuple.getT2(), goal, introduction, tuple.getT3(), tuple.getT4()))
