@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ProjectState {
     NOT_STARTED("진행 전"),
-    IN_PROGRESS("진행 후"),
+    IN_PROGRESS("진행 중"),
     COMPLETED("종료"),
     DELETED("삭제");
 
