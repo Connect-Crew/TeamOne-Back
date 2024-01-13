@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.projectservice.project.application.port.in.command;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.project.CreateRecruitRequest;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 
 public record CreateRecruitCommand(
-        Part part,
+        MemberPart part,
         String comment,
         Integer max
 ) {

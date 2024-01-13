@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.profile.domain.vo;
 
-import com.connectcrew.teamone.api.userservice.profile.ProfileResponse;
+import com.connectcrew.teamone.api.userservice.profile.ProfileApiResponse;
 import com.connectcrew.teamone.userservice.profile.domain.Part;
 import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.profile.domain.RepresentProject;
@@ -12,8 +12,8 @@ public record FullProfile(
         List<Part> parts,
         List<RepresentProject> representProjects
 ) {
-    public ProfileResponse toResponse() {
-        return ProfileResponse.builder()
+    public ProfileApiResponse toResponse() {
+        return ProfileApiResponse.builder()
                 .id(profile().userId())
                 .nickname(profile().nickname())
                 .profile(profile().profile())

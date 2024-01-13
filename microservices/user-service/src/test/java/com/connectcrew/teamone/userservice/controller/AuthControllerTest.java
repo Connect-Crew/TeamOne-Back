@@ -4,7 +4,7 @@ import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
-import com.connectcrew.teamone.api.userservice.user.UserResponse;
+import com.connectcrew.teamone.api.userservice.user.UserApiResponse;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity.FcmEntity;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.repository.FcmRepository;
@@ -75,7 +75,7 @@ class AuthControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(UserResponse.class);
+                .expectBody(UserApiResponse.class);
     }
 
     @Test
@@ -198,6 +198,6 @@ class AuthControllerTest {
                 .body(Mono.just(param), UserRegisterRequest.class)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(UserResponse.class);
+                .expectBody(UserApiResponse.class);
     }
 }

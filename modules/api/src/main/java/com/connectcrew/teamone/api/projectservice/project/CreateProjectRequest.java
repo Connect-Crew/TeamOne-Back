@@ -16,7 +16,7 @@ public record CreateProjectRequest(
         Career careerMin,
         Career careerMax,
         Long leader,
-        List<Part> leaderParts,
+        List<MemberPart> leaderParts,
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,

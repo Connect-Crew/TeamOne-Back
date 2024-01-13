@@ -15,7 +15,7 @@ public record ProjectQuery(
         Career career,
         List<Region> region,
         Boolean online,
-        Part part,
+        MemberPart part,
         List<String> skills,
         List<ProjectState> states,
         List<ProjectCategory> category,

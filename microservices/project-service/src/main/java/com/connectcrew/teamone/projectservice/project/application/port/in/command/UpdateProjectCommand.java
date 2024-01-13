@@ -25,7 +25,7 @@ public record UpdateProjectCommand(
         ProjectState state,
         Career careerMin,
         Career careerMax,
-        List<Part> leaderParts,
+        List<MemberPart> leaderParts,
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,
@@ -64,7 +64,7 @@ public record UpdateProjectCommand(
         Map<String, Long> skillIdMap = origin.skills().stream()
                 .collect(Collectors.toMap(Skill::skill, Skill::id));
 
-        Map<Part, ProjectPart> partProjectPartMap = origin.parts().stream()
+        Map<MemberPart, ProjectPart> partProjectPartMap = origin.parts().stream()
                 .collect(Collectors.toMap(ProjectPart::part, p -> p));
 
         List<ProjectPart> updatedParts = recruits.stream().map(r -> {

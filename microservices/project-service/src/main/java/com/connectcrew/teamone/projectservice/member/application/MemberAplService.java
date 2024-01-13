@@ -3,7 +3,7 @@ package com.connectcrew.teamone.projectservice.member.application;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
@@ -17,7 +17,6 @@ import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMe
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.ApplyStatus;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
-import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
@@ -55,11 +54,11 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     public Mono<UserRelationWithProject> findUserRelationByProjectAndUser(Long projectId, Long userId) {
-        Mono<List<Part>> membersParts = findMemberOutput.findByProjectAndUser(projectId, userId)
-                .map(m -> m.parts().stream().map(MemberPart::part).toList())
+        Mono<List<MemberPart>> membersParts = findMemberOutput.findByProjectAndUser(projectId, userId)
+                .map(m -> m.parts().stream().map(com.connectcrew.teamone.projectservice.member.domain.MemberPart::part).toList())
                 .defaultIfEmpty(List.of());
 
-        Mono<List<Part>> applyParts = findMemberOutput.findAllByProjectAndUser(projectId, userId)
+        Mono<List<MemberPart>> applyParts = findMemberOutput.findAllByProjectAndUser(projectId, userId)
                 .map(Apply::part)
                 .collectList()
                 .defaultIfEmpty(List.of());

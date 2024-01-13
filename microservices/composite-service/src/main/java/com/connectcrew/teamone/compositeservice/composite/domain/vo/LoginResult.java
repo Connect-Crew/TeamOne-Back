@@ -3,6 +3,7 @@ package com.connectcrew.teamone.compositeservice.composite.domain.vo;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
 import com.connectcrew.teamone.compositeservice.composite.domain.User;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public record LoginResult(
         String introduction,
         Double temperature,
         Integer responseRate,
-        List<String> parts,
+        List<MemberPart> parts,
         String email,
         String token,
         LocalDateTime exp,

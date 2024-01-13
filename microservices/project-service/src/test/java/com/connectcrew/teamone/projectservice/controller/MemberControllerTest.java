@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.config.TestConfig;
 import com.connectcrew.teamone.projectservice.member.adapter.in.web.MemberController;
 import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
@@ -48,7 +48,7 @@ public class MemberControllerTest {
                 .id(1L)
                 .project(1L)
                 .partCategory("testCategory")
-                .part(Part.AOS.name())
+                .part(MemberPart.AOS.name())
                 .comment("testComment")
                 .collected(0)
                 .targetCollect(2)
@@ -65,7 +65,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()
@@ -79,7 +79,7 @@ public class MemberControllerTest {
                 .id(1L)
                 .project(1L)
                 .partCategory("testCategory")
-                .part(Part.AOS.name())
+                .part(MemberPart.AOS.name())
                 .comment("testComment")
                 .collected(0)
                 .targetCollect(2)
@@ -95,7 +95,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()
@@ -116,7 +116,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()
@@ -130,7 +130,7 @@ public class MemberControllerTest {
                 .id(1L)
                 .project(1L)
                 .partCategory("testCategory")
-                .part(Part.AOS.name())
+                .part(MemberPart.AOS.name())
                 .comment("testComment")
                 .collected(2)
                 .targetCollect(2)
@@ -146,7 +146,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()
@@ -160,7 +160,7 @@ public class MemberControllerTest {
                 .id(1L)
                 .project(1L)
                 .partCategory("testCategory")
-                .part(Part.AOS.name())
+                .part(MemberPart.AOS.name())
                 .comment("testComment")
                 .collected(0)
                 .targetCollect(2)
@@ -176,7 +176,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()
@@ -190,7 +190,7 @@ public class MemberControllerTest {
                 .id(1L)
                 .project(1L)
                 .partCategory("testCategory")
-                .part(Part.AOS.name())
+                .part(MemberPart.AOS.name())
                 .comment("testComment")
                 .collected(0)
                 .targetCollect(2)
@@ -206,7 +206,7 @@ public class MemberControllerTest {
                 .bodyValue(new ApplyRequest(
                         1L,
                         1L,
-                        Part.ADVERTISEMENT_DESIGNER,
+                        MemberPart.ADVERTISEMENT_DESIGNER,
                         "testComment"
                 ))
                 .exchange()

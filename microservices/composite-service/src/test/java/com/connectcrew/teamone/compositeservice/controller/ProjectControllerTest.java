@@ -333,7 +333,7 @@ class ProjectControllerTest {
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 0L,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 "프로젝트 설명",
                 14,
                 initRecruits(false),
@@ -348,7 +348,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
@@ -391,7 +391,10 @@ class ProjectControllerTest {
                                 fieldWithPath("leader.introduction").type("String").description("프로젝트 리더 소개"),
                                 fieldWithPath("leader.temperature").type("String").description("프로젝트 리더 온도"),
                                 fieldWithPath("leader.responseRate").type("Number").description("프로젝트 리더 응답률"),
-                                fieldWithPath("leader.parts[]").type("String[]").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[]").type("Part[]").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[].key").type("String").description("프로젝트 리더 분야 key"),
+                                fieldWithPath("leader.parts[].part").type("String").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[].category").type("String").description("프로젝트 리더 분야 카테고리"),
                                 fieldWithPath("leader.representProjects[]").type("RepresentProject[]").description("프로젝트 리더 대표 프로젝트"),
                                 fieldWithPath("leader.representProjects[].id").type("Number").description("프로젝트 리더 대표 프로젝트 ID"),
                                 fieldWithPath("leader.representProjects[].thumbnail").type("String").description("프로젝트 리더 대표 프로젝트 썸네일"),
@@ -447,7 +450,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(1L)).thenReturn(Mono.just(new Profile(
@@ -457,7 +460,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(2L)).thenReturn(Mono.just(new Profile(
@@ -467,7 +470,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(3L)).thenReturn(Mono.just(new Profile(
@@ -477,7 +480,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
 
@@ -501,7 +504,10 @@ class ProjectControllerTest {
                                 fieldWithPath("[].profile.introduction").type("String").description("프로필 소개"),
                                 fieldWithPath("[].profile.temperature").type("Number").description("온도"),
                                 fieldWithPath("[].profile.responseRate").type("Number").description("응답률"),
-                                fieldWithPath("[].profile.parts").type("String[]").description("프로필 직무"),
+                                fieldWithPath("[].profile.parts[]").type("Part[]").description("프로필 직무"),
+                                fieldWithPath("[].profile.parts[].key").type("String").description("프로필 직무 key"),
+                                fieldWithPath("[].profile.parts[].part").type("String").description("프로필 직무 분야"),
+                                fieldWithPath("[].profile.parts[].category").type("String").description("프로필 직무 카테고리"),
                                 fieldWithPath("[].profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
                                 fieldWithPath("[].profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
                                 fieldWithPath("[].profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),

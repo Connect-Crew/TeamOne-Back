@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -28,7 +28,7 @@ public class PartEntity {
     public ProjectPart toDomain() {
         return ProjectPart.builder()
                 .id(id)
-                .part(Part.valueOf(part))
+                .part(MemberPart.valueOf(part))
                 .comment(comment)
                 .current(collected)
                 .max(targetCollect)

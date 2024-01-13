@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberPartEntity;
@@ -11,7 +11,6 @@ import com.connectcrew.teamone.projectservice.member.application.port.out.FindMe
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
-import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Flux<Member> findAllByProject(Long project) {
         return partRepository.findAllByProject(project)
-                .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
                 .flatMapMany(idPartMap -> memberRepository.findAllByProjectId(project)
                         .flatMap(member -> memberPartRepository.findAllByMember(member.getId())
                                 .map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart())))
@@ -50,7 +49,7 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
         return memberRepository.findByProjectIdAndUser(project, user)
                 .flatMap(member -> memberPartRepository.findAllByMember(member.getId()).collectList()
                         .flatMap(parts -> partRepository.findAllById(parts.stream().map(MemberPartEntity::getPart).toList())
-                                .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
+                                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
                                 .map(idPartMap -> member.toDomain(parts.stream().map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart()))).toList()))
                         )
                 );
@@ -59,7 +58,7 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Flux<Apply> findAllByProjectAndUser(Long project, Long user) {
         return partRepository.findAllByProject(project)
-                .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
                 .flatMapMany(idPartMap -> applyRepository.findAllByProjectAndUser(project, user)
                         .map(apply -> apply.toDomain(idPartMap.get(apply.getPartId())))
                 );
@@ -80,13 +79,13 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Flux<Apply> findAllApplyByProject(Long projectId) {
         return partRepository.findAllByProject(projectId)
-                .collectMap(PartEntity::getId, p -> Part.valueOf(p.getPart()))
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
                 .flatMapMany(partMap -> applyRepository.findAllByProject(projectId)
                         .map(apply -> apply.toDomain(partMap.get(apply.getPartId()))));
     }
 
     @Override
-    public Flux<Apply> findAllApplyByProjectAndPart(Long projectId, Part part) {
+    public Flux<Apply> findAllApplyByProjectAndPart(Long projectId, MemberPart part) {
         return partRepository.findByProjectAndPart(projectId, part.name())
                 .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartId(projectId, partEntity.getId()))
                 .map(e -> e.toDomain(part));
@@ -96,19 +95,19 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     public Mono<Apply> findApplyById(Long applyId) {
         return applyRepository.findById(applyId)
                 .flatMap(apply -> partRepository.findById(apply.getPartId())
-                        .map(part -> apply.toDomain(Part.valueOf(part.getPart())))
+                        .map(part -> apply.toDomain(MemberPart.valueOf(part.getPart())))
                 );
     }
 
     @Override
     public Mono<Member> save(Member member) {
         List<Long> memberPartIds = member.parts().stream()
-                .map(MemberPart::id)
+                .map(com.connectcrew.teamone.projectservice.member.domain.MemberPart::id)
                 .filter(Objects::nonNull)
                 .toList();
 
-        Map<Long, Part> partMap = new HashMap<>();
-        for (MemberPart part : member.parts()) {
+        Map<Long, MemberPart> partMap = new HashMap<>();
+        for (com.connectcrew.teamone.projectservice.member.domain.MemberPart part : member.parts()) {
             partMap.put(part.partId(), part.part());
         }
 

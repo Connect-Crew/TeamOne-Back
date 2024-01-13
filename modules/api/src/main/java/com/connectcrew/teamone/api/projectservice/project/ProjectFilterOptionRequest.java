@@ -12,7 +12,7 @@ public record ProjectFilterOptionRequest(
         @RequestParam(required = false) Career career,
         @RequestParam(required = false) List<Region> region,
         @RequestParam(required = false) Boolean online,
-        @RequestParam(required = false) Part part,
+        @RequestParam(required = false) MemberPart part,
         @RequestParam(required = false) List<String> skills,
         @RequestParam(required = false) List<ProjectState> states,
         @RequestParam(required = false) List<ProjectCategory> category,

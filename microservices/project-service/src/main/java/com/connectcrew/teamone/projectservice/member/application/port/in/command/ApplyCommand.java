@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.application.port.in.command;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
@@ -8,7 +8,7 @@ import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
 public record ApplyCommand(
         Long userId,
         Long projectId,
-        Part part,
+        MemberPart part,
         String message
 ) {
 

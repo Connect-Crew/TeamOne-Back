@@ -3,7 +3,7 @@ package com.connectcrew.teamone.projectservice.project.application;
 import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
@@ -113,7 +113,7 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
     }
 
     @NotNull
-    private Mono<Project> validateUpdatedPart(Project origin, Member originLeader, Project updated, List<Part> updatedLeaderParts) {
+    private Mono<Project> validateUpdatedPart(Project origin, Member originLeader, Project updated, List<MemberPart> updatedLeaderParts) {
         Set<Long> originPartIds = origin.parts().stream()
                 .map(ProjectPart::id)
                 .collect(Collectors.toSet());

@@ -1,10 +1,10 @@
 package com.connectcrew.teamone.projectservice.member.adapter.in.web;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyResponse;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusResponse;
 import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
-import com.connectcrew.teamone.api.projectservice.member.MemberResponse;
+import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMemberUseCase;
@@ -39,7 +39,7 @@ public class MemberController {
     private final SendErrorNotificationUseCase sendErrorNotificationUseCase;
 
     @GetMapping("/members/{projectId}")
-    public Flux<MemberResponse> getProjectMembers(@PathVariable Long projectId) {
+    public Flux<MemberApiResponse> getProjectMembers(@PathVariable Long projectId) {
         log.trace("getProjectMembers - projectId: {}", projectId);
         return queryProjectUseCase.findLeaderByProject(projectId)
                 .doOnNext(leaderId -> log.trace("getProjectMembers - leaderId: {}", leaderId))
@@ -73,7 +73,7 @@ public class MemberController {
     }
 
     @GetMapping("/applies")
-    public Flux<ApplyResponse> getPartApplyList(Long projectId, Part part, Long userId) {
+    public Flux<ApplyResponse> getPartApplyList(Long projectId, MemberPart part, Long userId) {
         log.trace("getPartApplyList - projectId: {}, part: {}, userId: {}", projectId, part, userId);
         return queryMemberUseCase.findAllApplies(new ProjectApplyQuery(projectId, userId, part))
                 .map(Apply::toResponse);

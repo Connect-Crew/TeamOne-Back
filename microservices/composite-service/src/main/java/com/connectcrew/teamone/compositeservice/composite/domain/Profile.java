@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.domain;
 
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import lombok.Builder;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public record Profile(
         String introduction,
         Double temperature,
         Integer responseRate,
-        List<String> parts,
+        List<MemberPart> parts,
         List<Long> representProjects
 ) {
 }

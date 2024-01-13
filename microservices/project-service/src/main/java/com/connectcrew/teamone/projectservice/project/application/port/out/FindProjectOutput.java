@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.application.port.out;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
@@ -24,6 +24,6 @@ public interface FindProjectOutput {
     Mono<Boolean> existsById(Long projectId);
     Mono<Boolean> existsReportByProjectAndUser(Long project, Long user);
     Flux<ProjectPart> findAllProjectPartByProject(Long project);
-    Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, Part part);
+    Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, MemberPart part);
 
 }

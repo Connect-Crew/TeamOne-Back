@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.projectservice.member.domain;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusResponse;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 
 public record ApplyStatus(
-        Part part,
+        MemberPart part,
         int applies,
         int current,
         int max

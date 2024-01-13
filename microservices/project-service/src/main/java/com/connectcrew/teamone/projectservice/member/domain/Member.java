@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.domain;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
-import com.connectcrew.teamone.api.projectservice.member.MemberResponse;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
 import com.connectcrew.teamone.projectservice.member.domain.enums.MemberState;
 
 import java.util.HashMap;
@@ -12,20 +12,20 @@ public record Member(
         Long id,
         Long user,
         Long project,
-        List<MemberPart> parts,
+        List<com.connectcrew.teamone.projectservice.member.domain.MemberPart> parts,
         MemberState state
 ) {
-    public MemberResponse toResponse(Boolean isLeader) {
-        return new MemberResponse(user, isLeader, parts.stream().map(MemberPart::part).toList());
+    public MemberApiResponse toResponse(Boolean isLeader) {
+        return new MemberApiResponse(user, isLeader, parts.stream().map(com.connectcrew.teamone.projectservice.member.domain.MemberPart::part).toList());
     }
 
-    public boolean containPart(Part part) {
+    public boolean containPart(MemberPart part) {
         return parts.stream().anyMatch(p -> p.part().equals(part));
     }
 
-    public Member update(Map<Part, Long> partIdMap, List<Part> newParts) {
-        Map<Part, MemberPart> partMap = new HashMap<>();
-        for (MemberPart part : this.parts) {
+    public Member update(Map<MemberPart, Long> partIdMap, List<MemberPart> newParts) {
+        Map<MemberPart, com.connectcrew.teamone.projectservice.member.domain.MemberPart> partMap = new HashMap<>();
+        for (com.connectcrew.teamone.projectservice.member.domain.MemberPart part : this.parts) {
             partMap.put(part.part(), part);
         }
 
@@ -33,7 +33,7 @@ public record Member(
                 id,
                 user,
                 project,
-                newParts.stream().map(p -> partMap.getOrDefault(p, new MemberPart(null, partIdMap.get(p), id, p))).toList(),
+                newParts.stream().map(p -> partMap.getOrDefault(p, new com.connectcrew.teamone.projectservice.member.domain.MemberPart(null, partIdMap.get(p), id, p))).toList(),
                 state
         );
     }

@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.api.projectservice.member;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 
 public record ApplyRequest(
         Long userId,
         Long projectId,
-        Part part,
+        MemberPart part,
         String message
 ) {
 }

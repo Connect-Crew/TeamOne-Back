@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence;
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.*;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
@@ -109,7 +109,7 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
     }
 
     @Override
-    public Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, Part part) {
+    public Mono<ProjectPart> findProjectPartByProjectAndPart(Long project, MemberPart part) {
         return partRepository.findByProjectAndPart(project, part.name())
                 .map(PartEntity::toDomain);
     }

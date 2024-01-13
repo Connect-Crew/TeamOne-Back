@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response;
 
 import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
+import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public record ProfileResponse(
         String introduction,
         Double temperature,
         Integer responseRate,
-        List<String> parts,
+        List<MemberPart> parts,
         List<Long> representProjects
 ) {
     public Profile toDomain() {

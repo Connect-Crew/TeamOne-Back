@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.application.port.out;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import reactor.core.publisher.Flux;
@@ -19,7 +19,7 @@ public interface FindMemberOutput {
     Mono<Boolean> existsApplyByPartAndUser(Long partId, Long user);
 
     Flux<Apply> findAllApplyByProject(Long projectId);
-    Flux<Apply> findAllApplyByProjectAndPart(Long projectId, Part part);
+    Flux<Apply> findAllApplyByProjectAndPart(Long projectId, MemberPart part);
 
     Mono<Apply> findApplyById(Long applyId);
 }

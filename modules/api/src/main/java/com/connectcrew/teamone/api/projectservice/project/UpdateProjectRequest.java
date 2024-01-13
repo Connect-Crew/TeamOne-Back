@@ -15,7 +15,7 @@ public record UpdateProjectRequest(
         ProjectState state,
         Career careerMin,
         Career careerMax,
-        List<Part> leaderParts,
+        List<MemberPart> leaderParts,
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,

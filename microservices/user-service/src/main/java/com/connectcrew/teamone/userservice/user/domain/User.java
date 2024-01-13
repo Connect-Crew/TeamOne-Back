@@ -3,7 +3,7 @@ package com.connectcrew.teamone.userservice.user.domain;
 
 import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.api.userservice.user.Social;
-import com.connectcrew.teamone.api.userservice.user.UserResponse;
+import com.connectcrew.teamone.api.userservice.user.UserApiResponse;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -21,8 +21,8 @@ public record User(
         LocalDateTime createdDate,
         LocalDateTime modifiedDate
 ) {
-    public UserResponse toResponse() {
-        return UserResponse.builder()
+    public UserApiResponse toResponse() {
+        return UserApiResponse.builder()
                 .id(id)
                 .socialId(socialId)
                 .provider(provider)

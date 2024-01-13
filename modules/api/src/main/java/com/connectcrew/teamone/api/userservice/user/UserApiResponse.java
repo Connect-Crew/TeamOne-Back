@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record UserResponse(
+public record UserApiResponse(
         Long id,
         String socialId,
         Social provider,

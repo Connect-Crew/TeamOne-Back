@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
 import lombok.*;
@@ -38,7 +38,7 @@ public class ApplyEntity {
                 .build();
     }
 
-    public Apply toDomain(Part part) {
+    public Apply toDomain(MemberPart part) {
         return Apply.builder()
                 .id(id)
                 .projectId(project)

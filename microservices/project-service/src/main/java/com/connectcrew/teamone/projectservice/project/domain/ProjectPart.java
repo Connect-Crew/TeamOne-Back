@@ -1,13 +1,13 @@
 package com.connectcrew.teamone.projectservice.project.domain;
 
-import com.connectcrew.teamone.api.projectservice.enums.Part;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.project.RecruitStatusResponse;
 import lombok.Builder;
 
 @Builder
 public record ProjectPart(
         Long id,
-        Part part,
+        MemberPart part,
         String comment,
         Integer current,
         Integer max
