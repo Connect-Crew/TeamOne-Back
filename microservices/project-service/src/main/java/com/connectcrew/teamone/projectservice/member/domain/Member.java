@@ -12,11 +12,11 @@ public record Member(
         Long id,
         Long user,
         Long project,
-        List<com.connectcrew.teamone.projectservice.member.domain.MemberPart> parts,
+        List<ProjectMemberPart> parts,
         MemberState state
 ) {
     public MemberApiResponse toResponse(Boolean isLeader) {
-        return new MemberApiResponse(user, isLeader, parts.stream().map(com.connectcrew.teamone.projectservice.member.domain.MemberPart::part).toList());
+        return new MemberApiResponse(user, isLeader, parts.stream().map(ProjectMemberPart::part).toList());
     }
 
     public boolean containPart(MemberPart part) {
@@ -24,8 +24,8 @@ public record Member(
     }
 
     public Member update(Map<MemberPart, Long> partIdMap, List<MemberPart> newParts) {
-        Map<MemberPart, com.connectcrew.teamone.projectservice.member.domain.MemberPart> partMap = new HashMap<>();
-        for (com.connectcrew.teamone.projectservice.member.domain.MemberPart part : this.parts) {
+        Map<MemberPart, ProjectMemberPart> partMap = new HashMap<>();
+        for (ProjectMemberPart part : this.parts) {
             partMap.put(part.part(), part);
         }
 
@@ -33,7 +33,7 @@ public record Member(
                 id,
                 user,
                 project,
-                newParts.stream().map(p -> partMap.getOrDefault(p, new com.connectcrew.teamone.projectservice.member.domain.MemberPart(null, partIdMap.get(p), id, p))).toList(),
+                newParts.stream().map(p -> partMap.getOrDefault(p, new ProjectMemberPart(null, partIdMap.get(p), id, p))).toList(),
                 state
         );
     }

@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -21,8 +22,8 @@ public class MemberPartEntity {
 
     private Long part;
 
-    public com.connectcrew.teamone.projectservice.member.domain.MemberPart toDomain(MemberPart part) {
-        return new com.connectcrew.teamone.projectservice.member.domain.MemberPart(
+    public ProjectMemberPart toDomain(MemberPart part) {
+        return new ProjectMemberPart(
                 id,
                 this.part,
                 member,
@@ -30,7 +31,7 @@ public class MemberPartEntity {
         );
     }
 
-    public static MemberPartEntity from(com.connectcrew.teamone.projectservice.member.domain.MemberPart part, Long memberId) {
+    public static MemberPartEntity from(ProjectMemberPart part, Long memberId) {
         return MemberPartEntity.builder()
                 .id(part.id())
                 .member(memberId)

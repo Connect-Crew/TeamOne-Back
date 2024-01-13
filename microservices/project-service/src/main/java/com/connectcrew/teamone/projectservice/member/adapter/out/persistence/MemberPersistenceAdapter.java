@@ -11,6 +11,7 @@ import com.connectcrew.teamone.projectservice.member.application.port.out.FindMe
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
@@ -102,12 +103,12 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     @Override
     public Mono<Member> save(Member member) {
         List<Long> memberPartIds = member.parts().stream()
-                .map(com.connectcrew.teamone.projectservice.member.domain.MemberPart::id)
+                .map(ProjectMemberPart::id)
                 .filter(Objects::nonNull)
                 .toList();
 
         Map<Long, MemberPart> partMap = new HashMap<>();
-        for (com.connectcrew.teamone.projectservice.member.domain.MemberPart part : member.parts()) {
+        for (ProjectMemberPart part : member.parts()) {
             partMap.put(part.partId(), part.part());
         }
 

@@ -1,9 +1,11 @@
 package com.connectcrew.teamone.projectservice.member.domain;
 
-public record MemberPart(
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+
+public record ProjectMemberPart(
         Long id,
         Long partId,
         Long memberId,
-        com.connectcrew.teamone.api.projectservice.enums.MemberPart part
+        MemberPart part
 ) {
 }

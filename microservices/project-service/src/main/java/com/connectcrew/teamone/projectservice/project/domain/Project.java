@@ -6,7 +6,7 @@ import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.enums.Region;
 import com.connectcrew.teamone.api.projectservice.project.ProjectResponse;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
-import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.Builder;
 
@@ -50,7 +50,7 @@ public record Project(
                 .category(category.stream().map(Category::category).toList())
                 .goal(goal)
                 .leader(leader.user())
-                .leaderParts(leader.parts().stream().map(MemberPart::part).toList())
+                .leaderParts(leader.parts().stream().map(ProjectMemberPart::part).toList())
                 .introduction(introduction)
                 .favorite(favorite)
                 .recruitStatuses(parts.stream().map(r -> r.toResponse(user.applies().contains(r.part()) || user.members().contains(r.part()))).toList())

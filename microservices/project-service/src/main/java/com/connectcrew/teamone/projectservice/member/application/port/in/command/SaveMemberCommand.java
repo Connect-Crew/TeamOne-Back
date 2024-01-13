@@ -2,6 +2,7 @@ package com.connectcrew.teamone.projectservice.member.application.port.in.comman
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.enums.MemberState;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public record SaveMemberCommand(
                 null,
                 userId,
                 projectId,
-                parts.stream().map(p -> new com.connectcrew.teamone.projectservice.member.domain.MemberPart(null, partIdMap.get(p), userId, p)).toList(),
+                parts.stream().map(p -> new ProjectMemberPart(null, partIdMap.get(p), userId, p)).toList(),
                 MemberState.ACTIVE
         );
     }

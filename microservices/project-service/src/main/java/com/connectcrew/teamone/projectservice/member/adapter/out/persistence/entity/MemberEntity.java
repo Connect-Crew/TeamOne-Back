@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.projectservice.member.domain.Member;
-import com.connectcrew.teamone.projectservice.member.domain.MemberPart;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.enums.MemberState;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -24,7 +24,7 @@ public class MemberEntity {
     private Long projectId;
     private MemberState state;
 
-    public Member toDomain(List<MemberPart> parts) {
+    public Member toDomain(List<ProjectMemberPart> parts) {
         return new Member(
                 id,
                 user,
