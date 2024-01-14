@@ -39,7 +39,7 @@ public record FindProjectListQuery(
         return new ProjectFilterOptionApiRequest(
                 lastId,
                 size,
-                goal.name(),
+                goal,
                 career,
                 region,
                 online,

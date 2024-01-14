@@ -84,6 +84,7 @@ public class ProjectController {
         Long id = claim.id();
 
         return queryProjectUseCase.getProjectList(request.toQuery())
+                .doOnNext(projects -> log.trace("getProjectList - projects: {}", projects))
                 .flatMap(projects -> queryUserUseCase.isFavorite(id, FavoriteType.PROJECT, projects.stream().map(ProjectItem::id).toList())
                         .map(favoriteMap -> Tuples.of(projects, favoriteMap)))
                 .map(tuple -> tuple.getT1().stream()

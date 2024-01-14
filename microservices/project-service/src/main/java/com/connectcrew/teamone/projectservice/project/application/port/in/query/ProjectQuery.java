@@ -26,7 +26,7 @@ public record ProjectQuery(
         return new ProjectQuery(
                 request.lastId(),
                 request.size(),
-                request.goal() != null ? ProjectGoal.valueOf(request.goal()) : null,
+                request.goal(),
                 request.career(),
                 request.region(),
                 request.online(),

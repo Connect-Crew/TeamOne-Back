@@ -8,7 +8,7 @@ import java.util.List;
 public record ProjectFilterOptionApiRequest(
         @RequestParam(required = false, defaultValue = "-1") Integer lastId,
         int size,
-        @RequestParam(required = false) String goal,
+        @RequestParam(required = false) ProjectGoal goal,
         @RequestParam(required = false) Career career,
         @RequestParam(required = false) List<Region> region,
         @RequestParam(required = false) Boolean online,
