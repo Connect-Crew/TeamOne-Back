@@ -11,8 +11,10 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.connectcrew.teamone.projectservice.global.constants.PatternConstanst.UUID_PATTERNS;
 
@@ -34,6 +36,19 @@ public record SaveProjectCommand(
         List<String> skills
 ) {
     public static SaveProjectCommand from(CreateProjectApiRequest request) {
+        Map<MemberPart, CreateRecruitCommand> recruits = request.recruits().stream()
+                .map(CreateRecruitCommand::from)
+                .collect(Collectors.toMap(CreateRecruitCommand::part, r -> r));
+
+        for (MemberPart part : request.leaderParts()) {
+            if (!recruits.containsKey(part)) {
+                recruits.put(part, new CreateRecruitCommand(part,  "리더의 직무입니다.", 1L));
+            } else {
+                CreateRecruitCommand recruit = recruits.get(part);
+                recruits.put(part, new CreateRecruitCommand(part, recruit.comment(), recruit.max() + 1));
+            }
+        }
+
         return new SaveProjectCommand(
                 request.title(),
                 request.banners(),
@@ -48,7 +63,7 @@ public record SaveProjectCommand(
                 request.category(),
                 request.goal(),
                 request.introduction(),
-                request.recruits().stream().map(CreateRecruitCommand::from).toList(),
+                recruits.values().stream().toList(),
                 request.skills()
         );
     }
