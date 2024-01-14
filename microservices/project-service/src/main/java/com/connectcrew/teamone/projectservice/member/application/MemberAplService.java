@@ -164,30 +164,31 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     @Override
     @Transactional
     public Mono<Apply> accept(Long applyId, Long leaderId) {
-        return findMemberOutput.findApplyById(applyId)
-                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원을 찾을 수 없습니다.")))
-                .flatMap(apply -> findProjectOutput.findLeaderById(apply.projectId()).map(leader -> Tuples.of(leader, apply)))
-                .switchIfEmpty(Mono.error(new NotFoundException("해당 지원이 있는 프로젝트를 찾을 수 없습니다.")))
-                .flatMap(tuple -> {
-                    if (!tuple.getT1().equals(leaderId))
-                        return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
-
-                    return Mono.just(tuple.getT2());
-                })
+        return findApply(applyId, leaderId)
                 .map(Apply::accept)
                 .flatMap(saveMemberOutput::saveApply)
-                .flatMap(apply -> findMemberOutput.findByProjectAndUser(apply.projectId(), apply.userId())
-                        .defaultIfEmpty(new Member(apply.userId(), apply.projectId()))
-                        .map(member -> member.addPart(apply.part(), apply.partId()))
-                        .flatMap(saveMemberOutput::save)
-                        .thenReturn(apply)
-                )
-                .flatMap(apply -> updateProjectOutput.updateCollected(apply.partId(), 1).thenReturn(apply));
-                // TODO : 해당 직무 모집이 끝난경우 나머지 지원자들의 상태를 REJECT로 변경 및 메시지 알림
+                .flatMap(this::addMember)
+                .flatMap(apply -> addCollectOnPart(apply).map(part -> Tuples.of(apply, part)))
+                .flatMap(tuple -> rejectAnotherAppliesIfCollectCompleted(tuple.getT1(), tuple.getT2()));
+    }
+
+    private Mono<Apply> rejectAnotherAppliesIfCollectCompleted(Apply apply, ProjectPart part) {
+        // TODO : 해당 직무 모집이 끝난경우 나머지 지원자들의 상태를 REJECT로 변경 및 메시지 알림
+        return Mono.just(apply);
+    }
+
+    private Mono<ProjectPart> addCollectOnPart(Apply apply) {
+        return updateProjectOutput.updateCollected(apply.partId(), 1);
     }
 
     @Override
     public Mono<Apply> reject(Long applyId, Long leaderId) {
+        return findApply(applyId, leaderId)
+                .map(Apply::reject)
+                .flatMap(saveMemberOutput::saveApply);
+    }
+
+    private Mono<Apply> findApply(Long applyId, Long leaderId) {
         return findMemberOutput.findApplyById(applyId)
                 .switchIfEmpty(Mono.error(new NotFoundException("해당 지원을 찾을 수 없습니다.")))
                 .flatMap(apply -> findProjectOutput.findLeaderById(apply.projectId()).map(leader -> Tuples.of(leader, apply)))
@@ -197,8 +198,14 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                         return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
 
                     return Mono.just(tuple.getT2());
-                })
-                .map(Apply::reject)
-                .flatMap(saveMemberOutput::saveApply);
+                });
+    }
+
+    private Mono<Apply> addMember(Apply apply) {
+        return findMemberOutput.findByProjectAndUser(apply.projectId(), apply.userId())
+                .defaultIfEmpty(new Member(apply.userId(), apply.projectId()))
+                .map(member -> member.addPart(apply.part(), apply.partId()))
+                .flatMap(saveMemberOutput::save)
+                .thenReturn(apply);
     }
 }

@@ -1,7 +1,9 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectDetail;
+import com.connectcrew.teamone.compositeservice.composite.domain.RecruitStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,8 +48,13 @@ public record ProjectDetailResponse(
                 detail.favorite(),
                 myFavorite,
                 detail.chatRoomId(),
-                detail.recruitStatuses().stream().map(RecruitStatusResponse::new).toList(),
+                detail.recruitStatuses().stream().map(recruit -> new RecruitStatusResponse(recruit, containLeader(detail.leaderParts(), recruit))).toList(),
                 detail.skills()
         );
     }
+
+    private static boolean containLeader(List<MemberPart> leaderParts, RecruitStatus status) {
+        return leaderParts.contains(status.part());
+    }
+
 }

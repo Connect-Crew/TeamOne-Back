@@ -38,7 +38,7 @@ public record ProjectItemResponse(
                 myFavorite,
                 item.category().stream().map(ProjectCategory::getDescription).toList(),
                 item.goal().getDescription(),
-                item.recruitStatus().stream().map(RecruitStatusResponse::new).toList()
+                item.recruitStatus().stream().map(recruit -> new RecruitStatusResponse(recruit, false)).toList()
         );
     }
 }

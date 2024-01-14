@@ -4,6 +4,7 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respon
 import com.connectcrew.teamone.compositeservice.composite.domain.RecruitStatus;
 
 public record RecruitStatusResponse(
+        Boolean containLeader,
         String category,
         String part,
         String partKey,
@@ -12,8 +13,9 @@ public record RecruitStatusResponse(
         Long max,
         Boolean applied
 ) {
-    public RecruitStatusResponse(RecruitStatus recruitStatus) {
+    public RecruitStatusResponse(RecruitStatus recruitStatus, Boolean containLeader) {
         this(
+                containLeader,
                 recruitStatus.part().getCategory().getDescription(),
                 recruitStatus.part().getDescription(),
                 recruitStatus.part().name(),

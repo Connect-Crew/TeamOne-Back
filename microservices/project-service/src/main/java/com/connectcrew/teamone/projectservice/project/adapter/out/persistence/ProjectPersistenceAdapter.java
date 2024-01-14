@@ -205,10 +205,10 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
     }
 
     @Override
-    public Mono<Long> updateCollected(Long partId, Integer change) {
+    public Mono<ProjectPart> updateCollected(Long partId, Integer change) {
         return partRepository.findById(partId)
                 .map(entity -> entity.setCollected(entity.getCollected() + change))
                 .flatMap(partRepository::save)
-                .map(PartEntity::getCollected);
+                .map(PartEntity::toDomain);
     }
 }
