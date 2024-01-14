@@ -10,6 +10,7 @@ public record UpdateProjectApiRequest(
         Long userId,
         String title,
         List<String> banners,
+        List<String> removeBanners,
         Region region,
         Boolean online,
         ProjectState state,

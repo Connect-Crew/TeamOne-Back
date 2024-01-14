@@ -23,12 +23,13 @@ public record ModifyProjectRequest(
         List<CreateRecruitRequest> recruits,
         List<String> skills
 ) {
-    public ModifyProjectCommand toCommand(List<String> bannerPaths) {
+    public ModifyProjectCommand toCommand(List<String> bannerPaths, List<String> removeBannerPaths) {
         return new ModifyProjectCommand(
                 projectId,
                 userId,
                 title,
                 bannerPaths,
+                removeBannerPaths,
                 region,
                 online,
                 state,

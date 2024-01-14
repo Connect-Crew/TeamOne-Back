@@ -8,6 +8,7 @@ import com.connectcrew.teamone.projectservice.project.domain.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -20,6 +21,7 @@ public record UpdateProjectCommand(
         Long userId,
         String title,
         List<String> banners,
+        List<String> removeBanners,
         Region region,
         Boolean online,
         ProjectState state,
@@ -40,7 +42,7 @@ public record UpdateProjectCommand(
 
         for (MemberPart part : request.leaderParts()) {
             if (!recruits.containsKey(part)) {
-                recruits.put(part, new CreateRecruitCommand(part,  "리더의 직무입니다.", 1L));
+                recruits.put(part, new CreateRecruitCommand(part, "리더의 직무입니다.", 1L));
             } else {
                 CreateRecruitCommand recruit = recruits.get(part);
                 recruits.put(part, new CreateRecruitCommand(part, recruit.comment(), recruit.max() + 1));
@@ -52,6 +54,7 @@ public record UpdateProjectCommand(
                 request.userId(),
                 request.title(),
                 request.banners(),
+                request.removeBanners(),
                 request.region(),
                 request.online(),
                 request.state(),
@@ -69,7 +72,12 @@ public record UpdateProjectCommand(
     public Project toDomain(Project origin, Member originLeader) {
 
         Map<String, Long> bannerIdMap = origin.banners().stream()
+                .filter(b -> !removeBanners.contains(b.path()))
                 .collect(Collectors.toMap(Banner::path, Banner::id));
+
+        List<Banner> banners = new ArrayList<>();
+        bannerIdMap.forEach((k, v) -> banners.add(new Banner(v, k)));
+        this.banners.forEach(b -> new Banner(bannerIdMap.getOrDefault(b, null), b));
 
         Map<ProjectCategory, Long> categoryIdMap = origin.category().stream()
                 .collect(Collectors.toMap(Category::category, Category::id));
@@ -101,7 +109,7 @@ public record UpdateProjectCommand(
         return Project.builder()
                 .id(origin.id())
                 .title(title)
-                .banners(banners.stream().map(b -> new Banner(bannerIdMap.getOrDefault(b, null), b)).toList())
+                .banners(banners)
                 .region(region)
                 .online(online)
                 .state(state)

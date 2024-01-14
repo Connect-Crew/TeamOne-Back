@@ -261,17 +261,17 @@ public class ProjectController {
                         .recruits(tuple.getT3())
                         .skills(tuple.getT4().stream().map(this::removeQuotation).toList())
                         .build())
-                .flatMap(request -> removeRemovedBanners(removeBanners).thenReturn(request))
-                .flatMap(request -> saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
+                .flatMap(request -> removeRemovedBanners(removeBanners).map(removeBannerPathList -> Tuples.of(request, removeBannerPathList)))
+                .flatMap(tuple -> saveFileUseCase.saveBanners(FileCategory.BANNER, banner).collectList()
                         .doOnNext(bannerPaths -> log.trace("modifyProject - bannerPaths: {}", bannerPaths))
-                        .flatMap(bannerPaths -> updateProjectUseCase.update(request.toCommand(bannerPaths))
+                        .flatMap(bannerPaths -> updateProjectUseCase.update(tuple.getT1().toCommand(bannerPaths, tuple.getT2()))
                                 .onErrorResume(ex -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, bannerPaths).then(Mono.error(ex)))) // 프로젝트 글 작성 실패시 저장된 배너 삭제
                         // TODO 프로젝트 글 작성 실패시 채팅방 삭제
                         .map(SimpleLongResponse::new))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.createProject", ErrorLevel.ERROR, ex));
     }
 
-    private Mono<Boolean> removeRemovedBanners(Flux<String> removeBanners) {
+    private Mono<List<String>> removeRemovedBanners(Flux<String> removeBanners) {
         // TODO 수정하는 프로젝트의 Banner인지 확인
         return removeBanners
                 .map(path -> {
@@ -279,7 +279,7 @@ public class ProjectController {
                     return splitedPath[splitedPath.length - 1];
                 })
                 .collectList()
-                .flatMap(removeBannerPaths -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, removeBannerPaths));
+                .flatMap(removeBannerPaths -> deleteFileUseCase.deleteBanners(FileCategory.BANNER, removeBannerPaths).thenReturn(removeBannerPaths));
     }
 
 
