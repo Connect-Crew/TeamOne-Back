@@ -3,7 +3,7 @@ package com.connectcrew.teamone.api.userservice.user;
 import lombok.Builder;
 
 @Builder
-public record UserRegisterRequest(
+public record UserRegisterApiRequest(
         String socialId,
         Social provider,
         String username,

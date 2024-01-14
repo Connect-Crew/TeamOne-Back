@@ -8,8 +8,8 @@ public record RecruitStatusResponse(
         String part,
         String partKey,
         String comment,
-        Integer current,
-        Integer max,
+        Long current,
+        Long max,
         Boolean applied
 ) {
     public RecruitStatusResponse(RecruitStatus recruitStatus) {

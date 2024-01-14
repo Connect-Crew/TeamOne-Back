@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.application;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.UpdateProjectUseCase;
@@ -10,7 +11,6 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.F
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     @Override
     public Mono<List<ProjectItem>> getProjectList(FindProjectListQuery query) {
         log.trace("getProjectList: {}", query);
-        return findProjectOutput.findAllProjectItems(query.toDomain()).collectList();
+        return findProjectOutput.findAllProjectItems(query.toApiRequest()).collectList();
     }
 
     @Override
@@ -63,26 +63,26 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
 
     @Override
     public Mono<Long> save(CreateProjectCommand command) {
-        return saveProjectOutput.save(command.toDomain());
+        return saveProjectOutput.save(command.toApiRequest());
     }
 
     @Override
     public Mono<Boolean> save(Apply apply) {
-        return saveProjectOutput.save(apply);
+        return saveProjectOutput.save(apply.toApiRequest());
     }
 
     @Override
     public Mono<Boolean> save(Report report) {
-        return saveProjectOutput.save(report);
+        return saveProjectOutput.save(report.toApiRequest());
     }
 
     @Override
     public Mono<Integer> setFavorite(ProjectFavorite favorite) {
-        return updateProjectOutput.updateFavorite(favorite);
+        return updateProjectOutput.updateFavorite(favorite.toApiRequest());
     }
 
     @Override
     public Mono<Long> update(ModifyProjectCommand command) {
-        return updateProjectOutput.update(command.toDomain());
+        return updateProjectOutput.update(command.toApiRequest());
     }
 }

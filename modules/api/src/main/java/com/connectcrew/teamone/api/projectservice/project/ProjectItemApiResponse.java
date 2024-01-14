@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record ProjectItemResponse(
+public record ProjectItemApiResponse(
         Long id,
         String title,
         String thumbnail,
@@ -20,6 +20,6 @@ public record ProjectItemResponse(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
-        List<RecruitStatusResponse> recruitStatus
+        List<RecruitStatusApiResponse> recruitStatus
 ) {
 }

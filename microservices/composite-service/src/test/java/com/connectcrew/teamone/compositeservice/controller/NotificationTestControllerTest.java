@@ -1,12 +1,12 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.NotificationTestRequest;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.SimpleBooleanResponse;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
-import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

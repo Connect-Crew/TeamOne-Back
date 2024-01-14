@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
+
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 
 public record PartResponse(
         String key,

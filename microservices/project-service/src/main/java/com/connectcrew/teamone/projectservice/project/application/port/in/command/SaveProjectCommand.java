@@ -2,7 +2,7 @@ package com.connectcrew.teamone.projectservice.project.application.port.in.comma
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.api.projectservice.project.CreateProjectRequest;
+import com.connectcrew.teamone.api.projectservice.project.CreateProjectApiRequest;
 import com.connectcrew.teamone.projectservice.project.domain.Banner;
 import com.connectcrew.teamone.projectservice.project.domain.Category;
 import com.connectcrew.teamone.projectservice.project.domain.Project;
@@ -33,7 +33,7 @@ public record SaveProjectCommand(
         List<CreateRecruitCommand> recruits,
         List<String> skills
 ) {
-    public static SaveProjectCommand from(CreateProjectRequest request) {
+    public static SaveProjectCommand from(CreateProjectApiRequest request) {
         return new SaveProjectCommand(
                 request.title(),
                 request.banners(),

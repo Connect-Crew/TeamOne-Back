@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.domain.vo;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
+
+import com.connectcrew.teamone.api.projectservice.enums.*;
 
 import java.util.List;
 

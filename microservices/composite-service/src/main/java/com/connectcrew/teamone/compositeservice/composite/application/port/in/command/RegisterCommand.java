@@ -1,7 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in.command;
 
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
 import com.connectcrew.teamone.compositeservice.composite.domain.Register;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 
 public record RegisterCommand(
         String token,
@@ -27,5 +28,19 @@ public record RegisterCommand(
                 fcm
         );
 
+    }
+
+    public UserRegisterApiRequest toApiRequest(String socialId) {
+        return new UserRegisterApiRequest(
+                socialId,
+                social,
+                username,
+                nickname,
+                profile,
+                email,
+                termsAgreement,
+                privacyAgreement,
+                fcm
+        );
     }
 }

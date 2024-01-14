@@ -1,4 +1,4 @@
-package com.connectcrew.teamone.compositeservice.composite.domain.vo;
+package com.connectcrew.teamone.api.global;
 
 import java.util.List;
 

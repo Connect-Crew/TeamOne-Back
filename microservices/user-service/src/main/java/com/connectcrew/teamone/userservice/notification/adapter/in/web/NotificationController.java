@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.notification.adapter.in.web;
 
-import com.connectcrew.teamone.api.userservice.notification.push.SaveFcmTokenRequest;
+import com.connectcrew.teamone.api.userservice.notification.push.SaveFcmTokenApiRequest;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SaveFcmTokenUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
@@ -22,7 +22,7 @@ public class NotificationController {
     private final SaveFcmTokenUseCase saveFcmTokenUseCase;
 
     @PostMapping("/token")
-    public Mono<Boolean> saveToken(@RequestBody SaveFcmTokenRequest request) {
+    public Mono<Boolean> saveToken(@RequestBody SaveFcmTokenApiRequest request) {
         log.trace("saveToken - request: {}", request);
         return saveFcmTokenUseCase.saveFcmToken(request.id(), request.fcm())
                 .doOnNext(result -> System.out.println("NotificationController.saveToken - result: " + result))

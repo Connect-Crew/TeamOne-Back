@@ -1,5 +1,10 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.project.*;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
+import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.*;
@@ -8,14 +13,12 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ChatWe
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
-import com.connectcrew.teamone.compositeservice.global.enums.*;
+import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
+import com.connectcrew.teamone.compositeservice.global.enums.SkillType;
 import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
 import com.connectcrew.teamone.compositeservice.global.error.message.ProjectExceptionMessage;
@@ -117,36 +120,36 @@ class ProjectControllerTest {
                 new RecruitStatus(
                         MemberPart.PL_PM_PO,
                         "프로토타입 기획자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.UI_UX_DESIGNER,
                         "프로토타입 디자이너를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.AOS,
                         "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : true
                 ),
                 new RecruitStatus(
                         MemberPart.IOS,
                         "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.BACKEND,
                         "Spring 백엔드 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 )
         );
@@ -206,7 +209,7 @@ class ProjectControllerTest {
     void listTest() {
         List<ProjectItem> items = initItems();
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
+        when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOptionApiRequest.class))).thenReturn(Flux.fromIterable(items));
         when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
 
         webTestClient.get()
@@ -329,7 +332,7 @@ class ProjectControllerTest {
                 ProjectState.IN_PROGRESS,
                 Career.SEEKER,
                 Career.YEAR_1,
-                UUID.randomUUID().toString(),
+                UUID.randomUUID(),
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 0L,
@@ -521,7 +524,7 @@ class ProjectControllerTest {
     void createProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.just(0L));
+        when(projectWebAdapter.save(any(CreateProjectApiRequest.class))).thenReturn(Mono.just(0L));
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
         when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
 
@@ -540,11 +543,11 @@ class ProjectControllerTest {
         multipartData.add("category", ProjectCategory.ECOMMERCE.name());
         multipartData.add("goal", ProjectGoal.STARTUP.name());
         multipartData.add("introduction", "프로젝트 설명");
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L));
         multipartData.add("skills", SkillType.Swift.name());
         multipartData.add("skills", SkillType.Kotlin.name());
         multipartData.add("skills", SkillType.Spring.name());
@@ -591,7 +594,7 @@ class ProjectControllerTest {
     void createFailureTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
+        when(projectWebAdapter.save(any(CreateProjectApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
         when(staticFileAdapter.delete(any(FileCategory.class), anyString())).thenReturn(true);
         when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
@@ -608,11 +611,11 @@ class ProjectControllerTest {
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2)
+                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L)
                 ),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
@@ -645,7 +648,7 @@ class ProjectControllerTest {
     void updateProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.update(any(ModifyProjectInfo.class))).thenReturn(Mono.just(0L));
+        when(projectWebAdapter.update(any(UpdateProjectApiRequest.class))).thenReturn(Mono.just(0L));
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
 
         MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
@@ -665,11 +668,11 @@ class ProjectControllerTest {
         multipartData.add("category", ProjectCategory.ECOMMERCE.name());
         multipartData.add("goal", ProjectGoal.STARTUP.name());
         multipartData.add("introduction", "프로젝트 설명");
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L));
         multipartData.add("skills", SkillType.Swift.name());
         multipartData.add("skills", SkillType.Kotlin.name());
         multipartData.add("skills", SkillType.Spring.name());
@@ -746,7 +749,7 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(userWebAdapter.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
-        when(projectWebAdapter.updateFavorite(any(ProjectFavorite.class))).thenReturn(Mono.just(10));
+        when(projectWebAdapter.updateFavorite(any(ProjectFavoriteApiRequest.class))).thenReturn(Mono.just(10));
         when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
 
         webTestClient.post()
@@ -852,7 +855,7 @@ class ProjectControllerTest {
     void applyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.just(true));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -880,7 +883,7 @@ class ProjectControllerTest {
     void notfoundApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -904,7 +907,7 @@ class ProjectControllerTest {
     void invalidApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -928,7 +931,7 @@ class ProjectControllerTest {
     void reportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.just(true));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/report")
@@ -955,7 +958,7 @@ class ProjectControllerTest {
     void notfoundReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")
@@ -979,7 +982,7 @@ class ProjectControllerTest {
     void invalidReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")

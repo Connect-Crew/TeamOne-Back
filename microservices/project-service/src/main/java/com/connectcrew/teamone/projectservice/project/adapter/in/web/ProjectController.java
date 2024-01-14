@@ -43,7 +43,7 @@ public class ProjectController {
 
 
     @GetMapping("/list")
-    public Flux<ProjectItemResponse> getProjectList(ProjectFilterOptionRequest option) {
+    public Flux<ProjectItemApiResponse> getProjectList(ProjectFilterOptionApiRequest option) {
         log.trace("getProjectList - option: {}", option);
         return queryProjectUseCase.findAllByQuery(ProjectQuery.from(option))
                 .map(ProjectItem::toResponse)
@@ -51,7 +51,7 @@ public class ProjectController {
     }
 
     @GetMapping("/list/{userId}")
-    public Flux<ProjectItemResponse> getProjectList(@PathVariable Long userId) {
+    public Flux<ProjectItemApiResponse> getProjectList(@PathVariable Long userId) {
         log.trace("getProjectList - userId: {}", userId);
         return queryProjectUseCase.findAllByUserId(userId)
                 .map(ProjectItem::toResponse)
@@ -60,7 +60,7 @@ public class ProjectController {
 
     @PostMapping("/")
     @Transactional
-    public Mono<Long> createProject(@RequestBody CreateProjectRequest request) {
+    public Mono<Long> createProject(@RequestBody CreateProjectApiRequest request) {
         log.trace("createProject - request: {}", request);
         return saveProjectUseCase.saveProject(SaveProjectCommand.from(request))
                 .doOnNext(project -> log.trace("createProject - project: {}", project))
@@ -73,7 +73,7 @@ public class ProjectController {
 
     @PutMapping("/")
     @Transactional
-    public Mono<Long> updateProject(@RequestBody UpdateProjectRequest request) {
+    public Mono<Long> updateProject(@RequestBody UpdateProjectApiRequest request) {
         log.trace("updateProject - request: {}", request);
         return updateProjectUseCase.updateProject(UpdateProjectCommand.from(request))
                 .doOnNext(project -> log.trace("updateProject - project: {}", project))
@@ -85,7 +85,7 @@ public class ProjectController {
     }
 
     @GetMapping("/")
-    public Mono<ProjectResponse> findProject(Long id, Long userId) {
+    public Mono<ProjectApiResponse> findProject(Long id, Long userId) {
         log.trace("findProject - id: {}, userId: {}", id, userId);
         return queryProjectUseCase.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("존재하지 않는 프로젝트입니다.")))
@@ -114,7 +114,7 @@ public class ProjectController {
     }
 
     @PostMapping("/report")
-    public Mono<Boolean> reportProject(@RequestBody ReportRequest request) {
+    public Mono<Boolean> reportProject(@RequestBody ReportApiRequest request) {
         log.trace("reportProject - request: {}", request);
         return saveProjectUseCase.saveReport(SaveReportCommand.from(request))
                 .doOnNext(report -> log.trace("reportProject - report: {}", report))
@@ -123,7 +123,7 @@ public class ProjectController {
     }
 
     @PostMapping("/favorite")
-    public Mono<Integer> updateFavorite(@RequestBody ProjectFavoriteRequest request) {
+    public Mono<Integer> updateFavorite(@RequestBody ProjectFavoriteApiRequest request) {
         log.trace("updateFavorite - request: {}", request);
         return updateProjectUseCase.updateFavorite(FavoriteCommand.from(request))
                 .doOnNext(favorite -> log.trace("updateFavorite - favorite: {}", favorite))

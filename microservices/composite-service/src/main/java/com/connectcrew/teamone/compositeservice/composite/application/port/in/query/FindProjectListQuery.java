@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in.query;
 
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.ProjectFilterOptionApiRequest;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFilterOption;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
 
 import java.util.List;
 
@@ -24,6 +24,22 @@ public record FindProjectListQuery(
                 lastId,
                 size,
                 goal,
+                career,
+                region,
+                online,
+                part,
+                skills,
+                states,
+                category,
+                search
+        );
+    }
+
+    public ProjectFilterOptionApiRequest toApiRequest() {
+        return new ProjectFilterOptionApiRequest(
+                lastId,
+                size,
+                goal.name(),
                 career,
                 region,
                 online,

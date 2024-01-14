@@ -3,7 +3,7 @@ package com.connectcrew.teamone.userservice.user.application.in.command;
 
 import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.api.userservice.user.Social;
-import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.user.domain.User;
@@ -24,7 +24,7 @@ public record CreateUserCommand(
         String fcm
 ) {
 
-    public static CreateUserCommand from(UserRegisterRequest request) {
+    public static CreateUserCommand from(UserRegisterApiRequest request) {
         return CreateUserCommand.builder()
                 .socialId(request.socialId())
                 .provider(request.provider())

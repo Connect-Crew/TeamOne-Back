@@ -4,7 +4,7 @@ import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.config.TestConfig;
 import com.connectcrew.teamone.projectservice.member.adapter.in.web.MemberController;
-import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
@@ -50,8 +50,8 @@ public class MemberControllerTest {
                 .partCategory("testCategory")
                 .part(MemberPart.AOS.name())
                 .comment("testComment")
-                .collected(0)
-                .targetCollect(2)
+                .collected(0L)
+                .targetCollect(2L)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(projectRepository.findById(anyLong())).thenReturn(Mono.just(ProjectEntity.builder().leader(1L).build()));
@@ -62,7 +62,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -81,8 +81,8 @@ public class MemberControllerTest {
                 .partCategory("testCategory")
                 .part(MemberPart.AOS.name())
                 .comment("testComment")
-                .collected(0)
-                .targetCollect(2)
+                .collected(0L)
+                .targetCollect(2L)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(false));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
@@ -92,7 +92,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -113,7 +113,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -132,8 +132,8 @@ public class MemberControllerTest {
                 .partCategory("testCategory")
                 .part(MemberPart.AOS.name())
                 .comment("testComment")
-                .collected(2)
-                .targetCollect(2)
+                .collected(2L)
+                .targetCollect(2L)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
@@ -143,7 +143,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -162,8 +162,8 @@ public class MemberControllerTest {
                 .partCategory("testCategory")
                 .part(MemberPart.AOS.name())
                 .comment("testComment")
-                .collected(0)
-                .targetCollect(2)
+                .collected(0L)
+                .targetCollect(2L)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
@@ -173,7 +173,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
@@ -192,8 +192,8 @@ public class MemberControllerTest {
                 .partCategory("testCategory")
                 .part(MemberPart.AOS.name())
                 .comment("testComment")
-                .collected(0)
-                .targetCollect(2)
+                .collected(0L)
+                .targetCollect(2L)
                 .build();
         when(projectRepository.existsById(anyLong())).thenReturn(Mono.just(true));
         when(partRepository.findByProjectAndPart(anyLong(), anyString())).thenReturn(Mono.just(part));
@@ -203,7 +203,7 @@ public class MemberControllerTest {
 
         webTestClient.post()
                 .uri("/member/apply")
-                .bodyValue(new ApplyRequest(
+                .bodyValue(new ApplyApiRequest(
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,

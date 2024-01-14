@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.userservice.controller;
 
-import com.connectcrew.teamone.api.userservice.notification.push.SaveFcmTokenRequest;
+import com.connectcrew.teamone.api.userservice.notification.push.SaveFcmTokenApiRequest;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.notification.adapter.in.web.NotificationController;
 import com.connectcrew.teamone.userservice.notification.adapter.out.messaging.FcmMessageAdapter;
@@ -100,7 +100,7 @@ class NotificationControllerTest {
 
         webTestClient.post()
                 .uri("/notification/token")
-                .bodyValue(new SaveFcmTokenRequest(0L, "fcm"))
+                .bodyValue(new SaveFcmTokenApiRequest(0L, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Boolean.class);

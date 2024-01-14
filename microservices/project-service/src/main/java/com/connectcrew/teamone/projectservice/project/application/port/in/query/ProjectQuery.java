@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.application.port.in.query;
 
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.api.projectservice.project.ProjectFilterOptionRequest;
+import com.connectcrew.teamone.api.projectservice.project.ProjectFilterOptionApiRequest;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectOption;
 import lombok.Builder;
 
@@ -22,7 +22,7 @@ public record ProjectQuery(
         String search
 ) {
 
-    public static ProjectQuery from(ProjectFilterOptionRequest request) {
+    public static ProjectQuery from(ProjectFilterOptionApiRequest request) {
         return new ProjectQuery(
                 request.lastId(),
                 request.size(),

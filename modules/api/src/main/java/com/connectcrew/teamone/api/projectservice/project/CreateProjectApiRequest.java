@@ -6,7 +6,7 @@ import com.connectcrew.teamone.api.projectservice.enums.*;
 import java.util.List;
 import java.util.UUID;
 
-public record CreateProjectRequest(
+public record CreateProjectApiRequest(
         String title,
         List<String> banners,
         Region region,
@@ -20,7 +20,7 @@ public record CreateProjectRequest(
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,
-        List<CreateRecruitRequest> recruits,
+        List<CreateRecruitApiRequest> recruits,
         List<String> skills
 ) {
 }

@@ -4,7 +4,7 @@ import com.connectcrew.teamone.api.projectservice.enums.Career;
 import com.connectcrew.teamone.api.projectservice.enums.ProjectGoal;
 import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.enums.Region;
-import com.connectcrew.teamone.api.projectservice.project.ProjectResponse;
+import com.connectcrew.teamone.api.projectservice.project.ProjectApiResponse;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
@@ -35,8 +35,8 @@ public record Project(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public ProjectResponse toResponse(Member leader, UserRelationWithProject user) {
-        return ProjectResponse.builder()
+    public ProjectApiResponse toResponse(Member leader, UserRelationWithProject user) {
+        return ProjectApiResponse.builder()
                 .id(id)
                 .title(title)
                 .banners(banners.stream().map(Banner::path).toList())

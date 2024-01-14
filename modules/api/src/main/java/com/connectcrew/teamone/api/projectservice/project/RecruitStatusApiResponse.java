@@ -5,12 +5,12 @@ import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import lombok.Builder;
 
 @Builder
-public record RecruitStatusResponse (
+public record RecruitStatusApiResponse(
         MemberPartCategory category,
         MemberPart part,
         String comment,
-        Integer current,
-        Integer max,
+        Long current,
+        Long max,
         boolean applied
 ){
 }

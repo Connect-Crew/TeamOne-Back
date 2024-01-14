@@ -77,17 +77,17 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                 .flatMap(partIdMap -> saveMemberOutput.save(command.toDomain(partIdMap)));
     }
 
-        @Override
-        public Mono<Apply> apply(ApplyCommand command) {
-            return checkProjectExits(command.projectId())
-                    .then(findProjectOutput.findProjectPartByProjectAndPart(command.projectId(), command.part()))
-                    .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
-                    .flatMap(this::checkNumberOfMember)
-                    .flatMap(part -> checkAlreadyPartMember(part, command.userId()))
-                    .flatMap(part -> checkAlreadyApply(part, command.userId()))
-                    .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())));
+    @Override
+    public Mono<Apply> apply(ApplyCommand command) {
+        return checkProjectExits(command.projectId())
+                .then(findProjectOutput.findProjectPartByProjectAndPart(command.projectId(), command.part()))
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())))
+                .flatMap(this::checkNumberOfMember)
+                .flatMap(part -> checkAlreadyPartMember(part, command.userId()))
+                .flatMap(part -> checkAlreadyApply(part, command.userId()))
+                .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())));
 
-        }
+    }
 
     private Mono<Boolean> checkProjectExits(Long projectId) {
         return findProjectOutput.existsById(projectId)
@@ -136,7 +136,6 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     }
 
 
-
     @Override
     public Flux<Apply> findAllApplies(ProjectApplyQuery query) {
         return findProjectOutput.findLeaderById(query.projectId())
@@ -154,7 +153,7 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                 .collectList()
                 .map(applyList -> applyList.stream().collect(Collectors.groupingBy(Apply::part)))
                 .flatMapMany(applyMap -> findProjectOutput.findAllProjectPartByProject(query.projectId())
-                        .map(recruitStatus -> ApplyStatus.of(recruitStatus, applyMap.getOrDefault(recruitStatus.part(), List.of()).size()))
+                        .map(recruitStatus -> ApplyStatus.of(recruitStatus, (long) applyMap.getOrDefault(recruitStatus.part(), List.of()).size()))
                 );
     }
 

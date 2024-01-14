@@ -3,7 +3,7 @@ package com.connectcrew.teamone.userservice.controller;
 import com.connectcrew.teamone.api.exception.ErrorInfo;
 import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.api.userservice.user.Social;
-import com.connectcrew.teamone.api.userservice.user.UserRegisterRequest;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
 import com.connectcrew.teamone.api.userservice.user.UserApiResponse;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.notification.adapter.out.persistence.entity.FcmEntity;
@@ -95,18 +95,18 @@ class AuthControllerTest {
 
     static Stream<Arguments> registerFailArgs() {
         return Stream.of(
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, "fcm"), UserExceptionMessage.TERMS_AGREEMENT_REQUIRED.getMessage()),
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, "fcm"), UserExceptionMessage.PRIVACY_AGREEMENT_REQUIRED.getMessage()),
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_LESS_2.getMessage()),
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_OVER_10.getMessage()),
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.SPACE_OR_SPECIAL_CHARACTER_IN_NAME.getMessage()),
-                Arguments.of(new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.DUPLICATE_NICKNAME.getMessage())
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", false, true, "fcm"), UserExceptionMessage.TERMS_AGREEMENT_REQUIRED.getMessage()),
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, false, "fcm"), UserExceptionMessage.PRIVACY_AGREEMENT_REQUIRED.getMessage()),
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "T", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_LESS_2.getMessage()),
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNickOver10Length", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.NAME_LENGTH_OVER_10.getMessage()),
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "Test Nick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.SPACE_OR_SPECIAL_CHARACTER_IN_NAME.getMessage()),
+                Arguments.of(new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "dupNick", null, "Test@Test.com", true, true, "fcm"), UserExceptionMessage.DUPLICATE_NICKNAME.getMessage())
         );
     }
 
     @ParameterizedTest
     @MethodSource("registerFailArgs")
-    void registerFailTest(UserRegisterRequest param, String expectMessage) {
+    void registerFailTest(UserRegisterApiRequest param, String expectMessage) {
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -128,7 +128,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/user/")
-                .body(Mono.just(param), UserRegisterRequest.class)
+                .body(Mono.just(param), UserRegisterApiRequest.class)
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
@@ -140,7 +140,7 @@ class AuthControllerTest {
     // 중복 회원가입 테스트
     @Test
     void duplicateRegisterTest() {
-        UserRegisterRequest param = new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
+        UserRegisterApiRequest param = new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -161,7 +161,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/user/")
-                .body(Mono.just(param), UserRegisterRequest.class)
+                .body(Mono.just(param), UserRegisterApiRequest.class)
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorInfo.class)
@@ -172,7 +172,7 @@ class AuthControllerTest {
 
     @Test
     void registerTest() {
-        UserRegisterRequest param = new UserRegisterRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
+        UserRegisterApiRequest param = new UserRegisterApiRequest("TestSocial", Social.GOOGLE, "TestUser", "TestNick", null, "Test@Test.com", true, true, "fcm");
         UserEntity user = UserEntity.builder()
                 .id(10L)
                 .provider(Social.GOOGLE.name())
@@ -195,7 +195,7 @@ class AuthControllerTest {
 
         webTestClient.post()
                 .uri("/user/")
-                .body(Mono.just(param), UserRegisterRequest.class)
+                .body(Mono.just(param), UserRegisterApiRequest.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UserApiResponse.class);

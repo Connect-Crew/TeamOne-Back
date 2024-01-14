@@ -1,7 +1,11 @@
 package com.connectcrew.teamone.api.projectservice.enums;
 
+import com.connectcrew.teamone.api.global.NameKey;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -23,4 +27,9 @@ public enum ProjectCategory {
     ETC("기타");
 
     private final String description;
+
+    public static List<NameKey> getNameKeys() {
+        return Arrays.stream(ProjectCategory.values()).map(r -> new NameKey(r.description, r.name())).toList();
+    }
+
 }

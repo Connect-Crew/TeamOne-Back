@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.domain;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
-import com.connectcrew.teamone.api.projectservice.project.RecruitStatusResponse;
+import com.connectcrew.teamone.api.projectservice.project.RecruitStatusApiResponse;
 import lombok.Builder;
 
 @Builder
@@ -9,11 +9,11 @@ public record ProjectPart(
         Long id,
         MemberPart part,
         String comment,
-        Integer current,
-        Integer max
+        Long current,
+        Long max
 ) {
 
-    public ProjectPart update(String comment, Integer current, Integer max) {
+    public ProjectPart update(String comment, Long current, Long max) {
         return new ProjectPart(
                 id,
                 part,
@@ -23,8 +23,8 @@ public record ProjectPart(
         );
     }
 
-    public RecruitStatusResponse toResponse(boolean applied) {
-        return RecruitStatusResponse.builder()
+    public RecruitStatusApiResponse toResponse(boolean applied) {
+        return RecruitStatusApiResponse.builder()
                 .category(part.getCategory())
                 .part(part)
                 .comment(comment)

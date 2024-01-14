@@ -1,8 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in.command;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.UpdateProjectApiRequest;
 
 import java.util.List;
 
@@ -23,8 +22,8 @@ public record ModifyProjectCommand(
         List<CreateRecruitCommand> recruits,
         List<String> skills
 ) {
-    public ModifyProjectInfo toDomain() {
-        return new ModifyProjectInfo(
+    public UpdateProjectApiRequest toApiRequest() {
+        return new UpdateProjectApiRequest(
                 projectId,
                 userId,
                 title,
@@ -38,7 +37,7 @@ public record ModifyProjectCommand(
                 category,
                 goal,
                 introduction,
-                recruits.stream().map(CreateRecruitCommand::toDomain).toList(),
+                recruits.stream().map(CreateRecruitCommand::toApiRequest).toList(),
                 skills
         );
     }

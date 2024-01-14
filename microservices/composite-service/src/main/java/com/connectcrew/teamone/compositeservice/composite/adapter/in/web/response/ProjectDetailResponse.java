@@ -1,10 +1,11 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response;
 
+import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectDetail;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.ProjectCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record ProjectDetailResponse(
         Long id,
@@ -22,7 +23,7 @@ public record ProjectDetailResponse(
         String introduction,
         Integer favorite,
         Boolean myFavorite,
-        String chatRoomId,
+        UUID chatRoomId,
         List<RecruitStatusResponse> recruitStatus,
         List<String> skills
 ) {

@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.projectservice.member.adapter.in.web;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
-import com.connectcrew.teamone.api.projectservice.leader.ApplyResponse;
-import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusResponse;
-import com.connectcrew.teamone.api.projectservice.member.ApplyRequest;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
 import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
@@ -53,7 +53,7 @@ public class MemberController {
 
     @PostMapping("/member/apply")
     @Transactional
-    public Mono<Boolean> apply(@RequestBody ApplyRequest request) {
+    public Mono<Boolean> apply(@RequestBody ApplyApiRequest request) {
         log.trace("apply - request: {}", request);
         return saveMemberUseCase.apply(ApplyCommand.from(request))
                 .flatMap(apply -> sendNotificationUseCase.sendToLeader(
@@ -66,14 +66,14 @@ public class MemberController {
     }
 
     @GetMapping("/applyStatus")
-    public Flux<ApplyStatusResponse> getApplyList(Long projectId, Long userId) {
+    public Flux<ApplyStatusApiResponse> getApplyList(Long projectId, Long userId) {
         log.trace("getApplyList - projectId: {}, userId: {}", projectId, userId);
         return queryMemberUseCase.findAllApplyStatus(new ProjectApplyStatusQuery(projectId, userId))
                 .map(ApplyStatus::toResponse);
     }
 
     @GetMapping("/applies")
-    public Flux<ApplyResponse> getPartApplyList(Long projectId, MemberPart part, Long userId) {
+    public Flux<ApplyApiResponse> getPartApplyList(Long projectId, MemberPart part, Long userId) {
         log.trace("getPartApplyList - projectId: {}, part: {}, userId: {}", projectId, part, userId);
         return queryMemberUseCase.findAllApplies(new ProjectApplyQuery(projectId, userId, part))
                 .map(Apply::toResponse);
@@ -81,7 +81,7 @@ public class MemberController {
 
     @PostMapping("/apply/{applyId}/leader/{leaderId}/accept")
     @Transactional
-    public Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyApiResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
         log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, leaderId);
         return updateMemberUseCase.accept(applyId, leaderId)
                 .map(Apply::toResponse);
@@ -89,7 +89,7 @@ public class MemberController {
 
     @DeleteMapping("/apply/{applyId}/leader/{leaderId}/reject")
     @Transactional
-    public Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyApiResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, leaderId);
         return updateMemberUseCase.reject(applyId, leaderId)
                 .map(Apply::toResponse);

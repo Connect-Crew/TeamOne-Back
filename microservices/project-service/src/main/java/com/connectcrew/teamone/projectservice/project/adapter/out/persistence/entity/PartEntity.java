@@ -22,8 +22,8 @@ public class PartEntity {
     private String partCategory;
     private String part;
     private String comment;
-    private Integer collected;
-    private Integer targetCollect;
+    private Long collected;
+    private Long targetCollect;
 
     public ProjectPart toDomain() {
         return ProjectPart.builder()

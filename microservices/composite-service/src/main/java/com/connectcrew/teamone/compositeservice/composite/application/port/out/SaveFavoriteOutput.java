@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
-import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import reactor.core.publisher.Mono;
 
 public interface SaveFavoriteOutput {

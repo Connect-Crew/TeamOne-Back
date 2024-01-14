@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.projectservice.project.application.port.in.command;
 
-import com.connectcrew.teamone.api.projectservice.project.ReportRequest;
+import com.connectcrew.teamone.api.projectservice.project.ReportApiRequest;
 import com.connectcrew.teamone.projectservice.project.domain.Report;
 
 public record SaveReportCommand(
@@ -8,7 +8,7 @@ public record SaveReportCommand(
         Long projectId,
         String reason
 ) {
-    public static SaveReportCommand from(ReportRequest request) {
+    public static SaveReportCommand from(ReportApiRequest request) {
         return new SaveReportCommand(
                 request.userId(),
                 request.projectId(),

@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.auth.application;
 
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -2,7 +2,7 @@ package com.connectcrew.teamone.projectservice.project.application.port.in.comma
 
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.api.projectservice.project.UpdateProjectRequest;
+import com.connectcrew.teamone.api.projectservice.project.UpdateProjectApiRequest;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.project.domain.*;
 import reactor.core.publisher.Mono;
@@ -33,7 +33,7 @@ public record UpdateProjectCommand(
         List<String> skills
 ) {
 
-    public static UpdateProjectCommand from(UpdateProjectRequest request) {
+    public static UpdateProjectCommand from(UpdateProjectApiRequest request) {
         return new UpdateProjectCommand(
                 request.projectId(),
                 request.userId(),
@@ -71,7 +71,7 @@ public record UpdateProjectCommand(
                     if (partProjectPartMap.containsKey(r.part())) {
                         ProjectPart projectPart = partProjectPartMap.get(r.part());
 
-                        int current = projectPart.current();
+                        long current = projectPart.current();
                         if (originLeader.containPart(r.part()) && !leaderParts.contains(r.part())) {
                             current--; // 기존에는 담당 파트였지만, 이번에는 담당 파트가 아닌 경우
                         } else if (!originLeader.containPart(r.part()) && leaderParts.contains(r.part())) {

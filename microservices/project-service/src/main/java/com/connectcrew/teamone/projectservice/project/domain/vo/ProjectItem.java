@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.domain.vo;
 
 import com.connectcrew.teamone.api.projectservice.enums.*;
-import com.connectcrew.teamone.api.projectservice.project.ProjectItemResponse;
+import com.connectcrew.teamone.api.projectservice.project.ProjectItemApiResponse;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import lombok.Builder;
 
@@ -24,8 +24,8 @@ public record ProjectItem(
         ProjectGoal goal,
         List<ProjectPart> recruitStatus
 ) {
-    public ProjectItemResponse toResponse() {
-        return ProjectItemResponse.builder()
+    public ProjectItemApiResponse toResponse() {
+        return ProjectItemApiResponse.builder()
                 .id(id)
                 .title(title)
                 .thumbnail(thumbnail)

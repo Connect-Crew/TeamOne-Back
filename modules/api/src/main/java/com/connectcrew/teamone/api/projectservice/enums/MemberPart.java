@@ -1,7 +1,14 @@
 package com.connectcrew.teamone.api.projectservice.enums;
 
+import com.connectcrew.teamone.api.global.NameKey;
+import com.connectcrew.teamone.api.global.NameKeyValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
@@ -132,4 +139,19 @@ public enum MemberPart {
 
     private final MemberPartCategory category;
     private final String description;
+
+    public static List<NameKeyValue<NameKey>> getNameKeyValues() {
+        List<NameKeyValue<NameKey>> result = new ArrayList<>();
+
+        Map<MemberPartCategory, List<NameKey>> partMap = new HashMap<>();
+        for (MemberPart part : MemberPart.values()) {
+            partMap.computeIfAbsent(part.category, k -> new ArrayList<>()).add(new NameKey(part.description, part.name()));
+        }
+
+        for (MemberPartCategory category : partMap.keySet()) {
+            result.add(new NameKeyValue<>(category.getDescription(), category.name(), partMap.get(category)));
+        }
+
+        return result;
+    }
 }

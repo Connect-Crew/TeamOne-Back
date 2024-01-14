@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web;
 
+import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
@@ -10,7 +11,6 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.RefreshResponse;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.AuthUserUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProfileUseCase;
-import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.error.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.compositeservice.global.error.enums.ErrorLevel;
 import jakarta.annotation.PostConstruct;

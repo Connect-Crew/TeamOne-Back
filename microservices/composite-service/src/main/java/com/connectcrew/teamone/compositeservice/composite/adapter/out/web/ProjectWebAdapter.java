@@ -1,25 +1,22 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.MemberResponse;
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectDetailResponse;
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectItemResponse;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
+import com.connectcrew.teamone.api.projectservice.project.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
 import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Flux<ProjectItem> findAllProjectItems(ProjectFilterOption option) {
+    public Flux<ProjectItem> findAllProjectItems(ProjectFilterOptionApiRequest option) {
         String[] host = this.host.replace("http://", "").split(":");
 
         return webClient.get()
@@ -54,7 +51,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .path("/project/list")
                         .queryParam("lastId", option.lastId())
                         .queryParam("size", option.size())
-                        .queryParam("goal", option.goal() != null ? option.goal().name() : null)
+                        .queryParam("goal", option.goal() != null ? option.goal() : null)
                         .queryParam("career", option.career() != null ? option.career().name() : null)
                         .queryParam("region", option.region() != null ? option.region().stream().map(Enum::name).toList() : null)
                         .queryParam("online", option.online())
@@ -66,9 +63,9 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .build()
                 )
                 .retrieve()
-                .bodyToFlux(ProjectItemResponse.class)
+                .bodyToFlux(ProjectItemApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(ProjectItemResponse::toDomain);
+                .map(ProjectItem::of);
     }
 
     @Override
@@ -76,9 +73,9 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/project/%d", host, userId))
                 .retrieve()
-                .bodyToFlux(ProjectItemResponse.class)
+                .bodyToFlux(ProjectItemApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(ProjectItemResponse::toDomain);
+                .map(ProjectItem::of);
     }
 
     @Override
@@ -86,22 +83,20 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/project/?id=%d&userId=%d", host, projectId, userId))
                 .retrieve()
-                .bodyToMono(ProjectDetailResponse.class)
+                .bodyToMono(ProjectApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(ProjectDetailResponse::toDomain);
+                .map(ProjectDetail::of);
     }
 
     @Override
     public Flux<ProjectMember> findMembers(Long projectId) {
-        ParameterizedTypeReference<List<MemberResponse>> type = new ParameterizedTypeReference<>() {
-        };
 
         return webClient.get()
                 .uri(String.format("%s/members/%d", host, projectId))
                 .retrieve()
-                .bodyToFlux(MemberResponse.class)
+                .bodyToFlux(MemberApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(MemberResponse::toDomain);
+                .map(ProjectMember::of);
     }
 
     @Override
@@ -109,7 +104,8 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/leader/applies?userId=%d&projectId=%d&part=%s", host, userId, projectId, part.name()))
                 .retrieve()
-                .bodyToFlux(Apply.class)
+                .bodyToFlux(ApplyApiResponse.class)
+                .map(Apply::of)
                 .onErrorResume(exHandler::handleException);
     }
 
@@ -118,12 +114,13 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/leader/applyStatus?userId=%d&projectId=%d", host, userId, projectId))
                 .retrieve()
-                .bodyToFlux(ApplyStatus.class)
+                .bodyToFlux(ApplyStatusApiResponse.class)
+                .map(ApplyStatus::of)
                 .onErrorResume(exHandler::handleException);
     }
 
     @Override
-    public Mono<Long> save(CreateProjectInfo input) {
+    public Mono<Long> save(CreateProjectApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/project/", host))
                 .bodyValue(input)
@@ -133,7 +130,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(Apply input) {
+    public Mono<Boolean> save(ApplyApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/member/apply", host))
                 .bodyValue(input)
@@ -143,7 +140,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(Report input) {
+    public Mono<Boolean> save(ReportApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/project/report", host))
                 .bodyValue(input)
@@ -153,7 +150,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Integer> updateFavorite(ProjectFavorite favorite) {
+    public Mono<Integer> updateFavorite(ProjectFavoriteApiRequest favorite) {
         return webClient.post()
                 .uri(String.format("%s/project/favorite", host))
                 .bodyValue(favorite)
@@ -163,7 +160,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Long> update(ModifyProjectInfo project) {
+    public Mono<Long> update(UpdateProjectApiRequest project) {
         return webClient.put()
                 .uri(String.format("%s/project/", host))
                 .bodyValue(project)

@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

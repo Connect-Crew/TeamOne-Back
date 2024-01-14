@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record ProjectResponse(
+public record ProjectApiResponse(
         Long id,
         String title,
         List<String> banners,
@@ -25,7 +25,7 @@ public record ProjectResponse(
         List<MemberPart> leaderParts,
         String introduction,
         Integer favorite,
-        List<RecruitStatusResponse> recruitStatuses,
+        List<RecruitStatusApiResponse> recruitStatuses,
         List<String> skills
 ) {
 }

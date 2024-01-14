@@ -1,5 +1,9 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
 import com.connectcrew.teamone.compositeservice.auth.application.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
@@ -12,13 +16,9 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
-import com.connectcrew.teamone.compositeservice.composite.domain.Register;
 import com.connectcrew.teamone.compositeservice.composite.domain.User;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
-import com.connectcrew.teamone.compositeservice.global.enums.Role;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
 import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
@@ -199,7 +199,7 @@ class UserControllerTest {
         Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS, MemberPart.AOS), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
-        when(userWebAdapter.save(any(Register.class))).thenReturn(Mono.just(user));
+        when(userWebAdapter.save(any(UserRegisterApiRequest.class))).thenReturn(Mono.just(user));
         when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
@@ -274,7 +274,7 @@ class UserControllerTest {
     @Test
     void invalidRegisterTest() {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
-        when(userWebAdapter.save(any(Register.class))).thenReturn(Mono.error(new IllegalArgumentException("공백과 특수문자는 들어갈 수 없어요.")));
+        when(userWebAdapter.save(any(UserRegisterApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException("공백과 특수문자는 들어갈 수 없어요.")));
 
         webTestClient.post()
                 .uri("/auth/register")

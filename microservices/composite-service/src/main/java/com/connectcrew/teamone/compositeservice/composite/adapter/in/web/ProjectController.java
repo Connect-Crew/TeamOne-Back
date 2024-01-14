@@ -1,5 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web;
 
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.*;
@@ -10,14 +12,11 @@ import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
 import com.connectcrew.teamone.compositeservice.composite.domain.ApplyStatus;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.DeleteFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.QueryFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.application.port.in.SaveFileUseCase;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
-import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
 import com.connectcrew.teamone.compositeservice.global.error.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.compositeservice.global.error.enums.ErrorLevel;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.ModifyProjectInfo;
+import com.connectcrew.teamone.api.projectservice.project.ProjectFavoriteApiRequest;
+import com.connectcrew.teamone.api.projectservice.project.UpdateProjectApiRequest;
 import reactor.core.publisher.Mono;
 
 public interface UpdateProjectOutput {
-    Mono<Integer> updateFavorite(ProjectFavorite favorite);
+    Mono<Integer> updateFavorite(ProjectFavoriteApiRequest favorite);
 
-    Mono<Long> update(ModifyProjectInfo project);
+    Mono<Long> update(UpdateProjectApiRequest project);
 }

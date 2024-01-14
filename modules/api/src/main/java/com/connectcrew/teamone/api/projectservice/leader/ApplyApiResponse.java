@@ -1,8 +1,9 @@
-package com.connectcrew.teamone.api.projectservice.member;
+package com.connectcrew.teamone.api.projectservice.leader;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 
-public record ApplyRequest(
+public record ApplyApiResponse(
+        Long id,
         Long userId,
         Long projectId,
         MemberPart part,

@@ -5,7 +5,7 @@ import com.connectcrew.teamone.api.projectservice.enums.*;
 
 import java.util.List;
 
-public record UpdateProjectRequest(
+public record UpdateProjectApiRequest(
         Long projectId,
         Long userId,
         String title,
@@ -19,7 +19,7 @@ public record UpdateProjectRequest(
         List<ProjectCategory> category,
         ProjectGoal goal,
         String introduction,
-        List<CreateRecruitRequest> recruits,
+        List<CreateRecruitApiRequest> recruits,
         List<String> skills
 ) {
 }

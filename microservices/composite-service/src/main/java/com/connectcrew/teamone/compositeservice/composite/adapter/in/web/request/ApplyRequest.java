@@ -1,7 +1,9 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
+
+;
 
 public record ApplyRequest(
         Long projectId,

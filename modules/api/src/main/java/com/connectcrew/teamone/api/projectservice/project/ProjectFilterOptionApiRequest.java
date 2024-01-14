@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-public record ProjectFilterOptionRequest(
+public record ProjectFilterOptionApiRequest(
         @RequestParam(required = false, defaultValue = "-1") Integer lastId,
         int size,
         @RequestParam(required = false) String goal,
