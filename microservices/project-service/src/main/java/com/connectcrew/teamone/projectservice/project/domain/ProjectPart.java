@@ -33,22 +33,4 @@ public record ProjectPart(
                 .applied(applied)
                 .build();
     }
-//
-//    public static ProjectPart from(CreateRecruitCommand request, boolean containLeader) {
-//        return ProjectPart.builder()
-//                .part(request.part())
-//                .comment(request.comment())
-//                .current(containLeader ? 1 : 0)
-//                .max(request.max())
-//                .build();
-//    }
-//
-//    public static ProjectPart from(CreateRecruitCommand request, int current) {
-//        return ProjectPart.builder()
-//                .part(request.part())
-//                .comment(request.comment())
-//                .current(current)
-//                .max(request.max())
-//                .build();
-//    }
 }

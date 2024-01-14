@@ -19,6 +19,7 @@ public record ProjectItem(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
+        List<MemberPart> leaderParts,
         List<RecruitStatus> recruitStatus
 ) {
 
@@ -36,6 +37,7 @@ public record ProjectItem(
                 res.favorite(),
                 res.category(),
                 res.goal(),
+                res.leaderParts(),
                 res.recruitStatus().stream().map(RecruitStatus::of).toList()
         );
     }

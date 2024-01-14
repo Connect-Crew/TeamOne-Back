@@ -1,7 +1,9 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
+import com.connectcrew.teamone.compositeservice.composite.domain.RecruitStatus;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
 
 import java.time.LocalDateTime;
@@ -38,7 +40,11 @@ public record ProjectItemResponse(
                 myFavorite,
                 item.category().stream().map(ProjectCategory::getDescription).toList(),
                 item.goal().getDescription(),
-                item.recruitStatus().stream().map(recruit -> new RecruitStatusResponse(recruit, false)).toList()
+                item.recruitStatus().stream().map(recruit -> new RecruitStatusResponse(recruit, containLeader(item.leaderParts(), recruit))).toList()
         );
+    }
+
+    private static boolean containLeader(List<MemberPart> leaderParts, RecruitStatus status) {
+        return leaderParts.contains(status.part());
     }
 }

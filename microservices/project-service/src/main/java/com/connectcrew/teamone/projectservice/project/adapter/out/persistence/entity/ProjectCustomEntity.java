@@ -20,7 +20,7 @@ public record ProjectCustomEntity(
         List<ProjectCategory> category,
         ProjectGoal goal
 ) {
-    public ProjectItem toItem(BannerEntity thumbnail, List<ProjectPart> recruitStatuses) {
+    public ProjectItem toItem(BannerEntity thumbnail, List<ProjectPart> recruitStatuses, List<MemberPart> leaderParts) {
         return ProjectItem.builder()
                 .id(id)
                 .title(title)
@@ -34,6 +34,7 @@ public record ProjectCustomEntity(
                 .favorite(favorite)
                 .category(category)
                 .goal(goal)
+                .leaderParts(leaderParts)
                 .recruitStatus(recruitStatuses)
                 .build();
     }

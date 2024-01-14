@@ -39,7 +39,8 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
         return customRepository.findAllByOption(option)
                 .flatMap(project -> findThumbnailEntity(project.id()).map(banner -> Tuples.of(project, banner)))
                 .flatMap(tuple -> findAllRecruitByProject(tuple.getT1().id()).map(parts -> Tuples.of(tuple.getT1(), tuple.getT2(), parts)))
-                .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3()));
+                .flatMap(tuple -> findAllLeaderParts(tuple.getT1().id()).collectList().map(leaderParts -> Tuples.of(tuple.getT1(), tuple.getT2(), tuple.getT3(), leaderParts)))
+                .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3(), tuple.getT4()));
     }
 
     @Override
@@ -47,7 +48,13 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
         return customRepository.findAllByUserId(userId)
                 .flatMap(project -> findThumbnailEntity(project.id()).map(banner -> Tuples.of(project, banner)))
                 .flatMap(tuple -> findAllRecruitByProject(tuple.getT1().id()).map(parts -> Tuples.of(tuple.getT1(), tuple.getT2(), parts)))
-                .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3()));
+                .flatMap(tuple -> findAllLeaderParts(tuple.getT1().id()).collectList().map(leaderParts -> Tuples.of(tuple.getT1(), tuple.getT2(), tuple.getT3(), leaderParts)))
+                .map(tuple -> tuple.getT1().toItem(tuple.getT2(), tuple.getT3(), tuple.getT4()));
+    }
+
+    private Flux<MemberPart> findAllLeaderParts(Long project) {
+        return partRepository.findAllLeaderPartByProject(project)
+                .map(p -> MemberPart.valueOf(p.getPart()));
     }
 
     private Mono<BannerEntity> findThumbnailEntity(Long project) {
@@ -188,7 +195,6 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
         return reportRepository.save(ReportEntity.from(report))
                 .map(entity -> entity.toDomain(report.projectTitle()));
     }
-
 
 
     @Override

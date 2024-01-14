@@ -20,4 +20,7 @@ public interface PartRepository extends ReactiveCrudRepository<PartEntity, Long>
 
     @Query("SELECT p.* FROM part AS p JOIN apply AS a ON p.id = a.part_id WHERE p.project = :project AND a.user = :user")
     Flux<PartEntity> findAllAppliedPartByProjectAndUser(Long project, Long user);
+
+    @Query("SELECT pt.* FROM part AS pt JOIN project AS p ON pt.project = p.id JOIN member_part AS mp ON pt.id = mp.part JOIN member AS m ON mp.member = m.id WHERE p.id = :project AND m.user = p.leader")
+    Flux<PartEntity> findAllLeaderPartByProject(Long project);
 }

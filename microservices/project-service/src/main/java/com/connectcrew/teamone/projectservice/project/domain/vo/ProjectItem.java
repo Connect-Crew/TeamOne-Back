@@ -22,6 +22,7 @@ public record ProjectItem(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
+        List<MemberPart> leaderParts,
         List<ProjectPart> recruitStatus
 ) {
     public ProjectItemApiResponse toResponse() {
@@ -38,25 +39,9 @@ public record ProjectItem(
                 .favorite(favorite)
                 .category(category)
                 .goal(goal)
-                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(false)).toList())
+                .leaderParts(leaderParts)
+                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(leaderParts.contains(r.part()))).toList())
                 .build();
     }
 
-//    public ProjectItemResponse toResponse(Collection<Part> applies) {
-//        return ProjectItemResponse.builder()
-//                .id(id)
-//                .title(title)
-//                .thumbnail(thumbnail)
-//                .region(region)
-//                .online(online)
-//                .careerMin(careerMin)
-//                .careerMax(careerMax)
-//                .createdAt(createdAt)
-//                .state(state)
-//                .favorite(favorite)
-//                .category(category)
-//                .goal(goal)
-//                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(applies.contains(r.part()))).toList())
-//                .build();
-//    }
 }

@@ -20,6 +20,7 @@ public record ProjectItemApiResponse(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
+        List<MemberPart> leaderParts,
         List<RecruitStatusApiResponse> recruitStatus
 ) {
 }

@@ -170,6 +170,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 ),
                 new ProjectItem(
@@ -185,6 +186,7 @@ class ProjectControllerTest {
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 ),
                 new ProjectItem(
@@ -200,6 +202,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 )
         );
