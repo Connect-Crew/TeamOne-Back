@@ -70,14 +70,9 @@ public record UpdateProjectCommand(
     }
 
     public Project toDomain(Project origin, Member originLeader) {
-
-        Map<String, Long> bannerIdMap = origin.banners().stream()
-                .filter(b -> !removeBanners.contains(b.path()))
-                .collect(Collectors.toMap(Banner::path, Banner::id));
-
         List<Banner> banners = new ArrayList<>();
-        bannerIdMap.forEach((k, v) -> banners.add(new Banner(v, k)));
-        this.banners.forEach(b -> new Banner(bannerIdMap.getOrDefault(b, null), b));
+        origin.banners().stream().filter(b -> !removeBanners.contains(b.path())).forEach(banners::add);
+        this.banners.forEach(b -> banners.add(new Banner(null, b)));
 
         Map<ProjectCategory, Long> categoryIdMap = origin.category().stream()
                 .collect(Collectors.toMap(Category::category, Category::id));
