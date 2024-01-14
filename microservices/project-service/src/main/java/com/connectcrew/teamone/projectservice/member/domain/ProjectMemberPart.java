@@ -8,4 +8,8 @@ public record ProjectMemberPart(
         Long memberId,
         MemberPart part
 ) {
+
+    public ProjectMemberPart(Long partId, MemberPart part) {
+        this(null, partId, null, part);
+    }
 }

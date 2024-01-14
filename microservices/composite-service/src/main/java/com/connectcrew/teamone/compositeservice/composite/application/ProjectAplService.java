@@ -85,4 +85,14 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     public Mono<Long> update(ModifyProjectCommand command) {
         return updateProjectOutput.update(command.toApiRequest());
     }
+
+    @Override
+    public Mono<Apply> acceptApply(Long applyId, Long userId) {
+        return updateProjectOutput.acceptApply(applyId, userId);
+    }
+
+    @Override
+    public Mono<Apply> rejectApply(Long applyId, Long userId) {
+        return updateProjectOutput.rejectApply(applyId, userId);
+    }
 }

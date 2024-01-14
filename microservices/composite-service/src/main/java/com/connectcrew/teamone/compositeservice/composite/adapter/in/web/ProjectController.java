@@ -27,6 +27,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -328,5 +329,29 @@ public class ProjectController {
 
         return saveProjectUseCase.save(param.toDomain(id)).map(SimpleBooleanResponse::new)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.reportProject", ErrorLevel.ERROR, ex));
+    }
+
+    @PostMapping("/apply/{applyId}/accept")
+    @Transactional
+    public Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, id);
+        return updateProjectUseCase.acceptApply(applyId, id)
+                .map(Apply::toResponse)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.acceptApply", ErrorLevel.ERROR, ex));
+    }
+
+    @DeleteMapping("/apply/{applyId}/reject")
+    @Transactional
+    public Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, id);
+        return updateProjectUseCase.rejectApply(applyId, id)
+                .map(Apply::toResponse)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.rejectApply", ErrorLevel.ERROR, ex));
     }
 }

@@ -19,24 +19,27 @@ public record Apply(
         return new ApplyApiResponse(id, userId, projectId, part, message);
     }
 
-//    public Apply accept() {
-//        return Apply.builder()
-//                .id(id)
-//                .userId(userId)
-//                .projectId(projectId)
-//                .partId(partId)
-//                .part(part)
-//                .message(message)
-//                .state(ApplyState.ACCEPT)
-//                .build();
-//    }
-//
-//    public Member toMember() {
-//        return new Member(
-//                userId,
-//                false,
-//                List.of(part),
-//                MemberState.ACTIVE
-//        );
-//    }
+    public Apply accept() {
+        return Apply.builder()
+                .id(id)
+                .userId(userId)
+                .projectId(projectId)
+                .partId(partId)
+                .part(part)
+                .message(message)
+                .state(ApplyState.ACCEPT)
+                .build();
+    }
+
+    public Apply reject() {
+        return Apply.builder()
+                .id(id)
+                .userId(userId)
+                .projectId(projectId)
+                .partId(partId)
+                .part(part)
+                .message(message)
+                .state(ApplyState.REJECT)
+                .build();
+    }
 }

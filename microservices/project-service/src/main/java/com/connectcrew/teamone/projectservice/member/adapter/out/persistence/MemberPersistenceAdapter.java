@@ -12,6 +12,7 @@ import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMe
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
+import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +61,7 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     public Flux<Apply> findAllByProjectAndUser(Long project, Long user) {
         return partRepository.findAllByProject(project)
                 .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
-                .flatMapMany(idPartMap -> applyRepository.findAllByProjectAndUser(project, user)
+                .flatMapMany(idPartMap -> applyRepository.findAllByProjectAndUserAndState(project, user, ApplyState.WAITING)
                         .map(apply -> apply.toDomain(idPartMap.get(apply.getPartId())))
                 );
 
@@ -81,14 +82,14 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     public Flux<Apply> findAllApplyByProject(Long projectId) {
         return partRepository.findAllByProject(projectId)
                 .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
-                .flatMapMany(partMap -> applyRepository.findAllByProject(projectId)
+                .flatMapMany(partMap -> applyRepository.findAllByProjectAndState(projectId, ApplyState.WAITING)
                         .map(apply -> apply.toDomain(partMap.get(apply.getPartId()))));
     }
 
     @Override
     public Flux<Apply> findAllApplyByProjectAndPart(Long projectId, MemberPart part) {
         return partRepository.findByProjectAndPart(projectId, part.name())
-                .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartId(projectId, partEntity.getId()))
+                .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartIdAndState(projectId, partEntity.getId(), ApplyState.WAITING))
                 .map(e -> e.toDomain(part));
     }
 

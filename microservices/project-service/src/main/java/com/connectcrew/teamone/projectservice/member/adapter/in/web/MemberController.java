@@ -75,7 +75,7 @@ public class MemberController {
     @GetMapping("/applies")
     public Flux<ApplyApiResponse> getPartApplyList(Long projectId, MemberPart part, Long userId) {
         log.trace("getPartApplyList - projectId: {}, part: {}, userId: {}", projectId, part, userId);
-        return queryMemberUseCase.findAllApplies(new ProjectApplyQuery(projectId, userId, part))
+        return queryMemberUseCase.findAllApplies(new ProjectApplyQuery(userId, projectId, part))
                 .map(Apply::toResponse);
     }
 

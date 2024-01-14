@@ -19,6 +19,7 @@ import com.connectcrew.teamone.projectservice.member.domain.ApplyStatus;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
+import com.connectcrew.teamone.projectservice.project.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase, SaveMemberUseCase {
 
     private final FindProjectOutput findProjectOutput;
+    private final UpdateProjectOutput updateProjectOutput;
 
     private final FindMemberOutput findMemberOutput;
 
@@ -138,8 +140,10 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     public Flux<Apply> findAllApplies(ProjectApplyQuery query) {
+        System.out.println("query = " + query);
         return findProjectOutput.findLeaderById(query.projectId())
                 .flatMapMany(leader -> {
+                    System.out.println(leader);
                     if (!leader.equals(query.leader()))
                         return Flux.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
 
@@ -170,8 +174,16 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
                     return Mono.just(tuple.getT2());
                 })
-                .flatMap(saveMemberOutput::saveApply);
-        // TODO UPDATE APPLY STATUS AND ADD MEMBER
+                .map(Apply::accept)
+                .flatMap(saveMemberOutput::saveApply)
+                .flatMap(apply -> findMemberOutput.findByProjectAndUser(apply.projectId(), apply.userId())
+                        .defaultIfEmpty(new Member(apply.userId(), apply.projectId()))
+                        .map(member -> member.addPart(apply.part(), apply.partId()))
+                        .flatMap(saveMemberOutput::save)
+                        .thenReturn(apply)
+                )
+                .flatMap(apply -> updateProjectOutput.updateCollected(apply.partId(), 1).thenReturn(apply));
+                // TODO : 해당 직무 모집이 끝난경우 나머지 지원자들의 상태를 REJECT로 변경 및 메시지 알림
     }
 
     @Override
@@ -185,7 +197,8 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                         return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
 
                     return Mono.just(tuple.getT2());
-                });
-        // TODO UPDATE APPLY STATUS
+                })
+                .map(Apply::reject)
+                .flatMap(saveMemberOutput::saveApply);
     }
 }

@@ -102,7 +102,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Flux<Apply> findAllApplies(Long userId, Long projectId, MemberPart part) {
         return webClient.get()
-                .uri(String.format("%s/leader/applies?userId=%d&projectId=%d&part=%s", host, userId, projectId, part.name()))
+                .uri(String.format("%s/applies?userId=%d&projectId=%d&part=%s", host, userId, projectId, part.name()))
                 .retrieve()
                 .bodyToFlux(ApplyApiResponse.class)
                 .map(Apply::of)
@@ -112,7 +112,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     @Override
     public Flux<ApplyStatus> findAllApplyStatus(Long userId, Long projectId) {
         return webClient.get()
-                .uri(String.format("%s/leader/applyStatus?userId=%d&projectId=%d", host, userId, projectId))
+                .uri(String.format("%s/applyStatus?userId=%d&projectId=%d", host, userId, projectId))
                 .retrieve()
                 .bodyToFlux(ApplyStatusApiResponse.class)
                 .map(ApplyStatus::of)
@@ -166,6 +166,26 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                 .bodyValue(project)
                 .retrieve()
                 .bodyToMono(Long.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Apply> acceptApply(Long applyId, Long userId) {
+        return webClient.post()
+                .uri(String.format("%s/apply/%d/leader/%d/accept", host, applyId, userId))
+                .retrieve()
+                .bodyToMono(ApplyApiResponse.class)
+                .map(Apply::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Apply> rejectApply(Long applyId, Long userId) {
+        return webClient.delete()
+                .uri(String.format("%s/apply/%d/leader/%d/reject", host, applyId, userId))
+                .retrieve()
+                .bodyToMono(ApplyApiResponse.class)
+                .map(Apply::of)
                 .onErrorResume(exHandler::handleException);
     }
 }

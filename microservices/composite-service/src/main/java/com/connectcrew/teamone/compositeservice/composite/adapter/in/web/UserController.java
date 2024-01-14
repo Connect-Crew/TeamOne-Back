@@ -31,7 +31,10 @@ public class UserController {
     @PostConstruct
     public void init() {
         JwtToken token = jwtProvider.createToken("123456", 2L, "TestUser", Role.USER);
-        log.debug("Test token for test : {}", token != null ? token.accessToken() : null);
+        log.debug("Test token for test user 2: {}", token != null ? token.accessToken() : null);
+
+        JwtToken token2 = jwtProvider.createToken("123456", 3L, "TestUser", Role.USER);
+        log.debug("Test token for test user 3 : {}", token2 != null ? token2.accessToken() : null);
     }
 
     @PostMapping("/auth/login")

@@ -52,4 +52,16 @@ public class PartEntity {
                 .map(part -> from(part, projectId))
                 .toList();
     }
+
+    public PartEntity setCollected(Long collected) {
+        return PartEntity.builder()
+                .id(id)
+                .project(project)
+                .partCategory(partCategory)
+                .part(part)
+                .comment(comment)
+                .collected(collected)
+                .targetCollect(targetCollect)
+                .build();
+    }
 }
