@@ -224,7 +224,7 @@ public class ProjectController {
             @RequestPart String goal,
             @RequestPart String introduction,
             @RequestPart Flux<String> recruits,
-            @RequestPart Flux<String> skills
+            @RequestPart(required = false) Flux<String> skills
     ) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long userId = claim.id();

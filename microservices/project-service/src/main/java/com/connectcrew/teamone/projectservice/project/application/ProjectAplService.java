@@ -101,7 +101,7 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
         Mono<Member> leader = findMemberOutput.findByProjectAndUser(command.projectId(), command.userId())
                 .switchIfEmpty(Mono.error(new NotFoundException("리더 정보를 찾을 수 없습니다.")));
 
-        return Mono.zip(project, leader)
+        return project.flatMap(p -> leader.map(l -> Tuples.of(p, l)))
                 .flatMap(tuple -> {
                     if (tuple.getT1().leader().equals(tuple.getT2().id())) return Mono.just(tuple);
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));

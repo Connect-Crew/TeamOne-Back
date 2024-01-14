@@ -34,6 +34,19 @@ public record UpdateProjectCommand(
 ) {
 
     public static UpdateProjectCommand from(UpdateProjectApiRequest request) {
+        Map<MemberPart, CreateRecruitCommand> recruits = request.recruits().stream()
+                .map(CreateRecruitCommand::from)
+                .collect(Collectors.toMap(CreateRecruitCommand::part, r -> r));
+
+        for (MemberPart part : request.leaderParts()) {
+            if (!recruits.containsKey(part)) {
+                recruits.put(part, new CreateRecruitCommand(part,  "리더의 직무입니다.", 1L));
+            } else {
+                CreateRecruitCommand recruit = recruits.get(part);
+                recruits.put(part, new CreateRecruitCommand(part, recruit.comment(), recruit.max() + 1));
+            }
+        }
+
         return new UpdateProjectCommand(
                 request.projectId(),
                 request.userId(),
@@ -48,7 +61,7 @@ public record UpdateProjectCommand(
                 request.category(),
                 request.goal(),
                 request.introduction(),
-                request.recruits().stream().map(CreateRecruitCommand::from).toList(),
+                recruits.values().stream().toList(),
                 request.skills()
         );
     }

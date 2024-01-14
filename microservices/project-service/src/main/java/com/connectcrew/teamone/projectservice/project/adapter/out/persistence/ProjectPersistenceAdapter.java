@@ -56,24 +56,25 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
 
     @Override
     public Mono<Project> findById(Long id) {
-        return projectRepository.findById(id)
-                .flatMap(project -> {
-                    Mono<List<Banner>> banners = bannerRepository.findAllByProject(id)
-                            .map(BannerEntity::toDomain)
-                            .collectList();
-                    Mono<List<ProjectPart>> parts = partRepository.findAllByProject(id)
-                            .map(PartEntity::toDomain)
-                            .collectList();
-                    Mono<List<Skill>> skills = skillRepository.findAllByProject(id)
-                            .map(SkillEntity::toDomain)
-                            .collectList();
-                    Mono<List<Category>> categories = categoryRepository.findAllByProject(id)
-                            .map(CategoryEntity::toDomain)
-                            .collectList();
+        Mono<List<Banner>> banners = bannerRepository.findAllByProject(id)
+                .map(BannerEntity::toDomain)
+                .collectList();
+        Mono<List<ProjectPart>> parts = partRepository.findAllByProject(id)
+                .map(PartEntity::toDomain)
+                .collectList();
+        Mono<List<Skill>> skills = skillRepository.findAllByProject(id)
+                .map(SkillEntity::toDomain)
+                .collectList();
+        Mono<List<Category>> categories = categoryRepository.findAllByProject(id)
+                .map(CategoryEntity::toDomain)
+                .collectList();
 
-                    return Mono.zip(banners, parts, skills, categories)
-                            .map(tuple -> project.toDomain(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()));
-                });
+        return projectRepository.findById(id)
+                .flatMap(proejct -> banners.map(b -> Tuples.of(proejct, b)))
+                .flatMap(tuple -> parts.map(p -> Tuples.of(tuple.getT1(), tuple.getT2(), p)))
+                .flatMap(tuple -> skills.map(s -> Tuples.of(tuple.getT1(), tuple.getT2(), tuple.getT3(), s)))
+                .flatMap(tuple -> categories.map(c -> Tuples.of(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), c)))
+                .map(tuple -> tuple.getT1().toDomain(tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5()));
     }
 
     @Override
