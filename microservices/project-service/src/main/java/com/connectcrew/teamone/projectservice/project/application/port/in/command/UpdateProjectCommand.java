@@ -91,8 +91,7 @@ public record UpdateProjectCommand(
                             current++; // 기존에는 담당 파트가 아니었지만, 이번에는 담당 파트인 경우
                         }
 
-                        projectPart.update(r.comment(), current, r.max());
-                        return projectPart;
+                        return projectPart.update(r.comment(), current, r.max());
                     } else {
                         return r.toDomain(leaderParts.contains(r.part()));
                     }
