@@ -104,7 +104,6 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
         return project.flatMap(p -> leader.map(l -> Tuples.of(p, l)))
                 .flatMap(tuple -> {
                     if (tuple.getT1().leader().equals(tuple.getT2().user())) return Mono.just(tuple);
-                    System.out.printf("leader: %d, user: %d\n", tuple.getT1().leader(), tuple.getT2().id());
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
                 })
                 .flatMap(tuple -> command.validate().thenReturn(tuple))
