@@ -20,10 +20,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -134,5 +131,18 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     public Mono<Apply> saveApply(Apply apply) {
         return applyRepository.save(ApplyEntity.from(apply))
                 .map(e -> e.toDomain(apply.part()));
+    }
+
+    @Override
+    public Mono<List<Apply>> saveAllApply(List<Apply> apply) {
+        List<ApplyEntity> entities = new ArrayList<>();
+        Map<Long, MemberPart> partIdPartMap = new HashMap<>();
+        for (Apply a : apply) {
+            entities.add(ApplyEntity.from(a));
+            partIdPartMap.put(a.partId(), a.part());
+        }
+        return applyRepository.saveAll(entities)
+                .map(e -> e.toDomain(partIdPartMap.get(e.getPartId())))
+                .collectList();
     }
 }

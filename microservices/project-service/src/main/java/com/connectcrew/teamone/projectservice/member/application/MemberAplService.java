@@ -173,8 +173,14 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     }
 
     private Mono<Apply> rejectAnotherAppliesIfCollectCompleted(Apply apply, ProjectPart part) {
-        // TODO : 해당 직무 모집이 끝난경우 나머지 지원자들의 상태를 REJECT로 변경 및 메시지 알림
-        return Mono.just(apply);
+        if (part.current() < part.max()) return Mono.just(apply);
+
+        return findMemberOutput.findAllApplyByProjectAndPart(apply.projectId(), apply.part())
+                .map(Apply::reject)
+                // TODO notification
+                .collectList()
+                .flatMap(saveMemberOutput::saveAllApply)
+                .thenReturn(apply);
     }
 
     private Mono<ProjectPart> addCollectOnPart(Apply apply) {
