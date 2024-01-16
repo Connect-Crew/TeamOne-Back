@@ -333,24 +333,24 @@ public class ProjectController {
 
     @PostMapping("/apply/{applyId}/accept")
     @Transactional
-    public Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token) {
+    public Mono<ApplyResponse> acceptApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody String leaderMessage) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
         log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, id);
-        return updateProjectUseCase.acceptApply(applyId, id)
+        return updateProjectUseCase.acceptApply(applyId, id, leaderMessage)
                 .map(Apply::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.acceptApply", ErrorLevel.ERROR, ex));
     }
 
-    @DeleteMapping("/apply/{applyId}/reject")
+    @PostMapping("/apply/{applyId}/reject")
     @Transactional
-    public Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token) {
+    public Mono<ApplyResponse> rejectApply(@PathVariable Long applyId, @RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody String leaderMessage) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, id);
-        return updateProjectUseCase.rejectApply(applyId, id)
+        return updateProjectUseCase.rejectApply(applyId, id, leaderMessage)
                 .map(Apply::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.rejectApply", ErrorLevel.ERROR, ex));
     }

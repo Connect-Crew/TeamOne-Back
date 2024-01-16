@@ -13,13 +13,14 @@ public record Apply(
         Long partId,
         MemberPart part,
         String message,
-        ApplyState state
+        ApplyState state,
+        String leaderMessage
 ) {
     public ApplyApiResponse toResponse() {
         return new ApplyApiResponse(id, userId, projectId, part, message);
     }
 
-    public Apply accept() {
+    public Apply accept(String leaderMessage) {
         return Apply.builder()
                 .id(id)
                 .userId(userId)
@@ -28,10 +29,11 @@ public record Apply(
                 .part(part)
                 .message(message)
                 .state(ApplyState.ACCEPT)
+                .leaderMessage(leaderMessage)
                 .build();
     }
 
-    public Apply reject() {
+    public Apply reject(String leaderMessage) {
         return Apply.builder()
                 .id(id)
                 .userId(userId)
@@ -40,6 +42,7 @@ public record Apply(
                 .part(part)
                 .message(message)
                 .state(ApplyState.REJECT)
+                .leaderMessage(leaderMessage)
                 .build();
     }
 }

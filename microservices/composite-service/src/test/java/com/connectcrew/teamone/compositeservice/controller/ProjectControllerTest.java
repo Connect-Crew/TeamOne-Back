@@ -1008,6 +1008,64 @@ class ProjectControllerTest {
                 ));
     }
 
+    @Test
+    void applyAcceptTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지")));
+
+        webTestClient.post()
+                .uri("/project/apply/{applyId}/accept", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue("리더의 메시지 (ex 연략 수단)")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ApplyResponse.class)
+                .consumeWith(document("project/apply-accept",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("applyId").description("지원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("part").type("String").description("지원 직군"),
+                                fieldWithPath("message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
+    @Test
+    void applyRejectTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지")));
+
+        webTestClient.post()
+                .uri("/project/apply/{applyId}/reject", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue("리더의 메시지 (ex 거절사유)")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ApplyResponse.class)
+                .consumeWith(document("project/apply-reject",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("applyId").description("지원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("part").type("String").description("지원 직군"),
+                                fieldWithPath("message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
     @AfterAll
     static void clearBannerForTest() {
         try (var pathStream = Files.walk(Paths.get(BANNER_PATH), Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)) {

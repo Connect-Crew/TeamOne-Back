@@ -18,8 +18,11 @@ import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.ApplyStatus;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
+import com.connectcrew.teamone.projectservice.notification.application.port.out.SendNotificationOutput;
+import com.connectcrew.teamone.projectservice.notification.domain.Notification;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.projectservice.project.application.port.out.UpdateProjectOutput;
+import com.connectcrew.teamone.projectservice.project.domain.Project;
 import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.UserRelationWithProject;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,7 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     private final FindMemberOutput findMemberOutput;
 
     private final SaveMemberOutput saveMemberOutput;
+    private final SendNotificationOutput sendNotificationOutput;
 
     @Override
     public Mono<Member> findMemberByProjectAndUser(Long project, Long user) {
@@ -87,8 +91,23 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                 .flatMap(this::checkNumberOfMember)
                 .flatMap(part -> checkAlreadyPartMember(part, command.userId()))
                 .flatMap(part -> checkAlreadyApply(part, command.userId()))
-                .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())));
+                .flatMap(part -> saveMemberOutput.saveApply(command.toDomain(part.id())))
+                .flatMap(this::sendApplyNotificationToLeader)
+                .doOnError(ex -> log.error("apply - error: {}", ex.getMessage(), ex));
+    }
 
+    private Mono<Apply> sendApplyNotificationToLeader(Apply apply) {
+        log.trace("apply - command: {}", apply);
+        return findProjectOutput.findById(apply.projectId())
+                .doOnNext(project -> sendNotificationOutput.send(
+                        new Notification(
+                                project.id(),
+                                "🔥새로운 지원자 알림",
+                                String.format("축하합니다! 지원하신 <b>[%s]</b>팀의 팀원이 되셨습니다!", project.title()),
+                                String.format("/apply/project/%d/apply/%d/applier/%d", apply.projectId(), apply.id(), apply.userId())
+                        )
+                ))
+                .thenReturn(apply);
     }
 
     private Mono<Boolean> checkProjectExits(Long projectId) {
@@ -140,10 +159,8 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     public Flux<Apply> findAllApplies(ProjectApplyQuery query) {
-        System.out.println("query = " + query);
         return findProjectOutput.findLeaderById(query.projectId())
                 .flatMapMany(leader -> {
-                    System.out.println(leader);
                     if (!leader.equals(query.leader()))
                         return Flux.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
 
@@ -163,21 +180,57 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
 
     @Override
     @Transactional
-    public Mono<Apply> accept(Long applyId, Long leaderId) {
+    public Mono<Apply> accept(Long applyId, Long leaderId, String leaderMessage) {
         return findApply(applyId, leaderId)
-                .map(Apply::accept)
+                .map(apply -> apply.accept(leaderMessage))
                 .flatMap(saveMemberOutput::saveApply)
                 .flatMap(this::addMember)
+                .flatMap(this::sendAcceptedNotificationToApplierAndMembers)
                 .flatMap(apply -> addCollectOnPart(apply).map(part -> Tuples.of(apply, part)))
                 .flatMap(tuple -> rejectAnotherAppliesIfCollectCompleted(tuple.getT1(), tuple.getT2()));
+    }
+
+    private Mono<Apply> sendAcceptedNotificationToApplierAndMembers(Apply apply) {
+        return findProjectOutput.findById(apply.projectId())
+                .doOnNext(project -> sendNotificationOutput.send(
+                        new Notification(
+                                apply.userId(),
+                                "🎉지원 승인 알림",
+                                String.format("축하합니다! 지원하신 <b>[%s]</b>팀의 팀원이 되셨습니다!", project.title()),
+                                String.format("/apply/project/%d/apply/%d/applier/%d/accepted", apply.projectId(), apply.id(), apply.userId())
+                        )
+                ))
+                .flatMap(project -> sendNewMemberNotificationToMembers(project, apply))
+                .thenReturn(apply);
+    }
+
+    private Mono<Apply> sendNewMemberNotificationToMembers(Project project, Apply apply) {
+        return findMemberOutput.findAllByProject(apply.projectId())
+                .map(Member::user)
+                .filter(userId -> !userId.equals(apply.userId()))
+                .collect(Collectors.toSet())
+                .doOnNext(memberIds -> {
+                    for (long memberId : memberIds) {
+                        sendNotificationOutput.send(
+                                new Notification(
+                                        memberId,
+                                        "새로운 팀원 알림",
+                                        String.format("<b>[%s]</b>팀에 새로운 팀원이 들어왔어요!", project.title()),
+                                        String.format("/apply/project/%d/apply/%d/applier/%d/new-member", apply.projectId(), apply.id(), apply.userId())
+                                )
+                        );
+                    }
+                })
+                .thenReturn(apply);
+
     }
 
     private Mono<Apply> rejectAnotherAppliesIfCollectCompleted(Apply apply, ProjectPart part) {
         if (part.current() < part.max()) return Mono.just(apply);
 
         return findMemberOutput.findAllApplyByProjectAndPart(apply.projectId(), apply.part())
-                .map(Apply::reject)
-                // TODO notification
+                .map(a -> a.reject("모집이 완료되었습니다."))
+                .flatMap(this::sendRejectedNotificationToApplier)
                 .collectList()
                 .flatMap(saveMemberOutput::saveAllApply)
                 .thenReturn(apply);
@@ -188,11 +241,25 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     }
 
     @Override
-    public Mono<Apply> reject(Long applyId, Long leaderId) {
+    public Mono<Apply> reject(Long applyId, Long leaderId, String leaderMessage) {
         return findApply(applyId, leaderId)
-                .map(Apply::reject)
+                .map(apply -> apply.reject(leaderMessage))
+                .flatMap(this::sendRejectedNotificationToApplier)
                 .flatMap(saveMemberOutput::saveApply);
     }
+
+    private Mono<Apply> sendRejectedNotificationToApplier(Apply apply) {
+        sendNotificationOutput.send(
+                new Notification(
+                        apply.userId(),
+                        "지원 거절 알림",
+                        "아쉬워요! 이런 이유로 함께 하지 못했어요.😭 사유 보러 가기!",
+                        String.format("/apply/project/%d/apply/%d/user/%d/accepted", apply.projectId(), apply.id(), apply.userId())
+                )
+        );
+        return Mono.just(apply);
+    }
+
 
     private Mono<Apply> findApply(Long applyId, Long leaderId) {
         return findMemberOutput.findApplyById(applyId)

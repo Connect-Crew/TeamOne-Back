@@ -9,7 +9,7 @@ public interface UpdateMemberUseCase {
 
     Mono<Member> updateMember(UpdateMemberCommand command);
 
-    Mono<Apply> accept(Long applyId, Long leaderId);
+    Mono<Apply> accept(Long applyId, Long leaderId, String leaderMessage);
 
-    Mono<Apply> reject(Long applyId, Long leaderId);
+    Mono<Apply> reject(Long applyId, Long leaderId, String leaderMessage);
 }

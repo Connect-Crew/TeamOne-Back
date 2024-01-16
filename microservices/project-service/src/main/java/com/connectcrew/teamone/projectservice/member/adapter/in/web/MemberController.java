@@ -56,12 +56,7 @@ public class MemberController {
     public Mono<Boolean> apply(@RequestBody ApplyApiRequest request) {
         log.trace("apply - request: {}", request);
         return saveMemberUseCase.apply(ApplyCommand.from(request))
-                .flatMap(apply -> sendNotificationUseCase.sendToLeader(
-                        request.projectId(),
-                        "새로운 지원자가 있습니다!",
-                        "지원자를 확인해주세요!",
-                        String.format("/apply/project/%d/apply/%d/user/%d", apply.projectId(), apply.id(), apply.userId())
-                ))
+                .thenReturn(true)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("MemberController.apply", ErrorLevel.ERROR, ex));
     }
 
@@ -81,17 +76,17 @@ public class MemberController {
 
     @PostMapping("/apply/{applyId}/leader/{leaderId}/accept")
     @Transactional
-    public Mono<ApplyApiResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyApiResponse> acceptApply(@PathVariable Long applyId, @PathVariable Long leaderId, @RequestBody String leaderMessage) {
         log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, leaderId);
-        return updateMemberUseCase.accept(applyId, leaderId)
+        return updateMemberUseCase.accept(applyId, leaderId, leaderMessage)
                 .map(Apply::toResponse);
     }
 
-    @DeleteMapping("/apply/{applyId}/leader/{leaderId}/reject")
+    @PostMapping("/apply/{applyId}/leader/{leaderId}/reject")
     @Transactional
-    public Mono<ApplyApiResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId) {
+    public Mono<ApplyApiResponse> rejectApply(@PathVariable Long applyId, @PathVariable Long leaderId, @RequestBody String leaderMessage) {
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, leaderId);
-        return updateMemberUseCase.reject(applyId, leaderId)
+        return updateMemberUseCase.reject(applyId, leaderId, leaderMessage)
                 .map(Apply::toResponse);
     }
 }

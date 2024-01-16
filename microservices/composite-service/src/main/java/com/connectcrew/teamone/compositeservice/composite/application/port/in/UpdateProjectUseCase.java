@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 public interface UpdateProjectUseCase {
     Mono<Long> update(ModifyProjectCommand command);
 
-    Mono<Apply> acceptApply(Long applyId, Long userId);
+    Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage);
 
-    Mono<Apply> rejectApply(Long applyId, Long userId);
+    Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage);
 }

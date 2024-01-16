@@ -170,9 +170,10 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Apply> acceptApply(Long applyId, Long userId) {
+    public Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage) {
         return webClient.post()
                 .uri(String.format("%s/apply/%d/leader/%d/accept", host, applyId, userId))
+                .bodyValue(leaderMessage)
                 .retrieve()
                 .bodyToMono(ApplyApiResponse.class)
                 .map(Apply::of)
@@ -180,9 +181,10 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Apply> rejectApply(Long applyId, Long userId) {
-        return webClient.delete()
+    public Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage) {
+        return webClient.post()
                 .uri(String.format("%s/apply/%d/leader/%d/reject", host, applyId, userId))
+                .bodyValue(leaderMessage)
                 .retrieve()
                 .bodyToMono(ApplyApiResponse.class)
                 .map(Apply::of)

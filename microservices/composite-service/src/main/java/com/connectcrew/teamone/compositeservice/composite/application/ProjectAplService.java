@@ -87,12 +87,12 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     }
 
     @Override
-    public Mono<Apply> acceptApply(Long applyId, Long userId) {
-        return updateProjectOutput.acceptApply(applyId, userId);
+    public Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage) {
+        return updateProjectOutput.acceptApply(applyId, userId, leaderMessage);
     }
 
     @Override
-    public Mono<Apply> rejectApply(Long applyId, Long userId) {
-        return updateProjectOutput.rejectApply(applyId, userId);
+    public Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage) {
+        return updateProjectOutput.rejectApply(applyId, userId, leaderMessage);
     }
 }

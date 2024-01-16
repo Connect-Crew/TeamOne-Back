@@ -10,7 +10,7 @@ public interface UpdateProjectOutput {
 
     Mono<Long> update(UpdateProjectApiRequest project);
 
-    Mono<Apply> acceptApply(Long applyId, Long userId);
+    Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage);
 
-    Mono<Apply> rejectApply(Long applyId, Long userId);
+    Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage);
 }

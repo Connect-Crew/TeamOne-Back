@@ -27,6 +27,8 @@ public class ApplyEntity {
     private String message;
     private ApplyState state;
 
+    private String leaderMessage;
+
     public static ApplyEntity from(Apply apply) {
         return ApplyEntity.builder()
                 .id(apply.id())
@@ -35,6 +37,7 @@ public class ApplyEntity {
                 .user(apply.userId())
                 .message(apply.message())
                 .state(apply.state())
+                .leaderMessage(apply.leaderMessage())
                 .build();
     }
 
@@ -47,6 +50,7 @@ public class ApplyEntity {
                 .userId(user)
                 .message(message)
                 .state(state)
+                .leaderMessage(leaderMessage)
                 .build();
     }
 }

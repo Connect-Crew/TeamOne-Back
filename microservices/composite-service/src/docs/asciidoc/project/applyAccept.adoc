@@ -1,0 +1,29 @@
+= 프로젝트 지원 상태 조회 - /project/apply/\{applyId\}/accept (POST)
+
+link:../index.html[home으로 돌아가기]
+
+해당 지원을 수락합니다.
+
+== Request
+
+include::{snippets}/project/apply-accept/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/apply-accept/request-headers.adoc[]
+
+=== path parameters
+
+include::{snippets}/project/apply-accept/path-parameters.adoc[]
+
+=== request body
+
+include::{snippets}/project/apply-accept/request-body.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/apply-accept/http-response.adoc[]
+
+include::{snippets}/project/apply-accept/response-fields.adoc[]
