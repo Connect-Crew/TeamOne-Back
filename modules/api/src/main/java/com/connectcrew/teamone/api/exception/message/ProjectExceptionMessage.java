@@ -33,6 +33,7 @@ public enum ProjectExceptionMessage {
     INVALID_FAVORITE("프로젝트 좋아요 값이 올바르지 않습니다."),
     ILLEGAL_CHATROOM_ID("채팅방 ID가 올바르지 않습니다."),
     FAVORITE_NEGATIVE("프로젝트 좋아요 값은 음수가 될 수 없습니다."),
+    UNREMOVABLE_PROJECT("프로젝트는 최소 7일 이후에 삭제할 수 있습니다."),
     ;
 
     private final String message;

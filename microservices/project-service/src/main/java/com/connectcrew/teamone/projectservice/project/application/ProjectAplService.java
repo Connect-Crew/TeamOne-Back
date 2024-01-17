@@ -31,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -121,6 +122,11 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                     if (project.leader().equals(userId)) return Mono.just(project);
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
                 })
+                .flatMap(project -> {
+                    if (projectState == ProjectState.DELETED && project.createdAt().plusDays(7L).isBefore(LocalDateTime.now()))
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PROJECT.toString()));
+                    return Mono.just(project);
+                })
                 .flatMap(project -> updateProjectOutput.updateState(projectId, projectState));
     }
 
@@ -131,6 +137,11 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                 .flatMap(project -> {
                     if (project.leader().equals(userId)) return Mono.just(project);
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
+                })
+                .flatMap(project -> {
+                    if (project.createdAt().plusDays(7L).isBefore(LocalDateTime.now()))
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PROJECT.toString()));
+                    return Mono.just(project);
                 })
                 .flatMap(project -> updateProjectOutput.updateState(projectId, ProjectState.DELETED));
     }
