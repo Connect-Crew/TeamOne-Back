@@ -4,6 +4,7 @@ import com.connectcrew.teamone.api.exception.InvalidOwnerException;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.project.application.port.in.QueryProjectUseCase;
@@ -110,6 +111,28 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                 .map(tuple -> Tuples.of(tuple.getT1(), tuple.getT2(), command.toDomain(tuple.getT1(), tuple.getT2())))
                 .flatMap(tuple -> validateUpdatedPart(tuple.getT1(), tuple.getT2(), tuple.getT3(), command.leaderParts()))
                 .flatMap(saveProjectOutput::save);
+    }
+
+    @Override
+    public Mono<ProjectState> updateProjectState(Long userId, Long projectId, ProjectState projectState) {
+        return findProjectOutput.findById(projectId)
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
+                .flatMap(project -> {
+                    if (project.leader().equals(userId)) return Mono.just(project);
+                    return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
+                })
+                .flatMap(project -> updateProjectOutput.updateState(projectId, projectState));
+    }
+
+    @Override
+    public Mono<ProjectState> deleteProjectState(Long userId, Long projectId) {
+        return findProjectOutput.findById(projectId)
+                .switchIfEmpty(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())))
+                .flatMap(project -> {
+                    if (project.leader().equals(userId)) return Mono.just(project);
+                    return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
+                })
+                .flatMap(project -> updateProjectOutput.updateState(projectId, ProjectState.DELETED));
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.out;
 
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.project.ProjectFavoriteApiRequest;
 import com.connectcrew.teamone.api.projectservice.project.UpdateProjectApiRequest;
 import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
@@ -13,4 +14,8 @@ public interface UpdateProjectOutput {
     Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage);
 
     Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage);
+
+    Mono<ProjectState> updateState(Long userId, Long projectId, ProjectState projectState);
+
+    Mono<ProjectState> delete(Long userId, Long projectId);
 }

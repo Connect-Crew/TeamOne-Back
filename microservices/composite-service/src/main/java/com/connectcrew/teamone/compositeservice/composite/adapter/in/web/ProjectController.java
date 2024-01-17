@@ -294,6 +294,26 @@ public class ProjectController {
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.favoriteProject", ErrorLevel.ERROR, ex));
     }
 
+    @PostMapping("/state")
+    @Transactional
+    public Mono<ProjectState> updateProjectState(@RequestHeader(JwtProvider.AUTH_HEADER) String token, Long projectId, ProjectState state) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long userId = claim.id();
+
+        return updateProjectUseCase.updateProjectState(userId, projectId, state)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateProjectState", ErrorLevel.ERROR, ex));
+    }
+
+    @DeleteMapping("/")
+    @Transactional
+    public Mono<ProjectState> deleteProject(@RequestHeader(JwtProvider.AUTH_HEADER) String token, Long projectId) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long userId = claim.id();
+
+        return updateProjectUseCase.deleteProjectState(userId, projectId)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.deleteProject", ErrorLevel.ERROR, ex));
+    }
+
     @GetMapping("/apply/{projectId}")
     private Mono<Map<MemberPart, ApplyStatusResponse>> getApplyStatus(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);

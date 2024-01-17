@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.application;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.QueryProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.UpdateProjectUseCase;
@@ -84,6 +85,16 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     @Override
     public Mono<Long> update(ModifyProjectCommand command) {
         return updateProjectOutput.update(command.toApiRequest());
+    }
+
+    @Override
+    public Mono<ProjectState> updateProjectState(Long userId, Long projectId, ProjectState projectState) {
+        return updateProjectOutput.updateState(userId, projectId, projectState);
+    }
+
+    @Override
+    public Mono<ProjectState> deleteProjectState(Long userId, Long projectId) {
+        return updateProjectOutput.delete(userId, projectId);
     }
 
     @Override

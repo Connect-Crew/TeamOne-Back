@@ -58,4 +58,27 @@ public record Project(
                 .build();
     }
 
+    public Project setState(ProjectState state) {
+        return Project.builder()
+                .id(id)
+                .title(title)
+                .banners(banners)
+                .region(region)
+                .online(online)
+                .state(state)
+                .chatRoomId(chatRoomId)
+                .careerMin(careerMin)
+                .careerMax(careerMax)
+                .leader(leader)
+                .category(category)
+                .goal(goal)
+                .introduction(introduction)
+                .parts(parts)
+                .favorite(favorite)
+                .skills(skills)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .build();
+    }
+
 }

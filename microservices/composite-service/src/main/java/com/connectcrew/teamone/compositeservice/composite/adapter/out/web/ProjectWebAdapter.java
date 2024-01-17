@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
 import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
@@ -188,6 +189,24 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                 .retrieve()
                 .bodyToMono(ApplyApiResponse.class)
                 .map(Apply::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectState> updateState(Long userId, Long projectId, ProjectState projectState) {
+        return webClient.post()
+                .uri(String.format("%s/project/state?userId=%d&projectId=%d&state=%s", host, userId, projectId, projectState.name()))
+                .retrieve()
+                .bodyToMono(ProjectState.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectState> delete(Long userId, Long projectId) {
+        return webClient.delete()
+                .uri(String.format("%s/project/?userId=%d&projectId=%d", host, userId, projectId))
+                .retrieve()
+                .bodyToMono(ProjectState.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

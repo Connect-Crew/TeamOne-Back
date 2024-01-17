@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.in.web;
 
 import com.connectcrew.teamone.api.exception.NotFoundException;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.project.*;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
@@ -82,6 +83,22 @@ public class ProjectController {
                         .thenReturn(project))
                 .map(Project::id)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateProject", ErrorLevel.ERROR, ex));
+    }
+
+    @PostMapping("/state")
+    @Transactional
+    public Mono<ProjectState> updateProjectState(Long userId, Long projectId, ProjectState state) {
+        log.trace("updateProjectState - userId: {}, projectId: {}, state: {}", userId, projectId, state);
+        return updateProjectUseCase.updateProjectState(userId, projectId, state)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.updateProjectState", ErrorLevel.ERROR, ex));
+    }
+
+    @DeleteMapping("/")
+    @Transactional
+    public Mono<ProjectState> deleteProject(Long userId, Long projectId) {
+        log.trace("deleteProject - userId: {}, projectId: {}", userId, projectId);
+        return updateProjectUseCase.deleteProjectState(userId, projectId)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.deleteProject", ErrorLevel.ERROR, ex));
     }
 
     @GetMapping("/")

@@ -3,6 +3,7 @@ package com.connectcrew.teamone.projectservice.project.adapter.out.persistence;
 import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.api.exception.message.ProjectExceptionMessage;
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.*;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import com.connectcrew.teamone.projectservice.project.application.port.out.FindProjectOutput;
@@ -216,5 +217,17 @@ public class ProjectPersistenceAdapter implements FindProjectOutput, SaveProject
                 .map(entity -> entity.setCollected(entity.getCollected() + change))
                 .flatMap(partRepository::save)
                 .map(PartEntity::toDomain);
+    }
+
+    @Override
+    public Mono<ProjectState> updateState(Long projectId, ProjectState projectState) {
+        return projectRepository.findById(projectId)
+                .map(entity -> {
+                    entity.setState(projectState.name());
+                    return entity;
+                })
+                .flatMap(projectRepository::save)
+                .map(ProjectEntity::getState)
+                .map(ProjectState::valueOf);
     }
 }
