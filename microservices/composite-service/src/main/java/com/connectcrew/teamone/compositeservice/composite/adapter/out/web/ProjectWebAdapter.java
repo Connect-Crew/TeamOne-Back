@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
 import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.member.KickApiRequest;
 import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
 import com.connectcrew.teamone.api.projectservice.project.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
@@ -207,6 +208,16 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                 .uri(String.format("%s/project/?userId=%d&projectId=%d", host, userId, projectId))
                 .retrieve()
                 .bodyToMono(ProjectState.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectMember> kickMember(Kick kick) {
+        return webClient.post()
+                .uri(String.format("%s/kick/project/%d/user/%d/username/%s/leader/%d", host, kick.project(), kick.userId(), kick.username(), kick.leaderId()))
+                .bodyValue(kick.reasonMap().entrySet().stream().map(entry -> new KickApiRequest(entry.getKey(), entry.getValue())).toList())
+                .retrieve()
+                .bodyToMono(ProjectMember.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

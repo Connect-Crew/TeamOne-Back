@@ -6,6 +6,7 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.in.Qu
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.SaveProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.UpdateProjectUseCase;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.KickCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.ModifyProjectCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.query.FindProjectListQuery;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
@@ -105,5 +106,10 @@ public class ProjectAplService implements QueryProjectUseCase, UpdateProjectUseC
     @Override
     public Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage) {
         return updateProjectOutput.rejectApply(applyId, userId, leaderMessage);
+    }
+
+    @Override
+    public Mono<ProjectMember> kickMember(KickCommand kickCommand) {
+        return updateProjectOutput.kickMember(kickCommand.toDomain());
     }
 }

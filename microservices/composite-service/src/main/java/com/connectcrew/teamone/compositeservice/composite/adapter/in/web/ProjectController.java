@@ -8,6 +8,7 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateChatRoomCommand;
+import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.KickCommand;
 import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
 import com.connectcrew.teamone.compositeservice.composite.domain.ApplyStatus;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
@@ -373,5 +374,17 @@ public class ProjectController {
         return updateProjectUseCase.rejectApply(applyId, id, leaderMessage)
                 .map(Apply::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.rejectApply", ErrorLevel.ERROR, ex));
+    }
+
+    @PostMapping("/kick")
+    public Mono<ProjectMemberResponse> kickMember(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody KickRequest request) {
+        TokenClaim claim = jwtProvider.getTokenClaim(token);
+        Long id = claim.id();
+
+        return queryProfileUseCase.getFullProfile(request.userId())
+                .flatMap(profile -> updateProjectUseCase.kickMember(KickCommand.from(id, profile.nickname(), request))
+                        .map(member -> new ProjectMemberResponse(member, ProfileResponse.from(profile)))
+                );
+
     }
 }
