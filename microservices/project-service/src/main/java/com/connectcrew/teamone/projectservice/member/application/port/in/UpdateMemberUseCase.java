@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.projectservice.member.application.port.in;
 
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.KickCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.UpdateMemberCommand;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
@@ -12,4 +13,6 @@ public interface UpdateMemberUseCase {
     Mono<Apply> accept(Long applyId, Long leaderId, String leaderMessage);
 
     Mono<Apply> reject(Long applyId, Long leaderId, String leaderMessage);
+
+    Mono<Member> kickMember(KickCommand command);
 }

@@ -5,11 +5,15 @@ import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.ent
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberPartEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.KickRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberPartRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
+import com.connectcrew.teamone.projectservice.member.application.port.out.DeleteMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
+import com.connectcrew.teamone.projectservice.member.application.port.out.UpdateMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.Kick;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
@@ -24,12 +28,13 @@ import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOutput {
+public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOutput, DeleteMemberOutput, UpdateMemberOutput {
 
     private final PartRepository partRepository;
     private final MemberRepository memberRepository;
     private final MemberPartRepository memberPartRepository;
     private final ApplyRepository applyRepository;
+    private final KickRepository kickRepository;
 
     @Override
     public Flux<Member> findAllByProject(Long project) {
@@ -144,5 +149,27 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
         return applyRepository.saveAll(entities)
                 .map(e -> e.toDomain(partIdPartMap.get(e.getPartId())))
                 .collectList();
+    }
+
+    @Override
+    public Mono<Kick> saveKick(Kick kick) {
+        return kickRepository.saveAll(kick.toEntities()).then().thenReturn(kick);
+    }
+
+    @Override
+    public Mono<List<Long>> deleteMemberPartById(Long memberId) {
+        return memberPartRepository.deleteAllByMember(memberId)
+                .map(MemberPartEntity::getPart)
+                .collectList();
+    }
+
+    @Override
+    public Mono<Boolean> decreaseMemberCount(List<Long> partIds) {
+        return partRepository.findAllById(partIds)
+                .map(partEntity -> partEntity.setCollected(partEntity.getCollected() - 1))
+                .collectList()
+                .flatMapMany(partRepository::saveAll)
+                .then()
+                .thenReturn(true);
     }
 }

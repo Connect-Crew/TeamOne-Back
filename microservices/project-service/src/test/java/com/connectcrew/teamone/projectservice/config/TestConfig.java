@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.config;
 
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.KickRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberPartRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
@@ -80,4 +81,7 @@ public class TestConfig {
 
     @MockBean
     MemberPartRepository memberPartRepository;
+
+    @MockBean
+    KickRepository kickRepository;
 }

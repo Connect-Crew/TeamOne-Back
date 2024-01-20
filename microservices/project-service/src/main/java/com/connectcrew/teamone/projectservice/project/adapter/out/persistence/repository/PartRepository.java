@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository;
 
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -9,6 +10,8 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 
 public interface PartRepository extends ReactiveCrudRepository<PartEntity, Long> {
+
+    Flux<PartEntity> findAllById(@NotNull Iterable<Long> ids);
     Flux<PartEntity> findAllByProject(Long project);
 
     Mono<PartEntity> findByProjectAndPart(Long project, String part);

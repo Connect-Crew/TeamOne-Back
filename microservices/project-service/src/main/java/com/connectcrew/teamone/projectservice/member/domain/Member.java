@@ -48,4 +48,8 @@ public record Member(
         newParts.add(new ProjectMemberPart(null, partId, id, part));
         return new Member(id, user, project, newParts, state);
     }
+
+    public Member kick() {
+        return new Member(id, user, project, parts, MemberState.KICKED);
+    }
 }

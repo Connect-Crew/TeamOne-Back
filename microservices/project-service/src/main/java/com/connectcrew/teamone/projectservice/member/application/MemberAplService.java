@@ -8,12 +8,15 @@ import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMe
 import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.ApplyCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.KickCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.SaveMemberCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.UpdateMemberCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyQuery;
 import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyStatusQuery;
+import com.connectcrew.teamone.projectservice.member.application.port.out.DeleteMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
+import com.connectcrew.teamone.projectservice.member.application.port.out.UpdateMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.ApplyStatus;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
@@ -45,8 +48,9 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
     private final UpdateProjectOutput updateProjectOutput;
 
     private final FindMemberOutput findMemberOutput;
-
+    private final DeleteMemberOutput deleteMemberOutput;
     private final SaveMemberOutput saveMemberOutput;
+    private final UpdateMemberOutput updateMemberOutput;
     private final SendNotificationOutput sendNotificationOutput;
 
     @Override
@@ -246,6 +250,40 @@ public class MemberAplService implements QueryMemberUseCase, UpdateMemberUseCase
                 .map(apply -> apply.reject(leaderMessage))
                 .flatMap(this::sendRejectedNotificationToApplier)
                 .flatMap(saveMemberOutput::saveApply);
+    }
+
+    @Override
+    public Mono<Member> kickMember(KickCommand command) {
+        return findProjectOutput.findLeaderById(command.projectId())
+                .flatMap(leader -> {
+                    if (!leader.equals(command.leaderId()))
+                        return Mono.error(new InvalidOwnerException("해당 프로젝트의 리더가 아닙니다."));
+
+                    return findMemberOutput.findByProjectAndUser(command.projectId(), command.userId());
+                })
+                .map(Member::kick)
+                .flatMap(saveMemberOutput::save)
+                .flatMap(this::updateProjectByKickedInfo)
+                .flatMap(member -> saveMemberOutput.saveKick(command.toDomain()).thenReturn(member))
+                .flatMap(member -> sendKickedNotificationToMember(command.userNickname(), member));
+    }
+
+    private Mono<Member> updateProjectByKickedInfo(Member member) {
+        return deleteMemberOutput.deleteMemberPartById(member.id())
+                .flatMap(updateMemberOutput::decreaseMemberCount)
+                .thenReturn(member);
+    }
+
+    private Mono<Member> sendKickedNotificationToMember(String nickname, Member member) {
+        sendNotificationOutput.send(
+                new Notification(
+                        member.user(),
+                        "내보내기 알림",
+                        String.format("리더가 <b>[%s]</b>님을 내보냈어요. 다른 프로젝트를 찾으러 가볼까요?", nickname),
+                        String.format("/kicked/project/%d/user/%d", member.project(), member.user())
+                )
+        );
+        return Mono.just(member);
     }
 
     private Mono<Apply> sendRejectedNotificationToApplier(Apply apply) {

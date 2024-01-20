@@ -4,6 +4,7 @@ import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
 import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.member.KickApiRequest;
 import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
@@ -11,6 +12,7 @@ import com.connectcrew.teamone.projectservice.member.application.port.in.QueryMe
 import com.connectcrew.teamone.projectservice.member.application.port.in.SaveMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.UpdateMemberUseCase;
 import com.connectcrew.teamone.projectservice.member.application.port.in.command.ApplyCommand;
+import com.connectcrew.teamone.projectservice.member.application.port.in.command.KickCommand;
 import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyQuery;
 import com.connectcrew.teamone.projectservice.member.application.port.in.query.ProjectApplyStatusQuery;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -88,5 +92,12 @@ public class MemberController {
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, leaderId);
         return updateMemberUseCase.reject(applyId, leaderId, leaderMessage)
                 .map(Apply::toResponse);
+    }
+
+    @PostMapping("/kick/project/{projectId}/user/{userId}/username/{username}/leader/{leaderId}")
+    public Mono<MemberApiResponse> kickMember(@PathVariable Long projectId, @PathVariable Long userId, @PathVariable String username, @PathVariable Long leaderId, @RequestBody List<KickApiRequest> request) {
+        log.trace("kickMember - projectId: {}, userId: {}, leaderId: {}", projectId, userId, leaderId);
+        return updateMemberUseCase.kickMember(KickCommand.from(projectId, userId, username, leaderId, request))
+                .map(member -> member.toResponse(false));
     }
 }

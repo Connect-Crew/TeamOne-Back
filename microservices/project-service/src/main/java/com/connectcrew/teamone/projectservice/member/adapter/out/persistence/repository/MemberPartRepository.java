@@ -11,4 +11,6 @@ public interface MemberPartRepository extends ReactiveCrudRepository<MemberPartE
     Flux<MemberPartEntity> findAllByMember(Long memberId);
 
     Flux<Long> deleteAllByMemberAndIdNotIn(Long member, List<Long> ids);
+
+    Flux<MemberPartEntity> deleteAllByMember(Long member);
 }

@@ -1,6 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.application.port.out;
 
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.Kick;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import reactor.core.publisher.Mono;
 
@@ -14,4 +15,6 @@ public interface SaveMemberOutput {
     Mono<Apply> saveApply(Apply apply);
 
     Mono<List<Apply>> saveAllApply(List<Apply> apply);
+
+    Mono<Kick> saveKick(Kick kick);
 }
