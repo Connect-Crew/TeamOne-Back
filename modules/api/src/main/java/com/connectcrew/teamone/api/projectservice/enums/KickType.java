@@ -1,7 +1,9 @@
 package com.connectcrew.teamone.api.projectservice.enums;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum KickType {
     ABUSE("욕설/비하발언"),

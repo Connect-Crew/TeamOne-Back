@@ -1066,6 +1066,114 @@ class ProjectControllerTest {
                 ));
     }
 
+    @Test
+    void updateStateTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.updateState(anyLong(), anyLong(), any(ProjectState.class))).thenReturn(Mono.just(ProjectState.IN_PROGRESS));
+
+        webTestClient.post()
+                .uri("/project/{projectId}/state/{state}/update", 1L, ProjectState.IN_PROGRESS.name())
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectState.class)
+                .consumeWith(document("project/update-state",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("프로젝트 ID"),
+                                parameterWithName("state").description("프로젝트 상태")
+                        )
+                ));
+    }
+
+    @Test
+    void deleteTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.delete(anyLong(), anyLong())).thenReturn(Mono.just(ProjectState.COMPLETED));
+
+        webTestClient.delete()
+                .uri("/project/{projectId}/delete", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectState.class)
+                .consumeWith(document("project/delete",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("프로젝트 ID")
+                        )
+                ));
+    }
+
+    @Test
+    void kickTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.kickMember(any(Kick.class))).thenReturn(Mono.just(new ProjectMember(0L, true, List.of(MemberPart.IOS, MemberPart.AOS))));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        )));
+
+        webTestClient.post()
+                .uri("/project/kick")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new KickRequest(
+                        1L,
+                        0L,
+                        List.of(
+                                new KickReasonRequest(KickType.OBSCENITY, KickType.OBSCENITY.getDescription()),
+                                new KickReasonRequest(KickType.ABUSE, KickType.ABUSE.getDescription())
+                        )
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectMemberResponse.class)
+                .consumeWith(document("project/delete",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("project").type("Number").description("프로젝트 ID"),
+                                fieldWithPath("userId").type("Number").description("유저 ID"),
+                                fieldWithPath("reasons").type("KickReasonRequest[]").description("내보내기 사유"),
+                                fieldWithPath("reasons[].type").type("String").description("내보내기 사유 타입"),
+                                fieldWithPath("reasons[].reason").type("String").description("내보내기 사유 메시지")
+                        ),
+                        responseFields(
+                                fieldWithPath("profile").type("Profile").description("프로필 정보"),
+                                fieldWithPath("profile.id").type("Number").description("프로필 ID"),
+                                fieldWithPath("profile.nickname").type("String").description("프로필 이름"),
+                                fieldWithPath("profile.profile").type("String").description("프로필 이미지"),
+                                fieldWithPath("profile.introduction").type("String").description("프로필 소개"),
+                                fieldWithPath("profile.temperature").type("Number").description("온도"),
+                                fieldWithPath("profile.responseRate").type("Number").description("응답률"),
+                                fieldWithPath("profile.parts[]").type("Part[]").description("프로필 직무"),
+                                fieldWithPath("profile.parts[].key").type("String").description("프로필 직무 key"),
+                                fieldWithPath("profile.parts[].part").type("String").description("프로필 직무 분야"),
+                                fieldWithPath("profile.parts[].category").type("String").description("프로필 직무 카테고리"),
+                                fieldWithPath("profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
+                                fieldWithPath("profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
+                                fieldWithPath("profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
+                                fieldWithPath("isLeader").type("Boolean").description("리더 여부"),
+                                fieldWithPath("parts").type("String[]").description("프로젝트 직무")
+                        )
+                ));
+    }
+
     @AfterAll
     static void clearBannerForTest() {
         try (var pathStream = Files.walk(Paths.get(BANNER_PATH), Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS)) {
