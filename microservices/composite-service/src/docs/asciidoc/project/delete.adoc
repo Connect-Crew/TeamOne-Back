@@ -1,0 +1,28 @@
+= 프로젝트 삭제하기 - /project/\{projectId\}/delete (DELETE)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트를 삭제하는 요청입니다.
+
+이때, 다음과 같은 경우 실패할 수 있습니다.
+
+* 프로젝트 리더가 아닌 경우
+* 프로젝트를 생성한지 7일이 지나지 않은 경우
+
+== Request
+
+include::{snippets}/project/delete/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/delete/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/project/delete/path-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/delete/http-response.adoc[]

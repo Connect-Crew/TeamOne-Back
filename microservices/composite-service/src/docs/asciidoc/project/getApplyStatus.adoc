@@ -1,4 +1,4 @@
-= 프로젝트 지원 상태 조회 - /project/apply/\{projectId\} (POST)
+= 프로젝트 지원 상태 조회 - /project/apply/\{projectId\} (GET)
 
 link:../index.html[home으로 돌아가기]
 

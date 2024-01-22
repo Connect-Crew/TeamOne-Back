@@ -28,6 +28,9 @@
 - link:project/applyAccept.html[프로젝트 지원 수락 - /project/apply/\{applyId\}/accept]
 - link:project/applyReject.html[프로젝트 지원 거절 - /project/apply/\{applyId\}/reject]
 - link:project/report.html[프로젝트 신고하기 - /project/report]
+- link:project/delete.html[프로젝트 삭제하기 - /project/\{projectId\}/delete]
+- link:project/kick.html[멤버 내보내기 - /project/kick]
+- link:project/updateState.html[프로젝트 상태 수정하기 - /project/\{projectId\}/state/\{state\}/update]
 
 == Push Notification 테스트 요청
 - link:notification/notification.html[Push 테스트 알림 보내기 - /notification]

@@ -1142,7 +1142,7 @@ class ProjectControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ProjectMemberResponse.class)
-                .consumeWith(document("project/delete",
+                .consumeWith(document("project/kick",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
                         ),

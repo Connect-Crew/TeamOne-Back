@@ -1,0 +1,25 @@
+= 멤버 내보내기 - /project/kick (POST)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트의 멤버를 내보내는 요청입니다.
+
+== Request
+
+include::{snippets}/project/kick/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/kick/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/project/kick/request-body.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/kick/http-response.adoc[]
+
+include::{snippets}/project/kick/response-fields.adoc[]

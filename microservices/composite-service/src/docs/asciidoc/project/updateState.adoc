@@ -1,0 +1,23 @@
+= 프로젝트 상태 수정하기 - /project/\{projectId\}/state/\{state\}/update (POST)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트의 상태를 수정하는 요청입니다.
+
+== Request
+
+include::{snippets}/project/update-state/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/update-state/request-headers.adoc[]
+
+=== path parameters
+
+include::{snippets}/project/update-state/path-parameters.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/update-state/http-response.adoc[]
