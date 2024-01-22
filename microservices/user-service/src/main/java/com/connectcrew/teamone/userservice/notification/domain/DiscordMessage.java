@@ -1,5 +1,7 @@
 package com.connectcrew.teamone.userservice.notification.domain;
 
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+
 public record DiscordMessage(
         ErrorLevel level,
         DiscordChannel channel,
@@ -8,7 +10,7 @@ public record DiscordMessage(
 ) {
 
     public String toMessage() {
-        return String.format("### [%s] %s\n```%s```\n\n", level, title, message);
+        return String.format("### [%s]\t%s\n```%s```\n\n", level, title, message);
     }
 
 }

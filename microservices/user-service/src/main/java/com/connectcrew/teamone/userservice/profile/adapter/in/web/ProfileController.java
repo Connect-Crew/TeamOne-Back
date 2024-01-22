@@ -1,9 +1,10 @@
 package com.connectcrew.teamone.userservice.profile.adapter.in.web;
 
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
-import com.connectcrew.teamone.userservice.profile.adapter.in.web.response.ProfileResponse;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.profile.ProfileApiResponse;
 import com.connectcrew.teamone.userservice.profile.application.in.QueryProfileUseCase;
+import com.connectcrew.teamone.userservice.profile.domain.vo.FullProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +22,9 @@ public class ProfileController {
     private final QueryProfileUseCase queryProfileUseCase;
 
     @GetMapping("/")
-    Mono<ProfileResponse> getProfile(Long id) {
+    Mono<ProfileApiResponse> getProfile(Long id) {
         return queryProfileUseCase.findProfileByUserId(id)
-                .map(ProfileResponse::from)
+                .map(FullProfile::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProfileController.getProfile", ErrorLevel.ERROR, ex));
     }
 }

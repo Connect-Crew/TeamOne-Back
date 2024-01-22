@@ -4,6 +4,7 @@ import com.connectcrew.teamone.api.exception.NotFoundException;
 import com.connectcrew.teamone.userservice.profile.application.in.QueryProfileUseCase;
 import com.connectcrew.teamone.userservice.profile.application.out.FindProfileOutput;
 import com.connectcrew.teamone.userservice.profile.domain.Part;
+import com.connectcrew.teamone.userservice.profile.domain.Profile;
 import com.connectcrew.teamone.userservice.profile.domain.RepresentProject;
 import com.connectcrew.teamone.userservice.profile.domain.enums.ProfileExceptionMessage;
 import com.connectcrew.teamone.userservice.profile.domain.vo.FullProfile;
@@ -30,5 +31,12 @@ public class ProfileAplService implements QueryProfileUseCase {
                     return Mono.zip(partsMono, representProjectIdsMono)
                             .map(tuple -> new FullProfile(profile, tuple.getT1(), tuple.getT2()));
                 });
+    }
+
+    @Override
+    public Mono<String> findUserNameByUserId(Long userId) {
+        return findProfileOutput.findByUserId(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException(ProfileExceptionMessage.NOTFOUND_PROFILE.getMessage())))
+                .map(Profile::nickname);
     }
 }

@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.userservice.favorite.adapter.out.persistence.entity;
 
 import com.connectcrew.teamone.userservice.favorite.domain.Favorite;
-import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;

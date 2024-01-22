@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.projectservice.global.exceptions.application;
 
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.projectservice.global.exceptions.application.port.out.SendErrorNotificationOutput;
-import com.connectcrew.teamone.projectservice.global.exceptions.domain.ErrorNotification;
-import com.connectcrew.teamone.projectservice.global.exceptions.enums.ErrorLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

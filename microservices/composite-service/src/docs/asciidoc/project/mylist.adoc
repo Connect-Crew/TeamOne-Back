@@ -1,0 +1,21 @@
+= 내 프로젝트 목록 가져오기 - /project/mylist (GET)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트 모집글 목록을 조회하는 요청입니다.
+
+== Request
+
+include::{snippets}/project/mylist/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/project/mylist/request-headers.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/mylist/http-response.adoc[]
+
+include::{snippets}/project/mylist/response-fields.adoc[]

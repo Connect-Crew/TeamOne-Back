@@ -1,5 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.domain;
 
+
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+
 import java.util.List;
 
 public record FullProfile(
@@ -9,7 +12,7 @@ public record FullProfile(
         String introduction,
         Double temperature,
         Integer responseRate,
-        List<String> parts,
+        List<MemberPart> parts,
         List<RepresentProject> representProjects
 ) {
     public static FullProfile from(Profile profile, List<RepresentProject> representProjects) {
@@ -22,6 +25,19 @@ public record FullProfile(
                 profile.responseRate(),
                 profile.parts(),
                 representProjects
+        );
+    }
+
+    public FullProfile update(List<MemberPart> parts) {
+        return new FullProfile(
+                this.id,
+                this.nickname,
+                this.profile,
+                this.introduction,
+                this.temperature,
+                this.responseRate,
+                parts,
+                this.representProjects
         );
     }
 }

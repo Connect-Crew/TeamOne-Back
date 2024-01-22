@@ -1,9 +1,9 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in;
 
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.RegisterCommand;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import reactor.core.publisher.Mono;
 
 public interface AuthUserUseCase {

@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.api.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -7,6 +8,8 @@ import java.time.LocalDateTime;
 
 @Getter
 public class ErrorInfo {
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private final LocalDateTime timestamp;
     private final String path;
     private final Integer status;

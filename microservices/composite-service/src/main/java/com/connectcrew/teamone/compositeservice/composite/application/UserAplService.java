@@ -1,5 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.application;
 
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.compositeservice.auth.application.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
@@ -12,8 +14,6 @@ import com.connectcrew.teamone.compositeservice.composite.application.port.out.*
 import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
 import com.connectcrew.teamone.compositeservice.composite.domain.User;
 import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
-import com.connectcrew.teamone.compositeservice.global.enums.FavoriteType;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class UserAplService implements
         return auth2TokenValidator.validate(command.token(), command.social())
                 .onErrorResume(ex -> Mono.error(new UnauthorizedException("유효하지 않은 Token 입니다.", ex)))
                 .doOnError(ex -> log.debug("register error: {}", ex.getMessage(), ex))
-                .flatMap(socialId -> saveUserOutput.save(command.toDomain(socialId)))
+                .flatMap(socialId -> saveUserOutput.save(command.toApiRequest(socialId)))
                 .flatMap(user -> findUserOutput.getProfile(user.id()).map(profile -> generateLoginResult(user, profile)));
     }
 

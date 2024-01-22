@@ -1,11 +1,11 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response;
 
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.ProjectCategory;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.NameKey;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.NameKeyValue;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.connectcrew.teamone.api.global.NameKey;
+import com.connectcrew.teamone.api.global.NameKeyValue;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectCategory;
+import com.connectcrew.teamone.api.projectservice.enums.Region;
 import com.connectcrew.teamone.compositeservice.global.enums.SkillType;
 
 import java.util.Arrays;

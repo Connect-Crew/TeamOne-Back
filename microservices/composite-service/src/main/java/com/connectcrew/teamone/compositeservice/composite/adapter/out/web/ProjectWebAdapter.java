@@ -1,23 +1,24 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.out.web;
 
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.MemberResponse;
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectDetailResponse;
-import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.response.ProjectItemResponse;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.ProjectState;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
+import com.connectcrew.teamone.api.projectservice.leader.ApplyStatusApiResponse;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.member.KickApiRequest;
+import com.connectcrew.teamone.api.projectservice.member.MemberApiResponse;
+import com.connectcrew.teamone.api.projectservice.project.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.FindProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.SaveProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.application.port.out.UpdateProjectOutput;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
 import com.connectcrew.teamone.compositeservice.global.error.adapter.out.WebClientExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Flux<ProjectItem> findAllProjectItems(ProjectFilterOption option) {
+    public Flux<ProjectItem> findAllProjectItems(ProjectFilterOptionApiRequest option) {
         String[] host = this.host.replace("http://", "").split(":");
 
         return webClient.get()
@@ -52,7 +53,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .path("/project/list")
                         .queryParam("lastId", option.lastId())
                         .queryParam("size", option.size())
-                        .queryParam("goal", option.goal() != null ? option.goal().name() : null)
+                        .queryParam("goal", option.goal() != null ? option.goal() : null)
                         .queryParam("career", option.career() != null ? option.career().name() : null)
                         .queryParam("region", option.region() != null ? option.region().stream().map(Enum::name).toList() : null)
                         .queryParam("online", option.online())
@@ -64,9 +65,19 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
                         .build()
                 )
                 .retrieve()
-                .bodyToFlux(ProjectItemResponse.class)
+                .bodyToFlux(ProjectItemApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(ProjectItemResponse::toDomain);
+                .map(ProjectItem::of);
+    }
+
+    @Override
+    public Flux<ProjectItem> findAllProjectItems(Long userId) {
+        return webClient.get()
+                .uri(String.format("%s/project/%d", host, userId))
+                .retrieve()
+                .bodyToFlux(ProjectItemApiResponse.class)
+                .onErrorResume(exHandler::handleException)
+                .map(ProjectItem::of);
     }
 
     @Override
@@ -74,26 +85,44 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
         return webClient.get()
                 .uri(String.format("%s/project/?id=%d&userId=%d", host, projectId, userId))
                 .retrieve()
-                .bodyToMono(ProjectDetailResponse.class)
+                .bodyToMono(ProjectApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(ProjectDetailResponse::toDomain);
+                .map(ProjectDetail::of);
     }
 
     @Override
-    public Mono<List<ProjectMember>> findMembers(Long projectId) {
-        ParameterizedTypeReference<List<MemberResponse>> type = new ParameterizedTypeReference<>() {
-        };
+    public Flux<ProjectMember> findMembers(Long projectId) {
 
         return webClient.get()
-                .uri(String.format("%s/member/members?id=%d", host, projectId))
+                .uri(String.format("%s/members/%d", host, projectId))
                 .retrieve()
-                .bodyToMono(type)
+                .bodyToFlux(MemberApiResponse.class)
                 .onErrorResume(exHandler::handleException)
-                .map(members -> members.stream().map(MemberResponse::toDomain).toList());
+                .map(ProjectMember::of);
     }
 
     @Override
-    public Mono<Long> save(CreateProjectInfo input) {
+    public Flux<Apply> findAllApplies(Long userId, Long projectId, MemberPart part) {
+        return webClient.get()
+                .uri(String.format("%s/applies?userId=%d&projectId=%d&part=%s", host, userId, projectId, part.name()))
+                .retrieve()
+                .bodyToFlux(ApplyApiResponse.class)
+                .map(Apply::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Flux<ApplyStatus> findAllApplyStatus(Long userId, Long projectId) {
+        return webClient.get()
+                .uri(String.format("%s/applyStatus?userId=%d&projectId=%d", host, userId, projectId))
+                .retrieve()
+                .bodyToFlux(ApplyStatusApiResponse.class)
+                .map(ApplyStatus::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Long> save(CreateProjectApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/project/", host))
                 .bodyValue(input)
@@ -103,7 +132,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(Apply input) {
+    public Mono<Boolean> save(ApplyApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/member/apply", host))
                 .bodyValue(input)
@@ -113,7 +142,7 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Boolean> save(Report input) {
+    public Mono<Boolean> save(ReportApiRequest input) {
         return webClient.post()
                 .uri(String.format("%s/project/report", host))
                 .bodyValue(input)
@@ -123,12 +152,72 @@ public class ProjectWebAdapter implements FindProjectOutput, SaveProjectOutput, 
     }
 
     @Override
-    public Mono<Integer> updateFavorite(ProjectFavorite favorite) {
+    public Mono<Integer> updateFavorite(ProjectFavoriteApiRequest favorite) {
         return webClient.post()
                 .uri(String.format("%s/project/favorite", host))
                 .bodyValue(favorite)
                 .retrieve()
                 .bodyToMono(Integer.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Long> update(UpdateProjectApiRequest project) {
+        return webClient.put()
+                .uri(String.format("%s/project/", host))
+                .bodyValue(project)
+                .retrieve()
+                .bodyToMono(Long.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Apply> acceptApply(Long applyId, Long userId, String leaderMessage) {
+        return webClient.post()
+                .uri(String.format("%s/apply/%d/leader/%d/accept", host, applyId, userId))
+                .bodyValue(leaderMessage)
+                .retrieve()
+                .bodyToMono(ApplyApiResponse.class)
+                .map(Apply::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<Apply> rejectApply(Long applyId, Long userId, String leaderMessage) {
+        return webClient.post()
+                .uri(String.format("%s/apply/%d/leader/%d/reject", host, applyId, userId))
+                .bodyValue(leaderMessage)
+                .retrieve()
+                .bodyToMono(ApplyApiResponse.class)
+                .map(Apply::of)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectState> updateState(Long userId, Long projectId, ProjectState projectState) {
+        return webClient.post()
+                .uri(String.format("%s/project/state?userId=%d&projectId=%d&state=%s", host, userId, projectId, projectState.name()))
+                .retrieve()
+                .bodyToMono(ProjectState.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectState> delete(Long userId, Long projectId) {
+        return webClient.delete()
+                .uri(String.format("%s/project/?userId=%d&projectId=%d", host, userId, projectId))
+                .retrieve()
+                .bodyToMono(ProjectState.class)
+                .onErrorResume(exHandler::handleException);
+    }
+
+    @Override
+    public Mono<ProjectMember> kickMember(Kick kick) {
+        return webClient.post()
+                .uri(String.format("%s/kick/project/%d/user/%d/username/%s/leader/%d", host, kick.project(), kick.userId(), kick.username(), kick.leaderId()))
+                .bodyValue(kick.reasonMap().entrySet().stream().map(entry -> new KickApiRequest(entry.getKey(), entry.getValue())).toList())
+                .retrieve()
+                .bodyToMono(ProjectMember.class)
                 .onErrorResume(exHandler::handleException);
     }
 }

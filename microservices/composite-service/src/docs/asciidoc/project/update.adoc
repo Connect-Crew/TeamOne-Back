@@ -1,0 +1,42 @@
+= 프로젝트 모집글 수정하기 - /project/{projectId} (PUT)
+
+link:../index.html[home으로 돌아가기]
+
+프로젝트 모집글을 수정하는 요청입니다.
+
+이때, Contents-Type은 *multipart/form-data* 로 설정해야 합니다.
+
+== Request
+
+// include::{snippets}/project/create-success/httpie-request.adoc[]
+바이너리 파일이 포함되어 예시 요청을 보여드릴 수 없습니다.
+
+=== request header
+
+include::{snippets}/project/update-success/request-headers.adoc[]
+
+=== pathParameter
+
+include::{snippets}/project/update-success/path-parameters.adoc[]
+
+=== parts
+
+include::{snippets}/project/update-success/request-parts.adoc[]
+
+==== recruit param description
+
+include::{snippets}/../../src/docs/asciidoc/project/recruitstatus.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/project/update-success/http-response.adoc[]
+
+include::{snippets}/project/update-success/response-fields.adoc[]
+
+=== response (실패)
+
+include::{snippets}/project/create-failure/http-response.adoc[]
+
+include::{snippets}/project/create-failure/response-fields.adoc[]

@@ -1,8 +1,8 @@
 package com.connectcrew.teamone.compositeservice.auth.application;
 
+import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
-import com.connectcrew.teamone.compositeservice.global.enums.Role;
 import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

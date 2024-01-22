@@ -1,9 +1,8 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request;
 
 
+import com.connectcrew.teamone.api.projectservice.enums.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateProjectCommand;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
 import lombok.Builder;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public record CreateProjectRequest(
                 region,
                 online,
                 state,
-                chatRoomId.toString(),
+                chatRoomId,
                 careerMin,
                 careerMax,
                 leader,

@@ -20,16 +20,20 @@ public enum ProjectExceptionMessage {
     RECRUIT_MAX_0_OVER("모집 인원은 0명 이상이어야 합니다."),
     RECRUIT_MAX_SUM_30_UNDER("최대 30자리 까지 모집 가능합니다."),
     CREATE_PROJECT_FAILED("프로젝트 생성에 실패했습니다."),
+    UPDATE_PROJECT_FAILED("프로젝트 수정에 실패했습니다."),
     LOAD_PROJECT_FAILED("프로젝트 조회에 실패했습니다."),
     ALREADY_PART_MEMBER("이미 해당 파트의 멤버입니다."),
     ALREADY_APPLY("이미 해당 파트에 지원했습니다."),
     COLLECTED_PART("이미 모집이 완료된 파트입니다."),
+    MAX_LESS_THAN_CURRENT("모집 인원이 현재 인원보다 작을 수 없습니다."),
+    UNREMOVABLE_PART("멤버가 있는 파트는 삭제할 수 없습니다."),
     ALREADY_REPORT("이미 신고한 프로젝트입니다."),
     NOT_FOUND_PART("해당 직무를 찾을 수 없습니다."),
     BANNER_NOT_FOUND("프로젝트 배너를 찾을 수 없습니다."),
     INVALID_FAVORITE("프로젝트 좋아요 값이 올바르지 않습니다."),
     ILLEGAL_CHATROOM_ID("채팅방 ID가 올바르지 않습니다."),
     FAVORITE_NEGATIVE("프로젝트 좋아요 값은 음수가 될 수 없습니다."),
+    UNREMOVABLE_PROJECT("프로젝트는 최소 7일 이후에 삭제할 수 있습니다."),
     ;
 
     private final String message;

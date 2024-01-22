@@ -1,7 +1,8 @@
 package com.connectcrew.teamone.userservice.controller;
 
 import com.connectcrew.teamone.api.exception.ErrorInfo;
-import com.connectcrew.teamone.api.user.profile.Profile;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.userservice.profile.ProfileApiResponse;
 import com.connectcrew.teamone.userservice.config.TestBeanConfig;
 import com.connectcrew.teamone.userservice.profile.adapter.in.web.ProfileController;
 import com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity.PartEntity;
@@ -56,8 +57,8 @@ class ProfileControllerTest {
                 .build();
 
         List<PartEntity> parts = List.of(
-                new PartEntity(0L, 0L, "testPart1"),
-                new PartEntity(1L, 1L, "testPart2")
+                new PartEntity(0L, 0L, MemberPart.DATA_ENGINEER.name()),
+                new PartEntity(1L, 1L, MemberPart.DEVOPS.name())
         );
 
         List<RepresentProjectEntity> representProjects = List.of(
@@ -76,7 +77,7 @@ class ProfileControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Profile.class);
+                .expectBody(ProfileApiResponse.class);
     }
 
     @Test

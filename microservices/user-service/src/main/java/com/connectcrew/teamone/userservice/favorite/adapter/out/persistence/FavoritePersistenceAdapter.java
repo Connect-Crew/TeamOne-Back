@@ -6,7 +6,7 @@ import com.connectcrew.teamone.userservice.favorite.application.port.out.DeleteF
 import com.connectcrew.teamone.userservice.favorite.application.port.out.FindFavoriteOutput;
 import com.connectcrew.teamone.userservice.favorite.application.port.out.SaveFavoriteOutput;
 import com.connectcrew.teamone.userservice.favorite.domain.Favorite;
-import com.connectcrew.teamone.userservice.favorite.domain.enums.FavoriteType;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

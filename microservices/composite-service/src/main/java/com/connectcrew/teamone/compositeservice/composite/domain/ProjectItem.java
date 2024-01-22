@@ -1,10 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.domain;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.Career;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.ProjectCategory;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.ProjectGoal;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.ProjectState;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.ProjectItemApiResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +19,26 @@ public record ProjectItem(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
+        List<MemberPart> leaderParts,
         List<RecruitStatus> recruitStatus
 ) {
+
+    public static ProjectItem of(ProjectItemApiResponse res) {
+        return new ProjectItem(
+                res.id(),
+                res.title(),
+                res.thumbnail(),
+                res.region(),
+                res.online(),
+                res.careerMin(),
+                res.careerMax(),
+                res.createdAt(),
+                res.state(),
+                res.favorite(),
+                res.category(),
+                res.goal(),
+                res.leaderParts(),
+                res.recruitStatus().stream().map(RecruitStatus::of).toList()
+        );
+    }
 }

@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request;
 
+import com.connectcrew.teamone.api.userservice.user.Social;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.RegisterCommand;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 
 public record RegisterRequest(
         String token,

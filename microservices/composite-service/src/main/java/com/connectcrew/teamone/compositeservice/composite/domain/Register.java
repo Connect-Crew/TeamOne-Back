@@ -1,6 +1,6 @@
 package com.connectcrew.teamone.compositeservice.composite.domain;
 
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
+import com.connectcrew.teamone.api.userservice.user.Social;
 import lombok.Builder;
 
 @Builder

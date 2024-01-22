@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity;
 
-import com.connectcrew.teamone.api.project.values.*;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import com.connectcrew.teamone.projectservice.project.domain.vo.ProjectItem;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public record ProjectCustomEntity(
         List<ProjectCategory> category,
         ProjectGoal goal
 ) {
-    public ProjectItem toItem(BannerEntity thumbnail, List<RecruitStatus> recruitStatuses) {
+    public ProjectItem toItem(BannerEntity thumbnail, List<ProjectPart> recruitStatuses, List<MemberPart> leaderParts) {
         return ProjectItem.builder()
                 .id(id)
                 .title(title)
@@ -34,6 +34,7 @@ public record ProjectCustomEntity(
                 .favorite(favorite)
                 .category(category)
                 .goal(goal)
+                .leaderParts(leaderParts)
                 .recruitStatus(recruitStatuses)
                 .build();
     }

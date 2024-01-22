@@ -1,5 +1,9 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
+import com.connectcrew.teamone.api.userservice.user.Role;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
 import com.connectcrew.teamone.compositeservice.auth.application.Auth2TokenValidator;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.JwtToken;
@@ -12,14 +16,9 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.domain.Profile;
-import com.connectcrew.teamone.compositeservice.composite.domain.Register;
 import com.connectcrew.teamone.compositeservice.composite.domain.User;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.MemberPart;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.LoginResult;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
-import com.connectcrew.teamone.compositeservice.global.enums.Role;
-import com.connectcrew.teamone.compositeservice.global.enums.Social;
 import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
 import com.connectcrew.teamone.compositeservice.global.error.exception.UnauthorizedException;
@@ -91,7 +90,7 @@ class UserControllerTest {
     @Test
     void loginTest() {
         User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now(), LocalDateTime.now());
-        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()), List.of(1L, 2L));
+        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS, MemberPart.AOS), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
         when(userWebAdapter.getUser(anyString(), any(Social.class))).thenReturn(Mono.just(user));
@@ -118,7 +117,10 @@ class UserControllerTest {
                                 fieldWithPath("introduction").type("String (Optional)").optional().description("사용자 소개"),
                                 fieldWithPath("temperature").type("Number").optional().description("사용자 온도"),
                                 fieldWithPath("responseRate").type("Number").optional().description("사용자 응답률"),
-                                fieldWithPath("parts").type("String[] (Optional)").optional().description("사용자 직무"),
+                                fieldWithPath("parts[]").type("Part[]").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].key").type("String").optional().description("사용자 직무 key"),
+                                fieldWithPath("parts[].part").type("String").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].category").type("String").optional().description("사용자 직무 카테고리"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
@@ -194,10 +196,10 @@ class UserControllerTest {
     @Test
     void registerTest() {
         User user = new User(0L, "socialId", Social.GOOGLE, "testUser", "test@test.com", Role.USER, LocalDateTime.now(), LocalDateTime.now());
-        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS.name(), MemberPart.AOS.name()), List.of(1L, 2L));
+        Profile profile = new Profile(0L, "이름", "profile image url", "소개 글", 36.5, 40, List.of(MemberPart.IOS, MemberPart.AOS), List.of(1L, 2L));
 
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
-        when(userWebAdapter.save(any(Register.class))).thenReturn(Mono.just(user));
+        when(userWebAdapter.save(any(UserRegisterApiRequest.class))).thenReturn(Mono.just(user));
         when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
         when(jwtProvider.createToken(anyString(), anyLong(), anyString(), any(Role.class))).thenReturn(new JwtToken("accessToken", LocalDateTime.now(), "refreshToken", LocalDateTime.now()));
 
@@ -206,7 +208,7 @@ class UserControllerTest {
                 .bodyValue(new RegisterRequest("sampleToken", Social.GOOGLE, "testUser", "testNick", null, "test@gmail.com", true, true, "fcm"))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(LoginResult.class)
+                .expectBody(LoginResponse.class)
                 .consumeWith(document("auth/register-success",
                         requestFields(
                                 fieldWithPath("token").type("String").description("Social 로그인 후 발급받은 토큰"),
@@ -226,7 +228,10 @@ class UserControllerTest {
                                 fieldWithPath("introduction").type("String (Optional)").optional().description("사용자 소개"),
                                 fieldWithPath("temperature").type("Number").optional().description("사용자 온도"),
                                 fieldWithPath("responseRate").type("Number").optional().description("사용자 응답률"),
-                                fieldWithPath("parts").type("String[] (Optional)").optional().description("사용자 직무"),
+                                fieldWithPath("parts[]").type("Part[]").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].key").type("String").optional().description("사용자 직무 key"),
+                                fieldWithPath("parts[].part").type("String").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].category").type("String").optional().description("사용자 직무 카테고리"),
                                 fieldWithPath("email").type("String (Optional)").optional().description("사용자 이메일"),
                                 fieldWithPath("token").type("String").description("Access Token"),
                                 fieldWithPath("exp").type("Datetime").description("Access Token 만료 시간"),
@@ -269,7 +274,7 @@ class UserControllerTest {
     @Test
     void invalidRegisterTest() {
         when(tokenValidator.validate(anyString(), any(Social.class))).thenReturn(Mono.just("socialId"));
-        when(userWebAdapter.save(any(Register.class))).thenReturn(Mono.error(new IllegalArgumentException("공백과 특수문자는 들어갈 수 없어요.")));
+        when(userWebAdapter.save(any(UserRegisterApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException("공백과 특수문자는 들어갈 수 없어요.")));
 
         webTestClient.post()
                 .uri("/auth/register")
@@ -330,7 +335,7 @@ class UserControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         );
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
@@ -354,7 +359,10 @@ class UserControllerTest {
                                 fieldWithPath("introduction").type("String").description("소개글"),
                                 fieldWithPath("temperature").type("String").description("온도"),
                                 fieldWithPath("responseRate").type("Number").description("응답률"),
-                                fieldWithPath("parts[]").type("String[]").description("직무 분야"),
+                                fieldWithPath("parts[]").type("Part[]").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].key").type("String").optional().description("사용자 직무 key"),
+                                fieldWithPath("parts[].part").type("String").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].category").type("String").optional().description("사용자 직무 카테고리"),
                                 fieldWithPath("representProjects[]").type("RepresentProject[]").description("대표 프로젝트"),
                                 fieldWithPath("representProjects[].id").type("Number").description("대표 프로젝트 ID"),
                                 fieldWithPath("representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일")

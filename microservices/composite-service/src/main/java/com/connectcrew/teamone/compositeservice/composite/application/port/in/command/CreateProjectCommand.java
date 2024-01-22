@@ -1,10 +1,10 @@
 package com.connectcrew.teamone.compositeservice.composite.application.port.in.command;
 
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
-import com.connectcrew.teamone.compositeservice.global.enums.Region;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.CreateProjectApiRequest;
 
 import java.util.List;
+import java.util.UUID;
 
 public record  CreateProjectCommand(
         String title,
@@ -12,7 +12,7 @@ public record  CreateProjectCommand(
         Region region,
         Boolean online,
         ProjectState state,
-        String chatRoomId,
+        UUID chatRoomId,
         Career careerMin,
         Career careerMax,
         Long leader,
@@ -23,8 +23,9 @@ public record  CreateProjectCommand(
         List<CreateRecruitCommand> recruits,
         List<String> skills
 ) {
-    public CreateProjectInfo toDomain() {
-        return new CreateProjectInfo(
+
+    public CreateProjectApiRequest toApiRequest() {
+        return new CreateProjectApiRequest(
                 title,
                 banners,
                 region,
@@ -38,7 +39,7 @@ public record  CreateProjectCommand(
                 category,
                 goal,
                 introduction,
-                recruits.stream().map(CreateRecruitCommand::toDomain).toList(),
+                recruits.stream().map(CreateRecruitCommand::toApiRequest).toList(),
                 skills
         );
     }

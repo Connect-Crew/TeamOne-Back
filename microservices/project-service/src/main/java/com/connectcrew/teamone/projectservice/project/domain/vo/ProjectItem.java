@@ -1,7 +1,8 @@
 package com.connectcrew.teamone.projectservice.project.domain.vo;
 
-import com.connectcrew.teamone.api.project.values.*;
-import com.connectcrew.teamone.projectservice.project.domain.RecruitStatus;
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.project.ProjectItemApiResponse;
+import com.connectcrew.teamone.projectservice.project.domain.ProjectPart;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,26 @@ public record ProjectItem(
         Integer favorite,
         List<ProjectCategory> category,
         ProjectGoal goal,
-        List<RecruitStatus> recruitStatus
+        List<MemberPart> leaderParts,
+        List<ProjectPart> recruitStatus
 ) {
+    public ProjectItemApiResponse toResponse() {
+        return ProjectItemApiResponse.builder()
+                .id(id)
+                .title(title)
+                .thumbnail(thumbnail)
+                .region(region)
+                .online(online)
+                .careerMin(careerMin)
+                .careerMax(careerMax)
+                .createdAt(createdAt)
+                .state(state)
+                .favorite(favorite)
+                .category(category)
+                .goal(goal)
+                .leaderParts(leaderParts)
+                .recruitStatus(recruitStatus.stream().map(r -> r.toResponse(leaderParts.contains(r.part()))).toList())
+                .build();
+    }
+
 }

@@ -21,4 +21,5 @@ docker rmi teamone-back-gateway:latest
 ./gradlew clean
 ./gradlew build
 
+docker-compose build --no-cache
 docker-compose up -d

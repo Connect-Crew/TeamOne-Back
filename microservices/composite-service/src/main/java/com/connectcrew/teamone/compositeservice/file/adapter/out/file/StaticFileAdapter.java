@@ -33,7 +33,7 @@ public class StaticFileAdapter implements SaveFileOutput, FindFileOutput, Delete
                 .filter(file -> category.isAllowedExtension(getFileExtension(file.filename())))
                 .flatMap(file -> {
                     String fileName = String.format("%s.%s", UUID.randomUUID(), getFileExtension(file.filename()));
-                    Path filePath = Path.of(basePath, category.name(), fileName);
+                    Path filePath = Path.of(basePath, category.name().toLowerCase(), fileName);
                     log.trace("save file: {}", filePath);
                     return file.transferTo(filePath).thenReturn(fileName);
                 });
@@ -53,7 +53,7 @@ public class StaticFileAdapter implements SaveFileOutput, FindFileOutput, Delete
     public Optional<Resource> find(FileCategory category, String fileName) {
         log.trace("Try to load file: {}", fileName);
         try {
-            Path filePath = Path.of(basePath, category.name(), fileName);
+            Path filePath = Path.of(basePath, category.name().toLowerCase(), fileName);
             Resource resource = new UrlResource(filePath.toUri());
             if (!resource.exists() || !resource.isReadable()) {
                 log.warn("File not found: {}", filePath);

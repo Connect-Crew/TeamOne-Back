@@ -21,7 +21,7 @@ services:
       - TZ=Asia/Seoul
 
     volumes:
-      - ${ROOT_PATH}/banner:/resources/banner
+      - ${ROOT_PATH}:/resources
 
     ports:
       - "9081:8080"

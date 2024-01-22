@@ -5,4 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface QueryProfileUseCase {
     Mono<FullProfile> findProfileByUserId(Long userId);
+
+    Mono<String> findUserNameByUserId(Long userId);
 }

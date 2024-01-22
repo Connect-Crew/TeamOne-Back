@@ -1,12 +1,14 @@
 package com.connectcrew.teamone.userservice.user.adapter.in.web;
 
-import com.connectcrew.teamone.api.user.auth.Social;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.user.Social;
+import com.connectcrew.teamone.api.userservice.user.UserRegisterApiRequest;
+import com.connectcrew.teamone.api.userservice.user.UserApiResponse;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
-import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
-import com.connectcrew.teamone.userservice.user.adapter.in.web.request.CreateUserRequest;
-import com.connectcrew.teamone.userservice.user.adapter.in.web.response.UserResponse;
 import com.connectcrew.teamone.userservice.user.application.in.CreateUserUseCase;
 import com.connectcrew.teamone.userservice.user.application.in.QueryUserUseCase;
+import com.connectcrew.teamone.userservice.user.application.in.command.CreateUserCommand;
+import com.connectcrew.teamone.userservice.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +26,16 @@ public class AuthController {
 
 
     @GetMapping("/")
-    public Mono<UserResponse> find(String socialId, Social provider) {
+    public Mono<UserApiResponse> find(String socialId, Social provider) {
         return queryUserUseCase.findBySocialIdAndProvider(socialId, provider.name())
-                .map(UserResponse::fromDomain)
+                .map(User::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("AuthController.find", ErrorLevel.ERROR, ex));
     }
 
     @PostMapping("/")
-    public Mono<UserResponse> save(@RequestBody CreateUserRequest request) {
-        return createUserUseCase.create(request.toCommand())
-                .map(UserResponse::fromDomain)
+    public Mono<UserApiResponse> save(@RequestBody UserRegisterApiRequest request) {
+        return createUserUseCase.create(CreateUserCommand.from(request))
+                .map(User::toResponse)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("AuthController.save", ErrorLevel.ERROR, ex));
     }
 }

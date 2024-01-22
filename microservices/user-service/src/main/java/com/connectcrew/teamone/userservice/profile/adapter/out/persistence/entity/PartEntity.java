@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.userservice.profile.adapter.out.persistence.entity;
 
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.userservice.profile.domain.Part;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -25,7 +26,7 @@ public class PartEntity {
         return PartEntity.builder()
                 .partId(part.partId())
                 .profileId(part.profileId())
-                .part(part.part())
+                .part(part.part().name())
                 .build();
     }
 
@@ -33,7 +34,7 @@ public class PartEntity {
         return Part.builder()
                 .partId(this.partId)
                 .profileId(this.profileId)
-                .part(this.part)
+                .part(MemberPart.valueOf(this.part))
                 .build();
     }
 }

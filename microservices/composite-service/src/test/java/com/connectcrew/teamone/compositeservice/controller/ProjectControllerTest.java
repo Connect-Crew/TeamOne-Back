@@ -1,5 +1,10 @@
 package com.connectcrew.teamone.compositeservice.controller;
 
+import com.connectcrew.teamone.api.projectservice.enums.*;
+import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
+import com.connectcrew.teamone.api.projectservice.project.*;
+import com.connectcrew.teamone.api.userservice.favorite.FavoriteType;
+import com.connectcrew.teamone.api.userservice.user.Role;
 import com.connectcrew.teamone.compositeservice.auth.application.JwtProvider;
 import com.connectcrew.teamone.compositeservice.auth.domain.TokenClaim;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.request.*;
@@ -8,13 +13,12 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ChatWe
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.domain.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.enums.*;
-import com.connectcrew.teamone.compositeservice.composite.domain.vo.CreateProjectInfo;
 import com.connectcrew.teamone.compositeservice.config.TestBeanConfig;
 import com.connectcrew.teamone.compositeservice.config.TestSecurityConfig;
 import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
 import com.connectcrew.teamone.compositeservice.file.domain.enums.FileCategory;
-import com.connectcrew.teamone.compositeservice.global.enums.*;
+import com.connectcrew.teamone.compositeservice.global.enums.ChatRoomType;
+import com.connectcrew.teamone.compositeservice.global.enums.SkillType;
 import com.connectcrew.teamone.compositeservice.global.error.domain.ErrorResponse;
 import com.connectcrew.teamone.compositeservice.global.error.exception.NotFoundException;
 import com.connectcrew.teamone.compositeservice.global.error.message.ProjectExceptionMessage;
@@ -116,36 +120,36 @@ class ProjectControllerTest {
                 new RecruitStatus(
                         MemberPart.PL_PM_PO,
                         "프로토타입 기획자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.UI_UX_DESIGNER,
                         "프로토타입 디자이너를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.AOS,
                         "코틀린을 이용한 안드로이드 앱 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : true
                 ),
                 new RecruitStatus(
                         MemberPart.IOS,
                         "Swift를 이용한 iOS 앱 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 ),
                 new RecruitStatus(
                         MemberPart.BACKEND,
                         "Spring 백엔드 개발자를 모집합니다.",
-                        1,
-                        2,
+                        1L,
+                        2L,
                         appliedIsNull ? null : false
                 )
         );
@@ -166,6 +170,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.IT),
                         ProjectGoal.PORTFOLIO,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 ),
                 new ProjectItem(
@@ -181,6 +186,7 @@ class ProjectControllerTest {
                         40,
                         List.of(ProjectCategory.APP),
                         ProjectGoal.STARTUP,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 ),
                 new ProjectItem(
@@ -196,6 +202,7 @@ class ProjectControllerTest {
                         49,
                         List.of(ProjectCategory.AI),
                         ProjectGoal.STARTUP,
+                        List.of(MemberPart.IOS, MemberPart.AOS),
                         initRecruits(true)
                 )
         );
@@ -205,10 +212,9 @@ class ProjectControllerTest {
     void listTest() {
         List<ProjectItem> items = initItems();
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOption.class))).thenReturn(Flux.fromIterable(items));
+        when(projectWebAdapter.findAllProjectItems(any(ProjectFilterOptionApiRequest.class))).thenReturn(Flux.fromIterable(items));
         when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
 
-        System.out.println("asfjabfkjawfbjaskfbnashjk");
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/project/list")
@@ -262,6 +268,52 @@ class ProjectControllerTest {
                                 fieldWithPath("[].category").type("String[]").description("프로젝트 분야"),
                                 fieldWithPath("[].goal").type("String").description("프로젝트 목표"),
                                 fieldWithPath("[].recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
+                                fieldWithPath("[].recruitStatus[].containLeader").type("Boolean").description("프로젝트 모집 직무의 리더 포함 여부"),
+                                fieldWithPath("[].recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
+                                fieldWithPath("[].recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
+                                fieldWithPath("[].recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
+                                fieldWithPath("[].recruitStatus[].comment").type("String").description("프로젝트 모집 코멘트"),
+                                fieldWithPath("[].recruitStatus[].current").type("Number").description("프로젝트 현재 인원"),
+                                fieldWithPath("[].recruitStatus[].max").type("Number").description("프로젝트 최대 인원"),
+                                fieldWithPath("[].recruitStatus[].applied").type("Boolean").description("프로젝트 지원 여부 (해당 요청에서는 무조건 null입니다. 사용X)")
+                        )
+                ));
+    }
+
+    @Test
+    void myListTest() {
+        List<ProjectItem> items = initItems();
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllProjectItems(anyLong())).thenReturn(Flux.fromIterable(items));
+        when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), any(List.class))).thenReturn(Mono.just(Map.of(0L, true, 1L, false, 2L, true)));
+
+        webTestClient.get()
+                .uri("/project/mylist")
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<List<ProjectItemResponse>>() {
+                })
+                .consumeWith(document("project/mylist",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type("Number").description("프로젝트 ID"),
+                                fieldWithPath("[].title").type("String").description("프로젝트 제목"),
+                                fieldWithPath("[].thumbnail").type("String (Optional)").optional().description("프로젝트 썸네일"),
+                                fieldWithPath("[].region").type("String").description("프로젝트 지역"),
+                                fieldWithPath("[].online").type("Boolean").description("온라인 여부"),
+                                fieldWithPath("[].careerMin").type("String").description("최소 프로젝트 경력"),
+                                fieldWithPath("[].careerMax").type("String").description("최대 프로젝트 경력"),
+                                fieldWithPath("[].createdAt").type("Datetime").description("프로젝트 생성 날짜"),
+                                fieldWithPath("[].state").type("String").description("프로젝트 상태"),
+                                fieldWithPath("[].favorite").type("Number").description("프로젝트 좋아요 수"),
+                                fieldWithPath("[].myFavorite").type("Boolean").description("내가 좋아요 한 프로젝트 여부"),
+                                fieldWithPath("[].category").type("String[]").description("프로젝트 분야"),
+                                fieldWithPath("[].goal").type("String").description("프로젝트 목표"),
+                                fieldWithPath("[].recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
+                                fieldWithPath("[].recruitStatus[].containLeader").type("Boolean").description("프로젝트 모집 직무의 리더 포함 여부"),
                                 fieldWithPath("[].recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
                                 fieldWithPath("[].recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
                                 fieldWithPath("[].recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
@@ -285,10 +337,11 @@ class ProjectControllerTest {
                 ProjectState.IN_PROGRESS,
                 Career.SEEKER,
                 Career.YEAR_1,
-                UUID.randomUUID().toString(),
+                UUID.randomUUID(),
                 List.of(ProjectCategory.IT, ProjectCategory.ECOMMERCE),
                 ProjectGoal.STARTUP,
                 0L,
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 "프로젝트 설명",
                 14,
                 initRecruits(false),
@@ -303,7 +356,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
@@ -346,11 +399,15 @@ class ProjectControllerTest {
                                 fieldWithPath("leader.introduction").type("String").description("프로젝트 리더 소개"),
                                 fieldWithPath("leader.temperature").type("String").description("프로젝트 리더 온도"),
                                 fieldWithPath("leader.responseRate").type("Number").description("프로젝트 리더 응답률"),
-                                fieldWithPath("leader.parts[]").type("String[]").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[]").type("Part[]").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[].key").type("String").description("프로젝트 리더 분야 key"),
+                                fieldWithPath("leader.parts[].part").type("String").description("프로젝트 리더 분야"),
+                                fieldWithPath("leader.parts[].category").type("String").description("프로젝트 리더 분야 카테고리"),
                                 fieldWithPath("leader.representProjects[]").type("RepresentProject[]").description("프로젝트 리더 대표 프로젝트"),
                                 fieldWithPath("leader.representProjects[].id").type("Number").description("프로젝트 리더 대표 프로젝트 ID"),
                                 fieldWithPath("leader.representProjects[].thumbnail").type("String").description("프로젝트 리더 대표 프로젝트 썸네일"),
                                 fieldWithPath("recruitStatus").type("RecruitStatus[]").description("프로젝트 모집 현황"),
+                                fieldWithPath("recruitStatus[].containLeader").type("Boolean").description("프로젝트 모집 직무의 리더 포함 여부"),
                                 fieldWithPath("recruitStatus[].category").type("String").description("프로젝트 모집 직무 카테고리"),
                                 fieldWithPath("recruitStatus[].part").type("String").description("프로젝트 모집 직무"),
                                 fieldWithPath("recruitStatus[].partKey").type("String").description("프로젝트 모집 직무 키값"),
@@ -393,7 +450,7 @@ class ProjectControllerTest {
                 new ProjectMember(2L, false, List.of(MemberPart.IOS, MemberPart.AOS)),
                 new ProjectMember(3L, false, List.of(MemberPart.IOS, MemberPart.AOS))
         );
-        when(projectWebAdapter.findMembers(anyLong())).thenReturn(Mono.just(members));
+        when(projectWebAdapter.findMembers(anyLong())).thenReturn(Flux.fromIterable(members));
         when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
         when(userWebAdapter.getProfile(0L)).thenReturn(Mono.just(new Profile(
                 0L,
@@ -402,7 +459,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(1L)).thenReturn(Mono.just(new Profile(
@@ -412,7 +469,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(2L)).thenReturn(Mono.just(new Profile(
@@ -422,7 +479,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
         when(userWebAdapter.getProfile(3L)).thenReturn(Mono.just(new Profile(
@@ -432,7 +489,7 @@ class ProjectControllerTest {
                 "소개 글",
                 36.5,
                 40,
-                List.of(MemberPart.IOS.name(), MemberPart.AOS.name()),
+                List.of(MemberPart.IOS, MemberPart.AOS),
                 List.of(1L, 2L)
         )));
 
@@ -456,7 +513,10 @@ class ProjectControllerTest {
                                 fieldWithPath("[].profile.introduction").type("String").description("프로필 소개"),
                                 fieldWithPath("[].profile.temperature").type("Number").description("온도"),
                                 fieldWithPath("[].profile.responseRate").type("Number").description("응답률"),
-                                fieldWithPath("[].profile.parts").type("String[]").description("프로필 직무"),
+                                fieldWithPath("[].profile.parts[]").type("Part[]").description("프로필 직무"),
+                                fieldWithPath("[].profile.parts[].key").type("String").description("프로필 직무 key"),
+                                fieldWithPath("[].profile.parts[].part").type("String").description("프로필 직무 분야"),
+                                fieldWithPath("[].profile.parts[].category").type("String").description("프로필 직무 카테고리"),
                                 fieldWithPath("[].profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
                                 fieldWithPath("[].profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
                                 fieldWithPath("[].profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
@@ -470,7 +530,7 @@ class ProjectControllerTest {
     void createProjectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.just(0L));
+        when(projectWebAdapter.save(any(CreateProjectApiRequest.class))).thenReturn(Mono.just(0L));
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
         when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
 
@@ -489,11 +549,11 @@ class ProjectControllerTest {
         multipartData.add("category", ProjectCategory.ECOMMERCE.name());
         multipartData.add("goal", ProjectGoal.STARTUP.name());
         multipartData.add("introduction", "프로젝트 설명");
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2));
-        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L));
         multipartData.add("skills", SkillType.Swift.name());
         multipartData.add("skills", SkillType.Kotlin.name());
         multipartData.add("skills", SkillType.Spring.name());
@@ -540,7 +600,7 @@ class ProjectControllerTest {
     void createFailureTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(CreateProjectInfo.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
+        when(projectWebAdapter.save(any(CreateProjectApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.TITLE_LENGTH_30_UNDER.toString())));
         when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
         when(staticFileAdapter.delete(any(FileCategory.class), anyString())).thenReturn(true);
         when(chatWebAdapter.createChatRoom(any(ChatRoomType.class), any(Set.class))).thenReturn(Mono.just(new ChatRoom(UUID.randomUUID(), ChatRoomType.PROJECT, Set.of(0L, 1L, 2L, 3L))));
@@ -557,11 +617,11 @@ class ProjectControllerTest {
                 ProjectGoal.STARTUP,
                 "프로젝트 설명",
                 List.of(
-                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2),
-                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2)
+                        new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L),
+                        new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L)
                 ),
                 List.of(SkillType.Swift.name(), SkillType.Kotlin.name(), SkillType.Spring.name())
         );
@@ -588,6 +648,80 @@ class ProjectControllerTest {
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
                         )
                 ));
+    }
+
+    @Test
+    void updateProjectTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.update(any(UpdateProjectApiRequest.class))).thenReturn(Mono.just(0L));
+        when(staticFileAdapter.saveAll(any(FileCategory.class), any(Flux.class))).thenReturn(Flux.just("banner1.png", "banner2.png"));
+
+        MultiValueMap<String, Object> multipartData = new LinkedMultiValueMap<>();
+        multipartData.add("banner", new ClassPathResource("banner1.png"));
+        multipartData.add("banner", new ClassPathResource("banner2.png"));
+        multipartData.add("removeBanners", "banner3.png");
+        multipartData.add("removeBanners", "banner4.png");
+        multipartData.add("title", "프로젝트 제목");
+        multipartData.add("region", Region.SEOUL.name());
+        multipartData.add("online", true);
+        multipartData.add("state", ProjectState.NOT_STARTED.name());
+        multipartData.add("careerMin", Career.SEEKER.name());
+        multipartData.add("careerMax", Career.YEAR_1.name());
+        multipartData.add("leaderParts", MemberPart.PL_PM_PO.name());
+        multipartData.add("leaderParts", MemberPart.UI_UX_DESIGNER.name());
+        multipartData.add("category", ProjectCategory.IT.name());
+        multipartData.add("category", ProjectCategory.ECOMMERCE.name());
+        multipartData.add("goal", ProjectGoal.STARTUP.name());
+        multipartData.add("introduction", "프로젝트 설명");
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.PL_PM_PO, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.UI_UX_DESIGNER, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.AOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.IOS, "코멘트", 2L));
+        multipartData.add("recruits", new CreateRecruitRequest(MemberPart.BACKEND, "코멘트", 2L));
+        multipartData.add("skills", SkillType.Swift.name());
+        multipartData.add("skills", SkillType.Kotlin.name());
+        multipartData.add("skills", SkillType.Spring.name());
+
+
+        webTestClient.put()
+                .uri("/project/{projectId}", 5L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(multipartData)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SimpleLongResponse.class)
+                .consumeWith(document("project/update-success",
+                                requestHeaders(
+                                        headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                                ),
+                                pathParameters(
+                                        parameterWithName("projectId").description("Project Id")
+                                ),
+                                requestParts(
+                                        partWithName("banner").optional().description("프로젝트 배너 이미지 최대 3개로 .jpg, .png, .jpeg 확장자만 허용합니다."),
+                                        partWithName("removeBanners").optional().description("삭제할 프로젝트 배너 이미지로 \"이름.확장자\" 형식으로 입력합니다."),
+                                        partWithName("title").description("프로젝트 제목"),
+                                        partWithName("region").description("프로젝트 지역"),
+                                        partWithName("online").description("온라인 여부"),
+                                        partWithName("state").description("프로젝트 상태"),
+                                        partWithName("careerMin").description("최소 경력"),
+                                        partWithName("careerMax").description("최대 경력"),
+                                        partWithName("leaderParts").description("프로젝트 리더 직무 (Collection)"),
+                                        partWithName("category").description("프로젝트 분야 (Collection)"),
+                                        partWithName("goal").description("프로젝트 목표"),
+                                        partWithName("introduction").description("프로젝트 소개"),
+                                        partWithName("recruits").description("프로젝트 모집 정보 (Collection)"),
+                                        partWithName("skills").description("프로젝트 스킬 (Collection)")
+                                ),
+                                responseFields(
+                                        fieldWithPath("value").type("Long").description("생성된 프로젝트 ID")
+                                )
+                        )
+                );
+
+        clearBannerForTest();
     }
 
     @Test
@@ -621,7 +755,7 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(userWebAdapter.setFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
-        when(projectWebAdapter.updateFavorite(any(ProjectFavorite.class))).thenReturn(Mono.just(10));
+        when(projectWebAdapter.updateFavorite(any(ProjectFavoriteApiRequest.class))).thenReturn(Mono.just(10));
         when(userWebAdapter.isFavorite(anyLong(), any(FavoriteType.class), anyLong())).thenReturn(Mono.just(true));
 
         webTestClient.post()
@@ -647,10 +781,87 @@ class ProjectControllerTest {
     }
 
     @Test
+    void getApplyTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllApplies(anyLong(), anyLong(), any(MemberPart.class))).thenReturn(Flux.just(
+                new Apply(0L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(1L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(2L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(3L, 0L, MemberPart.BACKEND, "지원 메시지"),
+                new Apply(4L, 0L, MemberPart.BACKEND, "지원 메시지")
+        ));
+
+        ParameterizedTypeReference<List<ApplyResponse>> resType = new ParameterizedTypeReference<>() {
+        };
+
+        webTestClient.get()
+                .uri("/project/apply/{projectId}/{part}", 0L, MemberPart.BACKEND)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(resType)
+                .consumeWith(document("project/apply-list",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("Project Id"),
+                                parameterWithName("part").description("Member Part")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("[].projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("[].part").type("String").description("지원 직군"),
+                                fieldWithPath("[].message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
+    @Test
+    void getApplyStatusTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.findAllApplyStatus(anyLong(), anyLong())).thenReturn(Flux.just(
+                new ApplyStatus(MemberPart.BACKEND, 4L, 2L, 6L),
+                new ApplyStatus(MemberPart.IOS, 4L, 2L, 6L)
+        ));
+
+        ParameterizedTypeReference<SimpleMapResponse<MemberPart, ApplyStatusResponse>> resType = new ParameterizedTypeReference<>() {
+        };
+
+        webTestClient.get()
+                .uri("/project/apply/{projectId}", 0L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(resType)
+                .consumeWith(document("project/apply-status",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("Project Id")
+                        ),
+                        responseFields(
+                                fieldWithPath("BACKEND").type("ApplyStatusResponse").description("백엔드 지원 현황"),
+                                fieldWithPath("BACKEND.applies").type("Number").description("지원한 인원"),
+                                fieldWithPath("BACKEND.current").type("Number").description("현재 멤버 인원"),
+                                fieldWithPath("BACKEND.max").type("Number").description("최대 모집 인원"),
+                                fieldWithPath("IOS").type("ApplyStatusResponse").description("IOS 지원 현황"),
+                                fieldWithPath("IOS.applies").type("Number").description("지원한 인원"),
+                                fieldWithPath("IOS.current").type("Number").description("현재 멤버 인원"),
+                                fieldWithPath("IOS.max").type("Number").description("최대 모집 인원")
+
+                        )
+                ));
+    }
+
+    @Test
     void applyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.just(true));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -678,7 +889,7 @@ class ProjectControllerTest {
     void notfoundApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -702,7 +913,7 @@ class ProjectControllerTest {
     void invalidApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Apply.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
+        when(projectWebAdapter.save(any(ApplyApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.COLLECTED_PART.toString())));
 
         webTestClient.post()
                 .uri("/project/apply")
@@ -726,7 +937,7 @@ class ProjectControllerTest {
     void reportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.just(true));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.just(true));
 
         webTestClient.post()
                 .uri("/project/report")
@@ -753,7 +964,7 @@ class ProjectControllerTest {
     void notfoundReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.error(new NotFoundException(ProjectExceptionMessage.NOT_FOUND_PROJECT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")
@@ -777,7 +988,7 @@ class ProjectControllerTest {
     void invalidReportTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.save(any(Report.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
+        when(projectWebAdapter.save(any(ReportApiRequest.class))).thenReturn(Mono.error(new IllegalArgumentException(ProjectExceptionMessage.ALREADY_REPORT.toString())));
 
         webTestClient.post()
                 .uri("/project/report")
@@ -793,6 +1004,172 @@ class ProjectControllerTest {
                                 fieldWithPath("error").type("String").description("에러 유형"),
                                 fieldWithPath("message").type("String").description("실패 메시지"),
                                 fieldWithPath("timestamp").type("Datetime").description("응답 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void applyAcceptTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지")));
+
+        webTestClient.post()
+                .uri("/project/apply/{applyId}/accept", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue("리더의 메시지 (ex 연략 수단)")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ApplyResponse.class)
+                .consumeWith(document("project/apply-accept",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("applyId").description("지원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("part").type("String").description("지원 직군"),
+                                fieldWithPath("message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
+    @Test
+    void applyRejectTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지")));
+
+        webTestClient.post()
+                .uri("/project/apply/{applyId}/reject", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue("리더의 메시지 (ex 거절사유)")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ApplyResponse.class)
+                .consumeWith(document("project/apply-reject",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("applyId").description("지원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
+                                fieldWithPath("part").type("String").description("지원 직군"),
+                                fieldWithPath("message").type("String").description("지원 메시지")
+                        )
+                ));
+    }
+
+    @Test
+    void updateStateTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.updateState(anyLong(), anyLong(), any(ProjectState.class))).thenReturn(Mono.just(ProjectState.IN_PROGRESS));
+
+        webTestClient.post()
+                .uri("/project/{projectId}/state/{state}/update", 1L, ProjectState.IN_PROGRESS.name())
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectState.class)
+                .consumeWith(document("project/update-state",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("프로젝트 ID"),
+                                parameterWithName("state").description("프로젝트 상태")
+                        )
+                ));
+    }
+
+    @Test
+    void deleteTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.delete(anyLong(), anyLong())).thenReturn(Mono.just(ProjectState.COMPLETED));
+
+        webTestClient.delete()
+                .uri("/project/{projectId}/delete", 1L)
+                .header(JwtProvider.AUTH_HEADER, token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectState.class)
+                .consumeWith(document("project/delete",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("projectId").description("프로젝트 ID")
+                        )
+                ));
+    }
+
+    @Test
+    void kickTest() {
+        String token = JwtProvider.BEARER_PREFIX + "access token";
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(projectWebAdapter.kickMember(any(Kick.class))).thenReturn(Mono.just(new ProjectMember(0L, true, List.of(MemberPart.IOS, MemberPart.AOS))));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        )));
+
+        webTestClient.post()
+                .uri("/project/kick")
+                .header(JwtProvider.AUTH_HEADER, token)
+                .bodyValue(new KickRequest(
+                        1L,
+                        0L,
+                        List.of(
+                                new KickReasonRequest(KickType.OBSCENITY, KickType.OBSCENITY.getDescription()),
+                                new KickReasonRequest(KickType.ABUSE, KickType.ABUSE.getDescription())
+                        )
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProjectMemberResponse.class)
+                .consumeWith(document("project/kick",
+                        requestHeaders(
+                                headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("project").type("Number").description("프로젝트 ID"),
+                                fieldWithPath("userId").type("Number").description("유저 ID"),
+                                fieldWithPath("reasons").type("KickReasonRequest[]").description("내보내기 사유"),
+                                fieldWithPath("reasons[].type").type("String").description("내보내기 사유 타입"),
+                                fieldWithPath("reasons[].reason").type("String").description("내보내기 사유 메시지")
+                        ),
+                        responseFields(
+                                fieldWithPath("profile").type("Profile").description("프로필 정보"),
+                                fieldWithPath("profile.id").type("Number").description("프로필 ID"),
+                                fieldWithPath("profile.nickname").type("String").description("프로필 이름"),
+                                fieldWithPath("profile.profile").type("String").description("프로필 이미지"),
+                                fieldWithPath("profile.introduction").type("String").description("프로필 소개"),
+                                fieldWithPath("profile.temperature").type("Number").description("온도"),
+                                fieldWithPath("profile.responseRate").type("Number").description("응답률"),
+                                fieldWithPath("profile.parts[]").type("Part[]").description("프로필 직무"),
+                                fieldWithPath("profile.parts[].key").type("String").description("프로필 직무 key"),
+                                fieldWithPath("profile.parts[].part").type("String").description("프로필 직무 분야"),
+                                fieldWithPath("profile.parts[].category").type("String").description("프로필 직무 카테고리"),
+                                fieldWithPath("profile.representProjects").type("RepresentProject[]").description("대표 프로젝트"),
+                                fieldWithPath("profile.representProjects[].id").type("Number").description("대표 프로젝트 ID"),
+                                fieldWithPath("profile.representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일"),
+                                fieldWithPath("isLeader").type("Boolean").description("리더 여부"),
+                                fieldWithPath("parts").type("String[]").description("프로젝트 직무")
                         )
                 ));
     }

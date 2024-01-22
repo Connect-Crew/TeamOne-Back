@@ -1,13 +1,13 @@
 package com.connectcrew.teamone.userservice.notification.application;
 
-import com.connectcrew.teamone.userservice.notification.adapter.in.eventlistener.event.ErrorNotification;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SaveFcmTokenUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendErrorNotificationUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.out.*;
-import com.connectcrew.teamone.userservice.notification.domain.ErrorLevel;
+import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.userservice.notification.domain.FcmMessage;
 import com.connectcrew.teamone.userservice.notification.domain.FcmToken;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -68,11 +68,11 @@ public class NotificationAplService implements SendMessageUseCase, SaveFcmTokenU
                 .message(getExceptionMessages((Exception) ex))
                 .build();
 
-        sendDiscordOutput.sendMessage(notification.toCommand().toDomain());
+        sendDiscordOutput.sendMessage(DiscordMessageCommand.from(notification).toDomain());
     }
 
     private String getExceptionMessages(Exception ex) {
-        List<String> causeMessages =  new ArrayList<>();
+        List<String> causeMessages = new ArrayList<>();
 
         while (ex != null) {
             causeMessages.add(ex.getClass().getSimpleName() + " : " + ex.getMessage());

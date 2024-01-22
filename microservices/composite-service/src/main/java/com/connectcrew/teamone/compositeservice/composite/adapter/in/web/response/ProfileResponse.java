@@ -11,7 +11,7 @@ public record ProfileResponse(
         String introduction,
         Double temperature,
         Integer responseRate,
-        List<String> parts,
+        List<PartResponse> parts,
         List<RepresentProjectResponse> representProjects
 ) {
     public static ProfileResponse from(FullProfile profile) {
@@ -22,7 +22,7 @@ public record ProfileResponse(
                 profile.introduction(),
                 profile.temperature(),
                 profile.responseRate(),
-                profile.parts(),
+                profile.parts().stream().map(PartResponse::new).toList(),
                 profile.representProjects().stream()
                         .map(RepresentProjectResponse::from)
                         .toList()

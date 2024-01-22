@@ -11,4 +11,4 @@ spring:
     bootstrap-servers: kafka:9093
 
 resource:
-  base-path: /resources/banner
+  base-path: /resources

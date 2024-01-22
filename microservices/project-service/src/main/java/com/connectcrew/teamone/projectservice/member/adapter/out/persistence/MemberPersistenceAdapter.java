@@ -1,14 +1,22 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence;
 
-import com.connectcrew.teamone.api.project.values.MemberPart;
+import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberEntity;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.MemberPartEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.KickRepository;
+import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberPartRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
+import com.connectcrew.teamone.projectservice.member.application.port.out.DeleteMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.FindMemberOutput;
 import com.connectcrew.teamone.projectservice.member.application.port.out.SaveMemberOutput;
+import com.connectcrew.teamone.projectservice.member.application.port.out.UpdateMemberOutput;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
+import com.connectcrew.teamone.projectservice.member.domain.Kick;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
+import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
+import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,44 +24,55 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOutput {
+public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOutput, DeleteMemberOutput, UpdateMemberOutput {
 
     private final PartRepository partRepository;
     private final MemberRepository memberRepository;
+    private final MemberPartRepository memberPartRepository;
     private final ApplyRepository applyRepository;
+    private final KickRepository kickRepository;
 
     @Override
-    public Mono<List<Member>> findAllByProject(Long project) {
-        Mono<Map<Long, MemberPart>> parts = partRepository.findAllByProject(project)
-                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()));
-        Mono<List<MemberEntity>> members = memberRepository.findAllByProject(project).collectList();
-
-        return Mono.zip(parts, members)
-                .map(tuple -> {
-                    Map<Long, MemberPart> partMap = tuple.getT1();
-                    List<MemberEntity> memberList = tuple.getT2();
-
-                    return memberList.stream()
-                            .collect(Collectors.groupingBy(MemberEntity::getUser, Collectors.mapping(m -> partMap.get(m.getPartId()), Collectors.toList())))
-                            .entrySet().stream().map(e -> new Member(e.getKey(), false, e.getValue())).toList();
-                });
+    public Flux<Member> findAllByProject(Long project) {
+        return partRepository.findAllByProject(project)
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
+                .flatMapMany(idPartMap -> memberRepository.findAllByProjectId(project)
+                        .flatMap(member -> memberPartRepository.findAllByMember(member.getId())
+                                .map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart())))
+                                .collectList()
+                                .map(member::toDomain)
+                        ));
     }
 
     @Override
-    public Flux<MemberPart> findAllPartIdByProjectAndUser(Long project, Long user) {
-        return partRepository.findAllByProjectAndUser(project, user)
-                .map(part -> MemberPart.valueOf(part.getPart()));
+    public Mono<Member> findByProjectAndUser(Long project, Long user) {
+        return memberRepository.findByProjectIdAndUser(project, user)
+                .flatMap(member -> memberPartRepository.findAllByMember(member.getId()).collectList()
+                        .flatMap(parts -> partRepository.findAllById(parts.stream().map(MemberPartEntity::getPart).toList())
+                                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
+                                .map(idPartMap -> member.toDomain(parts.stream().map(memberPart -> memberPart.toDomain(idPartMap.get(memberPart.getPart()))).toList()))
+                        )
+                );
+    }
+
+    @Override
+    public Flux<Apply> findAllByProjectAndUser(Long project, Long user) {
+        return partRepository.findAllByProject(project)
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
+                .flatMapMany(idPartMap -> applyRepository.findAllByProjectAndUserAndState(project, user, ApplyState.WAITING)
+                        .map(apply -> apply.toDomain(idPartMap.get(apply.getPartId())))
+                );
+
     }
 
     @Override
     public Mono<Boolean> existsMemberByPartAndUser(Long partId, Long user) {
-        return memberRepository.existsByPartIdAndUser(partId, user);
+        return memberRepository.countByPartIdAndUser(partId, user)
+                .map(count -> count > 0);
     }
 
     @Override
@@ -62,21 +81,95 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
     }
 
     @Override
-    public Mono<Long> saveMember(Long userId, List<Long> parts) {
-        List<MemberEntity> members = parts.stream().map(partId -> MemberEntity
-                        .builder()
-                        .partId(partId)
-                        .user(userId)
-                        .build())
+    public Flux<Apply> findAllApplyByProject(Long projectId) {
+        return partRepository.findAllByProject(projectId)
+                .collectMap(PartEntity::getId, p -> MemberPart.valueOf(p.getPart()))
+                .flatMapMany(partMap -> applyRepository.findAllByProjectAndState(projectId, ApplyState.WAITING)
+                        .map(apply -> apply.toDomain(partMap.get(apply.getPartId()))));
+    }
+
+    @Override
+    public Flux<Apply> findAllApplyByProjectAndPart(Long projectId, MemberPart part) {
+        return partRepository.findByProjectAndPart(projectId, part.name())
+                .flatMapMany(partEntity -> applyRepository.findAllByProjectAndPartIdAndState(projectId, partEntity.getId(), ApplyState.WAITING))
+                .map(e -> e.toDomain(part));
+    }
+
+    @Override
+    public Mono<Apply> findApplyById(Long applyId) {
+        return applyRepository.findById(applyId)
+                .flatMap(apply -> partRepository.findById(apply.getPartId())
+                        .map(part -> apply.toDomain(MemberPart.valueOf(part.getPart())))
+                );
+    }
+
+    @Override
+    public Mono<Member> save(Member member) {
+        List<Long> memberPartIds = member.parts().stream()
+                .map(ProjectMemberPart::id)
+                .filter(Objects::nonNull)
                 .toList();
-        return memberRepository.saveAll(members)
-                .collectList()
-                .thenReturn(userId);
+
+        Map<Long, MemberPart> partMap = new HashMap<>();
+        for (ProjectMemberPart part : member.parts()) {
+            partMap.put(part.partId(), part.part());
+        }
+
+        // 삭제된 part 제거
+        return memberPartRepository.deleteAllByMemberAndIdNotIn(member.id(), memberPartIds)
+                // member 저장
+                .then(memberRepository.save(MemberEntity.from(member))
+                        .flatMap(memberEntity -> {
+                            List<MemberPartEntity> partEntities = member.parts().stream().
+                                    map(part -> MemberPartEntity.from(part, memberEntity.getId()))
+                                    .toList();
+
+                            return memberPartRepository.saveAll(partEntities)
+                                    .map(memberPartEntity -> memberPartEntity.toDomain(partMap.get(memberPartEntity.getPart())))
+                                    .collectList()
+                                    .map(memberEntity::toDomain);
+                        })
+                );
     }
 
     @Override
     public Mono<Apply> saveApply(Apply apply) {
         return applyRepository.save(ApplyEntity.from(apply))
-                .map(ApplyEntity::toDomain);
+                .map(e -> e.toDomain(apply.part()));
+    }
+
+    @Override
+    public Mono<List<Apply>> saveAllApply(List<Apply> apply) {
+        List<ApplyEntity> entities = new ArrayList<>();
+        Map<Long, MemberPart> partIdPartMap = new HashMap<>();
+        for (Apply a : apply) {
+            entities.add(ApplyEntity.from(a));
+            partIdPartMap.put(a.partId(), a.part());
+        }
+        return applyRepository.saveAll(entities)
+                .map(e -> e.toDomain(partIdPartMap.get(e.getPartId())))
+                .collectList();
+    }
+
+    @Override
+    public Mono<Kick> saveKick(Kick kick) {
+        return kickRepository.saveAll(kick.toEntities()).then().thenReturn(kick);
+    }
+
+    @Override
+    public Mono<List<Long>> deleteMemberPartById(Long memberId) {
+        return memberPartRepository.deleteAllByMember(memberId)
+                .map(MemberPartEntity::getPart)
+                .collectList();
+    }
+
+    @Override
+    public Mono<Boolean> decreaseMemberCount(List<Long> partIds) {
+        return partRepository.findAllById(partIds)
+                .map(partEntity -> partEntity.setCollected(partEntity.getCollected() - 1))
+                .collectList()
+                .flatMapMany(partRepository::saveAll)
+                .then()
+                .thenReturn(true);
     }
 }
