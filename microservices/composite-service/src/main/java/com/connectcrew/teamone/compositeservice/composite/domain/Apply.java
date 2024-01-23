@@ -11,12 +11,13 @@ public record Apply(
         Long projectId,
         MemberPart part,
         String message,
+        String contact,
         ApplyState state,
         String leaderMessage
 ) {
 
     public ApplyResponse toResponse() {
-        return new ApplyResponse(projectId, userId, part, message, state, leaderMessage);
+        return new ApplyResponse(projectId, userId, part, message, contact, state, leaderMessage);
     }
 
     public static Apply of(ApplyApiResponse res) {
@@ -25,6 +26,7 @@ public record Apply(
                 res.projectId(),
                 res.part(),
                 res.message(),
+                res.contact(),
                 res.state(),
                 res.leaderMessage()
         );
@@ -35,7 +37,8 @@ public record Apply(
                 userId,
                 projectId,
                 part,
-                message
+                message,
+                contact
         );
     }
 }

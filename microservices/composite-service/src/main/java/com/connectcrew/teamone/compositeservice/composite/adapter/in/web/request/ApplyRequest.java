@@ -9,10 +9,11 @@ import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
 public record ApplyRequest(
         Long projectId,
         MemberPart part,
-        String message
+        String message,
+        String contact
 ) {
 
     public Apply toDomain(Long userId) {
-        return new Apply(userId, projectId, part, message, ApplyState.WAITING, null);
+        return new Apply(userId, projectId, part, message, contact, ApplyState.WAITING, null);
     }
 }

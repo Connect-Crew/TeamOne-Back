@@ -25,6 +25,9 @@ public class ApplyEntity {
     private Long user;
 
     private String message;
+
+    private String contact;
+
     private ApplyState state;
 
     private String leaderMessage;
@@ -36,6 +39,7 @@ public class ApplyEntity {
                 .partId(apply.partId())
                 .user(apply.userId())
                 .message(apply.message())
+                .contact(apply.contact())
                 .state(apply.state())
                 .leaderMessage(apply.leaderMessage())
                 .build();
@@ -49,6 +53,7 @@ public class ApplyEntity {
                 .part(part)
                 .userId(user)
                 .message(message)
+                .contact(contact)
                 .state(state)
                 .leaderMessage(leaderMessage)
                 .build();

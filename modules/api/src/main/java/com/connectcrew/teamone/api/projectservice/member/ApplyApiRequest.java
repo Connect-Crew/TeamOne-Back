@@ -6,6 +6,7 @@ public record ApplyApiRequest(
         Long userId,
         Long projectId,
         MemberPart part,
-        String message
+        String message,
+        String contact
 ) {
 }

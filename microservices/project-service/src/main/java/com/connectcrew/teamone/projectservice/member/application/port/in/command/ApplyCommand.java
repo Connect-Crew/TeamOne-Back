@@ -9,7 +9,8 @@ public record ApplyCommand(
         Long userId,
         Long projectId,
         MemberPart part,
-        String message
+        String message,
+        String contact
 ) {
 
     public static ApplyCommand from(ApplyApiRequest request) {
@@ -17,7 +18,8 @@ public record ApplyCommand(
                 request.userId(),
                 request.projectId(),
                 request.part(),
-                request.message()
+                request.message(),
+                request.contact()
         );
     }
 
@@ -28,6 +30,7 @@ public record ApplyCommand(
                 .partId(partId)
                 .part(part)
                 .message(message)
+                .contact(contact)
                 .state(ApplyState.WAITING)
                 .build();
     }

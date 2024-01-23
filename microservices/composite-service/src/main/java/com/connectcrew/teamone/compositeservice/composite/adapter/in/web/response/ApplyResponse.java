@@ -9,6 +9,7 @@ public record ApplyResponse(
         Long userId,
         MemberPart part,
         String message,
+        String contact,
         ApplyState state,
         String leaderMessage
 ) {

@@ -9,6 +9,7 @@ public record ApplyApiResponse(
         Long projectId,
         MemberPart part,
         String message,
+        String contact,
         ApplyState state,
         String leaderMessage
 ) {

@@ -98,7 +98,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isOk()
@@ -128,7 +129,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -149,7 +151,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -179,7 +182,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -209,7 +213,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -239,7 +244,8 @@ public class MemberControllerTest {
                         1L,
                         1L,
                         MemberPart.ADVERTISEMENT_DESIGNER,
-                        "testComment"
+                        "testComment",
+                        "testContact"
                 ))
                 .exchange()
                 .expectStatus().isBadRequest()

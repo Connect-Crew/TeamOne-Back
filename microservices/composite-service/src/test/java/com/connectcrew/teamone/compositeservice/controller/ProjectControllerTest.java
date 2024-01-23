@@ -785,11 +785,11 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.findAllApplies(anyLong(), anyLong(), any(MemberPart.class))).thenReturn(Flux.just(
-                new Apply(0L, 0L, MemberPart.BACKEND, "지원 메시지", ApplyState.WAITING, null),
-                new Apply(1L, 0L, MemberPart.BACKEND, "지원 메시지", ApplyState.WAITING, null),
-                new Apply(2L, 0L, MemberPart.BACKEND, "지원 메시지", ApplyState.WAITING, null),
-                new Apply(3L, 0L, MemberPart.BACKEND, "지원 메시지", ApplyState.WAITING, null),
-                new Apply(4L, 0L, MemberPart.BACKEND, "지원 메시지", ApplyState.WAITING, null)
+                new Apply(0L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(1L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(2L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(3L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(4L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null)
         ));
 
         ParameterizedTypeReference<List<ApplyResponse>> resType = new ParameterizedTypeReference<>() {
@@ -814,6 +814,7 @@ class ProjectControllerTest {
                                 fieldWithPath("[].projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("[].part").type("String").description("지원 직군"),
                                 fieldWithPath("[].message").type("String").description("지원 메시지"),
+                                fieldWithPath("[].contact").type("String").description("지원자 연락 수단"),
                                 fieldWithPath("[].state").type("String").description("지원 상태 (WAITING, ACCEPT, REJECT)"),
                                 fieldWithPath("[].leaderMessage").type("String (Optional)").description("리더의 응답 메시지")
                         )
@@ -871,7 +872,7 @@ class ProjectControllerTest {
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지", "연락수단"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SimpleBooleanResponse.class)
@@ -882,7 +883,8 @@ class ProjectControllerTest {
                         requestFields(
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
-                                fieldWithPath("message").type("String").description("지원 메시지")
+                                fieldWithPath("message").type("String").description("지원 메시지"),
+                                fieldWithPath("contact").type("String").description("지원자 연락 수단")
                         ),
                         responseFields(
                                 fieldWithPath("value").type("Boolean").description("지원 여부")
@@ -899,7 +901,7 @@ class ProjectControllerTest {
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지", "연락수단"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -923,7 +925,7 @@ class ProjectControllerTest {
         webTestClient.post()
                 .uri("/project/apply")
                 .header(JwtProvider.AUTH_HEADER, token)
-                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지"))
+                .bodyValue(new ApplyRequest(1L, MemberPart.PL_PM_PO, "지원 메시지", "연락수단"))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class)
@@ -1017,7 +1019,7 @@ class ProjectControllerTest {
     void applyAcceptTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", ApplyState.ACCEPT, "~~로 연락주세요~~")));
+        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.ACCEPT, "(리더 연락처)로 연락주세요")));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/accept", 1L)
@@ -1038,6 +1040,7 @@ class ProjectControllerTest {
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
                                 fieldWithPath("message").type("String").description("지원 메시지"),
+                                fieldWithPath("contact").type("String").description("지원자 연락 수단"),
                                 fieldWithPath("state").type("String").description("지원 상태 (WAITING, ACCEPT, REJECT)"),
                                 fieldWithPath("leaderMessage").type("String (Optional)").description("리더의 응답 메시지")
                         )
@@ -1048,7 +1051,7 @@ class ProjectControllerTest {
     void applyRejectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", ApplyState.REJECT, "~~한 이유로 같이하기 어려울거 같아요.")));
+        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.REJECT, "~~한 이유로 같이하기 어려울거 같아요.")));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/reject", 1L)
@@ -1069,6 +1072,7 @@ class ProjectControllerTest {
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
                                 fieldWithPath("message").type("String").description("지원 메시지"),
+                                fieldWithPath("contact").type("String").description("지원자 연락 수단"),
                                 fieldWithPath("state").type("String").description("지원 상태 (WAITING, ACCEPT, REJECT)"),
                                 fieldWithPath("leaderMessage").type("String (Optional)").description("리더의 응답 메시지")
                         )
