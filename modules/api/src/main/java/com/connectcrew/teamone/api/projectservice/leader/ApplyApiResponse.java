@@ -1,5 +1,6 @@
 package com.connectcrew.teamone.api.projectservice.leader;
 
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 
 public record ApplyApiResponse(
@@ -7,6 +8,8 @@ public record ApplyApiResponse(
         Long userId,
         Long projectId,
         MemberPart part,
-        String message
+        String message,
+        ApplyState state,
+        String leaderMessage
 ) {
 }

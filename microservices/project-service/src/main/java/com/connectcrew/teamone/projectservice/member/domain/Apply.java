@@ -2,7 +2,7 @@ package com.connectcrew.teamone.projectservice.member.domain;
 
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
-import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import lombok.Builder;
 
 @Builder
@@ -17,7 +17,7 @@ public record Apply(
         String leaderMessage
 ) {
     public ApplyApiResponse toResponse() {
-        return new ApplyApiResponse(id, userId, projectId, part, message);
+        return new ApplyApiResponse(id, userId, projectId, part, message, state, leaderMessage);
     }
 
     public Apply accept(String leaderMessage) {

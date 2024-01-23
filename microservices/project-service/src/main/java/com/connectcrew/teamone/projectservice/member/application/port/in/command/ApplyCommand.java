@@ -3,7 +3,7 @@ package com.connectcrew.teamone.projectservice.member.application.port.in.comman
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
 import com.connectcrew.teamone.projectservice.member.domain.Apply;
-import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 
 public record ApplyCommand(
         Long userId,

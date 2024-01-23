@@ -16,7 +16,7 @@ import com.connectcrew.teamone.projectservice.member.domain.Apply;
 import com.connectcrew.teamone.projectservice.member.domain.Kick;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
-import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository;
 
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
-import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

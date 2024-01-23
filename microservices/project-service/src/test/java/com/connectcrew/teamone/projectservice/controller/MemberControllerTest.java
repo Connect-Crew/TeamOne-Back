@@ -8,7 +8,7 @@ import com.connectcrew.teamone.projectservice.member.adapter.in.web.MemberContro
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.entity.ApplyEntity;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.ApplyRepository;
 import com.connectcrew.teamone.projectservice.member.adapter.out.persistence.repository.MemberRepository;
-import com.connectcrew.teamone.projectservice.member.domain.enums.ApplyState;
+import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.*;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.*;
 import org.junit.jupiter.api.Test;
