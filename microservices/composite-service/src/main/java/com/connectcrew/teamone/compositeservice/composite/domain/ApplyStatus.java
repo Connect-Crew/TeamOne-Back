@@ -8,11 +8,12 @@ public record ApplyStatus(
         MemberPart part,
         Long applies,
         Long current,
-        Long max
+        Long max,
+        String comment
 ) {
 
     public ApplyStatusResponse toResponse() {
-        return new ApplyStatusResponse(applies, current, max);
+        return new ApplyStatusResponse(applies, current, max, comment);
     }
 
     public static ApplyStatus of(ApplyStatusApiResponse res) {
@@ -20,7 +21,8 @@ public record ApplyStatus(
                 res.part(),
                 res.applies(),
                 res.current(),
-                res.max()
+                res.max(),
+                res.comment()
         );
     }
 }

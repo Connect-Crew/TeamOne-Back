@@ -8,19 +8,21 @@ public record ApplyStatus(
         MemberPart part,
         Long applies,
         Long current,
-        Long max
+        Long max,
+        String comment
 ) {
 
     public ApplyStatusApiResponse toResponse() {
-        return new ApplyStatusApiResponse(part, applies, current, max);
+        return new ApplyStatusApiResponse(part, applies, current, max, comment);
     }
 
-    public static ApplyStatus of(ProjectPart recruitStatus, Long applies) {
+    public static ApplyStatus of(ProjectPart projectPart, Long applies) {
         return new ApplyStatus(
-                recruitStatus.part(),
+                projectPart.part(),
                 applies,
-                recruitStatus.current(),
-                recruitStatus.max()
+                projectPart.current(),
+                projectPart.max(),
+                projectPart.comment()
         );
     }
 }

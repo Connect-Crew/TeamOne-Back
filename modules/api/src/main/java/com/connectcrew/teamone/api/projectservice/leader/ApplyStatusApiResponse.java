@@ -6,7 +6,8 @@ public record ApplyStatusApiResponse(
         MemberPart part,
         Long applies,
         Long current,
-        Long max
+        Long max,
+        String comment
 ) {
 
 }

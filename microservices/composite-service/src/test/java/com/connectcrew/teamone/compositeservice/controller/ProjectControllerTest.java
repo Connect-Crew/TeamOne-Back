@@ -825,8 +825,8 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.findAllApplyStatus(anyLong(), anyLong())).thenReturn(Flux.just(
-                new ApplyStatus(MemberPart.BACKEND, 4L, 2L, 6L),
-                new ApplyStatus(MemberPart.IOS, 4L, 2L, 6L)
+                new ApplyStatus(MemberPart.BACKEND, 4L, 2L, 6L, "~~~한 사람을 찾아요."),
+                new ApplyStatus(MemberPart.IOS, 4L, 2L, 6L, "~~~한 사람을 찾아요.")
         ));
 
         ParameterizedTypeReference<SimpleMapResponse<MemberPart, ApplyStatusResponse>> resType = new ParameterizedTypeReference<>() {
@@ -850,10 +850,13 @@ class ProjectControllerTest {
                                 fieldWithPath("BACKEND.applies").type("Number").description("지원한 인원"),
                                 fieldWithPath("BACKEND.current").type("Number").description("현재 멤버 인원"),
                                 fieldWithPath("BACKEND.max").type("Number").description("최대 모집 인원"),
+                                fieldWithPath("BACKEND.comment").type("String").description("모집 코멘트"),
                                 fieldWithPath("IOS").type("ApplyStatusResponse").description("IOS 지원 현황"),
                                 fieldWithPath("IOS.applies").type("Number").description("지원한 인원"),
                                 fieldWithPath("IOS.current").type("Number").description("현재 멤버 인원"),
-                                fieldWithPath("IOS.max").type("Number").description("최대 모집 인원")
+                                fieldWithPath("IOS.max").type("Number").description("최대 모집 인원"),
+                                fieldWithPath("IOS.comment").type("String").description("모집 코멘트")
+
 
                         )
                 ));

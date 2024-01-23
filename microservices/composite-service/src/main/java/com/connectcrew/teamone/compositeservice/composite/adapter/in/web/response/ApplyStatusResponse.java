@@ -3,6 +3,7 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respon
 public record ApplyStatusResponse(
         Long applies,
         Long current,
-        Long max
+        Long max,
+        String comment
 ) {
 }
