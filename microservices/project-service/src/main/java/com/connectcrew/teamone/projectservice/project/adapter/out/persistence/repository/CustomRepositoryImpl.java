@@ -107,6 +107,7 @@ public class CustomRepositoryImpl implements CustomRepository {
                 optionSql.add(String.format("(title LIKE '%%%s%%' OR introduction LIKE '%%%s%%')", keyword, keyword));
             }
         }
+        optionSql.add("p.state != " + ProjectState.DELETED.name()); // 삭제된 프로젝트는 검색되지 않도록 함.
 
         String whereSql = optionSql.size() > 0 ? "WHERE " + String.join(" AND ", optionSql) : "";
 
