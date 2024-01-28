@@ -16,7 +16,7 @@ public record ApplyStatus(
 
         return new ApplyStatusResponse(
                 part.name(),
-                part.getCategory().name(),
+                part.getCategory().getDescription(),
                 applies,
                 current,
                 max,
