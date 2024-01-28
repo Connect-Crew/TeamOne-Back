@@ -783,6 +783,16 @@ class ProjectControllerTest {
     @Test
     void getApplyTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
+        Profile profile = new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        );
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.findAllApplies(anyLong(), anyLong(), any(MemberPart.class))).thenReturn(Flux.just(
                 new Apply(0L, 0L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
@@ -791,6 +801,8 @@ class ProjectControllerTest {
                 new Apply(0L, 3L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
                 new Apply(0L, 4L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null)
         ));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         ParameterizedTypeReference<List<ApplyResponse>> resType = new ParameterizedTypeReference<>() {
         };
@@ -811,7 +823,20 @@ class ProjectControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("[].id").type("Number").description("지원 아이디"),
-                                fieldWithPath("[].userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("[].user").type("Profile").description("지원자 프로필"),
+                                fieldWithPath("[].user.id").type("Number").description("지원자 아이디"),
+                                fieldWithPath("[].user.nickname").type("String").description("지원자 닉네임"),
+                                fieldWithPath("[].user.profile").type("String").description("지원자 프로필 이미지"),
+                                fieldWithPath("[].user.introduction").type("String").description("지원자 소개"),
+                                fieldWithPath("[].user.temperature").type("Number").description("지원자 온도"),
+                                fieldWithPath("[].user.responseRate").type("Number").description("지원자 응답률"),
+                                fieldWithPath("[].user.parts[]").type("Part[]").description("지원자 직군"),
+                                fieldWithPath("[].user.parts[].key").type("String").description("지원자 직군 키값"),
+                                fieldWithPath("[].user.parts[].part").type("String").description("지원자 직군"),
+                                fieldWithPath("[].user.parts[].category").type("String").description("지원자 직군 카테고리"),
+                                fieldWithPath("[].user.representProjects[]").type("RepresentProject[]").description("지원자 대표 프로젝트"),
+                                fieldWithPath("[].user.representProjects[].id").type("Number").description("지원자 대표 프로젝트 ID"),
+                                fieldWithPath("[].user.representProjects[].thumbnail").type("String").description("지원자 대표 프로젝트 썸네일"),
                                 fieldWithPath("[].projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("[].part").type("String").description("지원 직군"),
                                 fieldWithPath("[].message").type("String").description("지원 메시지"),
@@ -1015,8 +1040,20 @@ class ProjectControllerTest {
     @Test
     void applyAcceptTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
+        Profile profile = new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        );
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(0L, 1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.ACCEPT, "(리더 연락처)로 연락주세요")));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/accept", 1L)
@@ -1034,7 +1071,20 @@ class ProjectControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").type("Number").description("지원 아이디"),
-                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("user").type("Profile").description("지원자 프로필"),
+                                fieldWithPath("user.id").type("Number").description("지원자 아이디"),
+                                fieldWithPath("user.nickname").type("String").description("지원자 닉네임"),
+                                fieldWithPath("user.profile").type("String").description("지원자 프로필 이미지"),
+                                fieldWithPath("user.introduction").type("String").description("지원자 소개"),
+                                fieldWithPath("user.temperature").type("Number").description("지원자 온도"),
+                                fieldWithPath("user.responseRate").type("Number").description("지원자 응답률"),
+                                fieldWithPath("user.parts[]").type("Part[]").description("지원자 직군"),
+                                fieldWithPath("user.parts[].key").type("String").description("지원자 직군 키값"),
+                                fieldWithPath("user.parts[].part").type("String").description("지원자 직군"),
+                                fieldWithPath("user.parts[].category").type("String").description("지원자 직군 카테고리"),
+                                fieldWithPath("user.representProjects[]").type("RepresentProject[]").description("지원자 대표 프로젝트"),
+                                fieldWithPath("user.representProjects[].id").type("Number").description("지원자 대표 프로젝트 ID"),
+                                fieldWithPath("user.representProjects[].thumbnail").type("String").description("지원자 대표 프로젝트 썸네일"),
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
                                 fieldWithPath("message").type("String").description("지원 메시지"),
@@ -1048,8 +1098,20 @@ class ProjectControllerTest {
     @Test
     void applyRejectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
+        Profile profile = new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        );
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(0L, 1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.REJECT, "~~한 이유로 같이하기 어려울거 같아요.")));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(projectWebAdapter.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/reject", 1L)
@@ -1067,7 +1129,20 @@ class ProjectControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").type("Number").description("지원 아이디"),
-                                fieldWithPath("userId").type("Number").description("지원자 아이디"),
+                                fieldWithPath("user").type("Profile").description("지원자 프로필"),
+                                fieldWithPath("user.id").type("Number").description("지원자 아이디"),
+                                fieldWithPath("user.nickname").type("String").description("지원자 닉네임"),
+                                fieldWithPath("user.profile").type("String").description("지원자 프로필 이미지"),
+                                fieldWithPath("user.introduction").type("String").description("지원자 소개"),
+                                fieldWithPath("user.temperature").type("Number").description("지원자 온도"),
+                                fieldWithPath("user.responseRate").type("Number").description("지원자 응답률"),
+                                fieldWithPath("user.parts[]").type("Part[]").description("지원자 직군"),
+                                fieldWithPath("user.parts[].key").type("String").description("지원자 직군 키값"),
+                                fieldWithPath("user.parts[].part").type("String").description("지원자 직군"),
+                                fieldWithPath("user.parts[].category").type("String").description("지원자 직군 카테고리"),
+                                fieldWithPath("user.representProjects[]").type("RepresentProject[]").description("지원자 대표 프로젝트"),
+                                fieldWithPath("user.representProjects[].id").type("Number").description("지원자 대표 프로젝트 ID"),
+                                fieldWithPath("user.representProjects[].thumbnail").type("String").description("지원자 대표 프로젝트 썸네일"),
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
                                 fieldWithPath("message").type("String").description("지원 메시지"),

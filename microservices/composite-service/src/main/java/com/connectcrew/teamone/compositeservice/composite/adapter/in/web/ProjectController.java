@@ -9,7 +9,6 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.*;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.CreateChatRoomCommand;
 import com.connectcrew.teamone.compositeservice.composite.application.port.in.command.KickCommand;
-import com.connectcrew.teamone.compositeservice.composite.domain.Apply;
 import com.connectcrew.teamone.compositeservice.composite.domain.ApplyStatus;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectFavorite;
 import com.connectcrew.teamone.compositeservice.composite.domain.ProjectItem;
@@ -332,7 +331,8 @@ public class ProjectController {
         Long id = claim.id();
 
         return queryProjectUseCase.getApplies(id, projectId, part)
-                .map(Apply::toResponse)
+                .flatMap(apply -> queryProfileUseCase.getFullProfile(apply.userId())
+                        .map(apply::toResponse))
                 .collectList();
     }
 
@@ -362,7 +362,8 @@ public class ProjectController {
 
         log.trace("acceptApply - applyId: {}, leaderId: {}", applyId, id);
         return updateProjectUseCase.acceptApply(applyId, id, leaderMessage)
-                .map(Apply::toResponse)
+                .flatMap(apply -> queryProfileUseCase.getFullProfile(apply.userId())
+                        .map(apply::toResponse))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.acceptApply", ErrorLevel.ERROR, ex));
     }
 
@@ -374,7 +375,8 @@ public class ProjectController {
 
         log.trace("rejectApply - applyId: {}, leaderId: {}", applyId, id);
         return updateProjectUseCase.rejectApply(applyId, id, leaderMessage)
-                .map(Apply::toResponse)
+                .flatMap(apply -> queryProfileUseCase.getFullProfile(apply.userId())
+                        .map(apply::toResponse))
                 .doOnError(ex -> sendErrorNotificationUseCase.send("ProjectController.rejectApply", ErrorLevel.ERROR, ex));
     }
 

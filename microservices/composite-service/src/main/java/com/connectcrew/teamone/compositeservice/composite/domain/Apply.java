@@ -5,6 +5,7 @@ import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
 import com.connectcrew.teamone.api.projectservice.member.ApplyApiRequest;
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.ApplyResponse;
+import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.ProfileResponse;
 import lombok.Builder;
 
 @Builder
@@ -19,8 +20,8 @@ public record Apply(
         String leaderMessage
 ) {
 
-    public ApplyResponse toResponse() {
-        return new ApplyResponse(id, projectId, userId, part, message, contact, state, leaderMessage);
+    public ApplyResponse toResponse(FullProfile profile) {
+        return new ApplyResponse(id, projectId, ProfileResponse.from(profile), part, message, contact, state, leaderMessage);
     }
 
     public static Apply of(ApplyApiResponse res) {

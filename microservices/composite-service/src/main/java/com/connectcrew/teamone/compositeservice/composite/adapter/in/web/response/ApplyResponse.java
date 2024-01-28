@@ -7,7 +7,7 @@ import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 public record ApplyResponse(
         Long id,
         Long projectId,
-        Long userId,
+        ProfileResponse user,
         MemberPart part,
         String message,
         String contact,
