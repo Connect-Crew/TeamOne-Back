@@ -848,8 +848,10 @@ class ProjectControllerTest {
                                 parameterWithName("projectId").description("Project Id")
                         ),
                         responseFields(
-                                fieldWithPath("[].part").type("String").description("지원 직군"),
-                                fieldWithPath("[].partCategory").type("String").description("지원 직군 카테고리"),
+                                fieldWithPath("[].partKey").type("String").description("지원 직군 키값"),
+                                fieldWithPath("[].partDescription").type("String").description("지원 직군"),
+                                fieldWithPath("[].partCategoryKey").type("String").description("지원 직군 카테고리 키값"),
+                                fieldWithPath("[].partCategoryDescription").type("String").description("지원 직군 카테고리"),
                                 fieldWithPath("[].applies").type("Number").description("지원한 인원"),
                                 fieldWithPath("[].current").type("Number").description("현재 멤버 인원"),
                                 fieldWithPath("[].max").type("Number").description("최대 모집 인원"),
