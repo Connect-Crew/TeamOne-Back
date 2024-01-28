@@ -10,7 +10,8 @@
 
 == 사용자 관련 요청
 
-- link:user/profile.html[최신 프로필 정보 요청 - /user/myprofile]
+- link:user/myprofile.html[내 프로필 정보 요청 - /user/myprofile]
+- link:user/profile.html[프로필 정보 요청 - /user/profile/\{userId\}]
 
 == 프로젝트 모집 관련 요청
 

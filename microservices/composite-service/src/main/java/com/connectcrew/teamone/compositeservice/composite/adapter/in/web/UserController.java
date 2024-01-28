@@ -70,4 +70,11 @@ public class UserController {
                 .map(ProfileResponse::from)
                 .doOnError(ex -> sendErrorNotificationUseCase.send("UserController.getMyProfile", ErrorLevel.ERROR, ex));
     }
+
+    @GetMapping("/user/profile/{id}")
+    public Mono<ProfileResponse> getProfile(@PathVariable Long id) {
+        return queryProfileUseCase.getFullProfile(id)
+                .map(ProfileResponse::from)
+                .doOnError(ex -> sendErrorNotificationUseCase.send("UserController.getMyProfile", ErrorLevel.ERROR, ex));
+    }
 }

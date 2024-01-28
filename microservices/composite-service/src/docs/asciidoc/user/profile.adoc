@@ -1,4 +1,4 @@
-= 최신 프로필 정보 요청 - /user/myprofile (GET)
+= 프로필 정보 요청 - /user/profile/\{userId\} (GET)
 
 link:../index.html[home으로 돌아가기]
 
@@ -6,16 +6,20 @@ link:../index.html[home으로 돌아가기]
 
 == Request
 
-include::{snippets}/user/getMyProfile/http-request.adoc[]
+include::{snippets}/user/getProfile/http-request.adoc[]
 
 === request header
 
 include::{snippets}/user/getMyProfile/request-headers.adoc[]
 
+=== path parameters
+
+include::{snippets}/user/getProfile/path-parameters.adoc[]
+
 == Response
 
 === response (성공)
 
-include::{snippets}/user/getMyProfile/http-response.adoc[]
+include::{snippets}/user/getProfile/http-response.adoc[]
 
-include::{snippets}/user/getMyProfile/response-fields.adoc[]
+include::{snippets}/user/getProfile/response-fields.adoc[]

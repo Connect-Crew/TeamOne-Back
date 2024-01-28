@@ -49,6 +49,8 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 @WebFluxTest
@@ -351,6 +353,50 @@ class UserControllerTest {
                 .consumeWith(document("user/getMyProfile",
                         requestHeaders(
                                 headerWithName(JwtProvider.AUTH_HEADER).description(JwtProvider.BEARER_PREFIX + "Access Token")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type("Number").description("사용자 ID"),
+                                fieldWithPath("nickname").type("String").description("닉네임"),
+                                fieldWithPath("profile").type("String (Optional)").description("프로필 이미지"),
+                                fieldWithPath("introduction").type("String").description("소개글"),
+                                fieldWithPath("temperature").type("String").description("온도"),
+                                fieldWithPath("responseRate").type("Number").description("응답률"),
+                                fieldWithPath("parts[]").type("Part[]").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].key").type("String").optional().description("사용자 직무 key"),
+                                fieldWithPath("parts[].part").type("String").optional().description("사용자 직무"),
+                                fieldWithPath("parts[].category").type("String").optional().description("사용자 직무 카테고리"),
+                                fieldWithPath("representProjects[]").type("RepresentProject[]").description("대표 프로젝트"),
+                                fieldWithPath("representProjects[].id").type("Number").description("대표 프로젝트 ID"),
+                                fieldWithPath("representProjects[].thumbnail").type("String").description("대표 프로젝트 썸네일")
+                        )
+                ));
+    }
+
+    @Test
+    void getProfile() {
+        Profile profile = new Profile(
+                0L,
+                "이름",
+                "profile image url",
+                "소개 글",
+                36.5,
+                40,
+                List.of(MemberPart.IOS, MemberPart.AOS),
+                List.of(1L, 2L)
+        );
+        when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
+        when(userWebAdapter.getProfile(anyLong())).thenReturn(Mono.just(profile));
+        when(projectRequest.findProjectThumbnail(anyLong())).thenReturn(Mono.just(String.format("%s.jpg", UUID.randomUUID())));
+
+        webTestClient.get()
+                .uri("/user/profile/{id}", 0L)
+                .header(JwtProvider.AUTH_HEADER, "Bearer myToken")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ProfileResponse.class)
+                .consumeWith(document("user/getProfile",
+                        pathParameters(
+                                parameterWithName("id").description("User Id")
                         ),
                         responseFields(
                                 fieldWithPath("id").type("Number").description("사용자 ID"),
