@@ -14,7 +14,7 @@ public record DiscordMessageCommand(
         String message
 ) {
     public static DiscordMessageCommand from(WishApiEvent event, String username) {
-        return new DiscordMessageCommand(ErrorLevel.INFO, DiscordChannel.WISH, String.format("%s(%d)님 우리 ConnectCrew에게 요청사항이 왔어요.", username, event.userId()), event.message());
+        return new DiscordMessageCommand(ErrorLevel.INFO, DiscordChannel.WISH, String.format("%s(%d)님 우리 ConnectCrew에게 바라는점이 있어요.", username, event.userId()), event.message());
     }
 
     public static DiscordMessageCommand from(ErrorNotification event) {
