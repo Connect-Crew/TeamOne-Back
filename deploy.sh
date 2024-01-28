@@ -1,5 +1,8 @@
 #!/bin/sh
 
+./gradlew clean
+./gradlew build
+
 docker-compose stop composite
 docker-compose stop user
 docker-compose stop project
@@ -17,9 +20,6 @@ docker rmi teamone-back-user:latest
 docker rmi teamone-back-project:latest
 docker rmi teamone-back-chat:latest
 docker rmi teamone-back-gateway:latest
-
-./gradlew clean
-./gradlew build
 
 docker-compose build --no-cache
 docker-compose up -d
