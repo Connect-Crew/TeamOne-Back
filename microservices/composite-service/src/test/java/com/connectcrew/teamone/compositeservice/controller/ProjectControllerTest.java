@@ -831,7 +831,7 @@ class ProjectControllerTest {
                 new ApplyStatus(MemberPart.IOS, 4L, 2L, 6L, "~~~한 사람을 찾아요.")
         ));
 
-        ParameterizedTypeReference<SimpleMapResponse<MemberPart, ApplyStatusResponse>> resType = new ParameterizedTypeReference<>() {
+        ParameterizedTypeReference<List<ApplyStatusResponse>> resType = new ParameterizedTypeReference<>() {
         };
 
         webTestClient.get()
@@ -848,18 +848,12 @@ class ProjectControllerTest {
                                 parameterWithName("projectId").description("Project Id")
                         ),
                         responseFields(
-                                fieldWithPath("BACKEND").type("ApplyStatusResponse").description("백엔드 지원 현황"),
-                                fieldWithPath("BACKEND.applies").type("Number").description("지원한 인원"),
-                                fieldWithPath("BACKEND.current").type("Number").description("현재 멤버 인원"),
-                                fieldWithPath("BACKEND.max").type("Number").description("최대 모집 인원"),
-                                fieldWithPath("BACKEND.comment").type("String").description("모집 코멘트"),
-                                fieldWithPath("IOS").type("ApplyStatusResponse").description("IOS 지원 현황"),
-                                fieldWithPath("IOS.applies").type("Number").description("지원한 인원"),
-                                fieldWithPath("IOS.current").type("Number").description("현재 멤버 인원"),
-                                fieldWithPath("IOS.max").type("Number").description("최대 모집 인원"),
-                                fieldWithPath("IOS.comment").type("String").description("모집 코멘트")
-
-
+                                fieldWithPath("[].part").type("String").description("지원 직군"),
+                                fieldWithPath("[].partCategory").type("String").description("지원 직군 카테고리"),
+                                fieldWithPath("[].applies").type("Number").description("지원한 인원"),
+                                fieldWithPath("[].current").type("Number").description("현재 멤버 인원"),
+                                fieldWithPath("[].max").type("Number").description("최대 모집 인원"),
+                                fieldWithPath("[].comment").type("String").description("모집 코멘트")
                         )
                 ));
     }

@@ -35,7 +35,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -318,12 +317,13 @@ public class ProjectController {
     }
 
     @GetMapping("/apply/{projectId}")
-    private Mono<Map<MemberPart, ApplyStatusResponse>> getApplyStatus(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
+    private Mono<List<ApplyStatusResponse>> getApplyStatus(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @PathVariable Long projectId) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();
 
         return queryProjectUseCase.getApplyStatus(id, projectId)
-                .collectMap(ApplyStatus::part, ApplyStatus::toResponse);
+                .map(ApplyStatus::toResponse)
+                .collectList();
     }
 
     @GetMapping("/apply/{projectId}/{part}")

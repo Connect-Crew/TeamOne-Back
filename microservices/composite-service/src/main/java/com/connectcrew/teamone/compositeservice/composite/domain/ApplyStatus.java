@@ -13,7 +13,15 @@ public record ApplyStatus(
 ) {
 
     public ApplyStatusResponse toResponse() {
-        return new ApplyStatusResponse(applies, current, max, comment);
+
+        return new ApplyStatusResponse(
+                part.name(),
+                part.getCategory().name(),
+                applies,
+                current,
+                max,
+                comment
+        );
     }
 
     public static ApplyStatus of(ApplyStatusApiResponse res) {
