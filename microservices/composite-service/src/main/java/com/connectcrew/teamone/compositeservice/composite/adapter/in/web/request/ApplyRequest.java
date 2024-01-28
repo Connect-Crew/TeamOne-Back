@@ -14,6 +14,13 @@ public record ApplyRequest(
 ) {
 
     public Apply toDomain(Long userId) {
-        return new Apply(userId, projectId, part, message, contact, ApplyState.WAITING, null);
+        return Apply.builder()
+                .userId(userId)
+                .projectId(projectId)
+                .part(part)
+                .message(message)
+                .contact(contact)
+                .state(ApplyState.WAITING)
+                .build();
     }
 }

@@ -44,7 +44,7 @@ public class CustomRepositoryImpl implements CustomRepository {
           # 온라인
           AND p.with_online = 1
           # 직무
-          AND pt.partId = 'BACKEND' # or pt.part_category = 'DEVELOP'
+          AND pt.part = 'BACKEND' # or pt.part_category = 'DEVELOP'
           # 상태
           AND p.state IN ('RECRUITING')
           # 카테고리
@@ -81,7 +81,7 @@ public class CustomRepositoryImpl implements CustomRepository {
             if (option.part().name().startsWith("TOTAL_")) {
                 optionSql.add(String.format("pt.part_category = '%s'", option.part().getCategory().name()));
             } else {
-                optionSql.add(String.format("pt.partId = '%s'", option.part().name()));
+                optionSql.add(String.format("pt.part = '%s'", option.part().name()));
             }
 
         }

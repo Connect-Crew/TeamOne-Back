@@ -785,11 +785,11 @@ class ProjectControllerTest {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
         when(projectWebAdapter.findAllApplies(anyLong(), anyLong(), any(MemberPart.class))).thenReturn(Flux.just(
-                new Apply(0L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
-                new Apply(1L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
-                new Apply(2L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
-                new Apply(3L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
-                new Apply(4L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null)
+                new Apply(0L, 0L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(0L, 1L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(0L, 2L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(0L, 3L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null),
+                new Apply(0L, 4L, 0L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.WAITING, null)
         ));
 
         ParameterizedTypeReference<List<ApplyResponse>> resType = new ParameterizedTypeReference<>() {
@@ -810,6 +810,7 @@ class ProjectControllerTest {
                                 parameterWithName("part").description("Member Part")
                         ),
                         responseFields(
+                                fieldWithPath("[].id").type("Number").description("지원 아이디"),
                                 fieldWithPath("[].userId").type("Number").description("지원자 아이디"),
                                 fieldWithPath("[].projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("[].part").type("String").description("지원 직군"),
@@ -1019,7 +1020,7 @@ class ProjectControllerTest {
     void applyAcceptTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.ACCEPT, "(리더 연락처)로 연락주세요")));
+        when(projectWebAdapter.acceptApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(0L, 1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.ACCEPT, "(리더 연락처)로 연락주세요")));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/accept", 1L)
@@ -1036,6 +1037,7 @@ class ProjectControllerTest {
                                 parameterWithName("applyId").description("지원 ID")
                         ),
                         responseFields(
+                                fieldWithPath("id").type("Number").description("지원 아이디"),
                                 fieldWithPath("userId").type("Number").description("지원자 아이디"),
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
@@ -1051,7 +1053,7 @@ class ProjectControllerTest {
     void applyRejectTest() {
         String token = JwtProvider.BEARER_PREFIX + "access token";
         when(jwtProvider.getTokenClaim(anyString())).thenReturn(new TokenClaim("socialId", Role.USER, 0L, "nickname"));
-        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.REJECT, "~~한 이유로 같이하기 어려울거 같아요.")));
+        when(projectWebAdapter.rejectApply(anyLong(), anyLong(), anyString())).thenReturn(Mono.just(new Apply(0L, 1L, 3L, MemberPart.BACKEND, "지원 메시지", "연락수단", ApplyState.REJECT, "~~한 이유로 같이하기 어려울거 같아요.")));
 
         webTestClient.post()
                 .uri("/project/apply/{applyId}/reject", 1L)
@@ -1068,6 +1070,7 @@ class ProjectControllerTest {
                                 parameterWithName("applyId").description("지원 ID")
                         ),
                         responseFields(
+                                fieldWithPath("id").type("Number").description("지원 아이디"),
                                 fieldWithPath("userId").type("Number").description("지원자 아이디"),
                                 fieldWithPath("projectId").type("Number").description("프로젝트 아이디"),
                                 fieldWithPath("part").type("String").description("지원 직군"),
