@@ -32,5 +32,8 @@
 - link:project/kick.html[멤버 내보내기 - /project/kick]
 - link:project/updateState.html[프로젝트 상태 수정하기 - /project/\{projectId\}/state/\{state\}/update]
 
+== 바랍니다 요청
+- link:wish/wish.html[바랍니다 전송 - /wish]
+
 == Push Notification 테스트 요청
 - link:notification/notification.html[Push 테스트 알림 보내기 - /notification]

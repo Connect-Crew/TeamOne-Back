@@ -1,0 +1,25 @@
+= 최신 프로필 정보 요청 - /wish (POST)
+
+link:../index.html[home으로 돌아가기]
+
+사용자의 요청사항을 Discord로 전송합니다.
+
+== Request
+
+include::{snippets}/wish/sendWish/http-request.adoc[]
+
+=== request header
+
+include::{snippets}/wish/sendWish/request-headers.adoc[]
+
+=== request body
+
+include::{snippets}/wish/sendWish/request-fields.adoc[]
+
+== Response
+
+=== response (성공)
+
+include::{snippets}/wish/sendWish/http-response.adoc[]
+
+include::{snippets}/wish/sendWish/response-fields.adoc[]
