@@ -4,6 +4,7 @@ import com.connectcrew.teamone.api.constants.KafkaEventTopic;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.api.userservice.notification.push.SendMessageEvent;
 import com.connectcrew.teamone.api.userservice.notification.report.ReportNotification;
+import com.connectcrew.teamone.api.wish.WishApiEvent;
 import com.connectcrew.teamone.userservice.notification.application.port.in.SendMessageUseCase;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.DiscordMessageCommand;
 import com.connectcrew.teamone.userservice.notification.application.port.in.command.SendMessageCommand;
@@ -51,11 +52,24 @@ public class NotificationEventListener {
             ReportNotification event = objectMapper.readValue(body, ReportNotification.class);
 
             queryProfileUseCase.findUserNameByUserId(event.userId())
-                            .flatMap(nickname -> sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event, nickname))).subscribe();
+                    .flatMap(nickname -> sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event, nickname))).subscribe();
 
 
         } catch (Exception e) {
             log.error("consumeErrorNotificationEvent error", e);
+        }
+    }
+
+    @KafkaListener(topics = KafkaEventTopic.WishNotification, groupId = "user-service")
+    public void consumeWishNotificationEvent(String body) {
+        try {
+            WishApiEvent event = objectMapper.readValue(body, WishApiEvent.class);
+
+            queryProfileUseCase.findUserNameByUserId(event.userId())
+                    .flatMap(nickname -> sendMessageUseCase.sendMessage(DiscordMessageCommand.from(event, nickname)))
+                    .subscribe();
+        } catch (Exception e) {
+            log.error("consumePushNotificationEvent error", e);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.connectcrew.teamone.userservice.notification.application.port.in.com
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorLevel;
 import com.connectcrew.teamone.api.userservice.notification.error.ErrorNotification;
 import com.connectcrew.teamone.api.userservice.notification.report.ReportNotification;
+import com.connectcrew.teamone.api.wish.WishApiEvent;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordChannel;
 import com.connectcrew.teamone.userservice.notification.domain.DiscordMessage;
 
@@ -12,6 +13,9 @@ public record DiscordMessageCommand(
         String title,
         String message
 ) {
+    public static DiscordMessageCommand from(WishApiEvent event, String username) {
+        return new DiscordMessageCommand(ErrorLevel.INFO, DiscordChannel.WISH, String.format("%s(%d)님 우리 ConnectCrew에게 요청사항이 왔어요.", username, event.userId()), event.message());
+    }
 
     public static DiscordMessageCommand from(ErrorNotification event) {
         return new DiscordMessageCommand(event.level(), DiscordChannel.ERROR, String.format("%s\t%s", event.service(), event.caller()), event.message());

@@ -6,6 +6,7 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ChatWe
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.ProjectWebAdapter;
 import com.connectcrew.teamone.compositeservice.composite.adapter.out.web.UserWebAdapter;
 import com.connectcrew.teamone.compositeservice.file.adapter.out.file.StaticFileAdapter;
+import com.connectcrew.teamone.compositeservice.wish.adapter.out.event.WishEventAdapter;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -52,4 +53,7 @@ public class TestBeanConfig {
 
     @MockBean
     StaticFileAdapter staticFileAdapter;
+
+    @MockBean
+    WishEventAdapter wishEventAdapter;
 }

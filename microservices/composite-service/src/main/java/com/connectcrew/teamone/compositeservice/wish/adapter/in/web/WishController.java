@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/wish")
+@RestController
 @RequiredArgsConstructor
 public class WishController {
     private final JwtProvider jwtProvider;
 
     private final SendWishUseCase sendWishUseCase;
 
-    @PostMapping()
+    @PostMapping("/wish")
     public WishResponse sendWish(@RequestHeader(JwtProvider.AUTH_HEADER) String token, @RequestBody WishRequest request) {
         TokenClaim claim = jwtProvider.getTokenClaim(token);
         Long id = claim.id();

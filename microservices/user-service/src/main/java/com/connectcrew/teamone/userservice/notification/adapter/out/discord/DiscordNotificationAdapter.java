@@ -24,7 +24,12 @@ public class DiscordNotificationAdapter implements SendDiscordOutput {
 
     private final Map<DiscordChannel, TextChannel> channels;
 
-    public DiscordNotificationAdapter(@Value("${discord.bot.token}") String token, @Value("${discord.channel.report}") String reportChannel, @Value("${discord.channel.error}") String errorChannel) {
+    public DiscordNotificationAdapter(
+            @Value("${discord.bot.token}") String token,
+            @Value("${discord.channel.report}") String reportChannel,
+            @Value("${discord.channel.error}") String errorChannel,
+            @Value("${discord.channel.wish}") String wishChannel
+    ) {
         this.token = token;
         try {
             jda = JDABuilder.createDefault(token)
@@ -33,7 +38,8 @@ public class DiscordNotificationAdapter implements SendDiscordOutput {
 
             channels = Map.of(
                     DiscordChannel.REPORT, Objects.requireNonNull(jda.getTextChannelById(reportChannel)),
-                    DiscordChannel.ERROR, Objects.requireNonNull(jda.getTextChannelById(errorChannel))
+                    DiscordChannel.ERROR, Objects.requireNonNull(jda.getTextChannelById(errorChannel)),
+                    DiscordChannel.WISH, Objects.requireNonNull(jda.getTextChannelById(wishChannel))
             );
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
