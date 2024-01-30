@@ -4,6 +4,15 @@ link:../index.html[home으로 돌아가기]
 
 프로젝트의 멤버를 내보내는 요청입니다.
 
+이때, 사유(reason)의 유형은 다음과 같습니다.
+
+- ABUSE : 욕설/비하발언
+- BAD_PARTICIPATION : 참여율 저조
+- DISSENSION : 팀원과의 불화
+- GIVEN_UP : 자진 중도 포기
+- OBSCENITY : 19+ 음란성, 만남 유도"
+- ETC : 기타
+
 == Request
 
 include::{snippets}/project/kick/http-request.adoc[]
@@ -14,7 +23,7 @@ include::{snippets}/project/kick/request-headers.adoc[]
 
 === request body
 
-include::{snippets}/project/kick/request-body.adoc[]
+include::{snippets}/project/kick/request-fields.adoc[]
 
 == Response
 
