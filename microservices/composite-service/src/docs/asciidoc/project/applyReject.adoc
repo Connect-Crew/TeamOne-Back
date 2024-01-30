@@ -18,6 +18,8 @@ include::{snippets}/project/apply-reject/path-parameters.adoc[]
 
 === request body
 
+리더의 메시지를 Body에 문자열로 담아서 보냅니다.
+
 include::{snippets}/project/apply-reject/request-body.adoc[]
 
 == Response
