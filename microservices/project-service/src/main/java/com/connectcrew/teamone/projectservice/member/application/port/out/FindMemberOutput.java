@@ -22,4 +22,6 @@ public interface FindMemberOutput {
     Flux<Apply> findAllApplyByProjectAndPart(Long projectId, MemberPart part);
 
     Mono<Apply> findApplyById(Long applyId);
+
+    Mono<Integer> countMemberByProject(Long projectId);
 }

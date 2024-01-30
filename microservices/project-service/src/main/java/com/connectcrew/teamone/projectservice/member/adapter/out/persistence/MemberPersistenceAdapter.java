@@ -17,6 +17,7 @@ import com.connectcrew.teamone.projectservice.member.domain.Kick;
 import com.connectcrew.teamone.projectservice.member.domain.Member;
 import com.connectcrew.teamone.projectservice.member.domain.ProjectMemberPart;
 import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
+import com.connectcrew.teamone.projectservice.member.domain.enums.MemberState;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.entity.PartEntity;
 import com.connectcrew.teamone.projectservice.project.adapter.out.persistence.repository.PartRepository;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +102,11 @@ public class MemberPersistenceAdapter implements FindMemberOutput, SaveMemberOut
                 .flatMap(apply -> partRepository.findById(apply.getPartId())
                         .map(part -> apply.toDomain(MemberPart.valueOf(part.getPart())))
                 );
+    }
+
+    @Override
+    public Mono<Integer> countMemberByProject(Long projectId) {
+        return memberRepository.countByProjectIdAndState(projectId, MemberState.ACTIVE);
     }
 
     @Override

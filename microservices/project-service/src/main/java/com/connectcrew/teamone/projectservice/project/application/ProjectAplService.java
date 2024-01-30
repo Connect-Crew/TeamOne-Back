@@ -123,8 +123,8 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
                 })
                 .flatMap(project -> {
-                    if (projectState == ProjectState.DELETED && project.createdAt().plusDays(7L).isBefore(LocalDateTime.now()))
-                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PROJECT.toString()));
+                    if (projectState == ProjectState.COMPLETED && project.createdAt().plusDays(14L).isBefore(LocalDateTime.now()))
+                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.NOT_COMPLETABLE_PROJECT.toString()));
                     return Mono.just(project);
                 })
                 .flatMap(project -> updateProjectOutput.updateState(projectId, projectState));
@@ -138,10 +138,10 @@ public class ProjectAplService implements QueryProjectUseCase, SaveProjectUseCas
                     if (project.leader().equals(userId)) return Mono.just(project);
                     return Mono.error(new InvalidOwnerException(ProjectExceptionMessage.INVALID_PROJECT_OWNER.toString()));
                 })
-                .flatMap(project -> {
-                    if (project.createdAt().plusDays(7L).isBefore(LocalDateTime.now()))
-                        return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.UNREMOVABLE_PROJECT.toString()));
-                    return Mono.just(project);
+                .then(findMemberOutput.countMemberByProject(projectId))
+                .flatMap(memberCount -> {
+                    if(memberCount > 1) return Mono.error(new IllegalArgumentException(ProjectExceptionMessage.NOT_DELETABLE_PROJECT.toString()));
+                    return Mono.just(memberCount);
                 })
                 .flatMap(project -> updateProjectOutput.updateState(projectId, ProjectState.DELETED));
     }
