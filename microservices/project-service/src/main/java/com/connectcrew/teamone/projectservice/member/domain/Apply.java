@@ -5,6 +5,8 @@ import com.connectcrew.teamone.api.projectservice.leader.ApplyApiResponse;
 import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record Apply(
         Long id,
@@ -15,10 +17,11 @@ public record Apply(
         String message,
         String contact,
         ApplyState state,
-        String leaderMessage
+        String leaderMessage,
+        LocalDateTime leaderResponseAt
 ) {
     public ApplyApiResponse toResponse() {
-        return new ApplyApiResponse(id, userId, projectId, part, message, contact, state, leaderMessage);
+        return new ApplyApiResponse(id, userId, projectId, part, message, contact, state, leaderMessage, leaderResponseAt);
     }
 
     public Apply accept(String leaderMessage) {
@@ -32,6 +35,7 @@ public record Apply(
                 .contact(contact)
                 .state(ApplyState.ACCEPT)
                 .leaderMessage(leaderMessage)
+                .leaderResponseAt(LocalDateTime.now())
                 .build();
     }
 
@@ -46,6 +50,7 @@ public record Apply(
                 .contact(contact)
                 .state(ApplyState.REJECT)
                 .leaderMessage(leaderMessage)
+                .leaderResponseAt(LocalDateTime.now())
                 .build();
     }
 }

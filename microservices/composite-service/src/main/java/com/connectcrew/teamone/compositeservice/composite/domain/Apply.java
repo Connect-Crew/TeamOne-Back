@@ -8,6 +8,8 @@ import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respons
 import com.connectcrew.teamone.compositeservice.composite.adapter.in.web.response.ProfileResponse;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record Apply(
         Long id,
@@ -17,11 +19,12 @@ public record Apply(
         String message,
         String contact,
         ApplyState state,
-        String leaderMessage
+        String leaderMessage,
+        LocalDateTime leaderResponseAt
 ) {
 
     public ApplyResponse toResponse(FullProfile profile) {
-        return new ApplyResponse(id, projectId, ProfileResponse.from(profile), part, message, contact, state, leaderMessage);
+        return new ApplyResponse(id, projectId, ProfileResponse.from(profile), part, message, contact, state, leaderMessage, leaderResponseAt);
     }
 
     public static Apply of(ApplyApiResponse res) {
@@ -33,7 +36,8 @@ public record Apply(
                 res.message(),
                 res.contact(),
                 res.state(),
-                res.leaderMessage()
+                res.leaderMessage(),
+                res.leaderResponseAt()
         );
     }
 

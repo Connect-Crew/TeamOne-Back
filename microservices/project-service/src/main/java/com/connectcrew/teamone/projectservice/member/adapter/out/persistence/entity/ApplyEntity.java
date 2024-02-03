@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Data
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class ApplyEntity {
     private ApplyState state;
 
     private String leaderMessage;
+    private LocalDateTime leaderResponseAt;
 
     public static ApplyEntity from(Apply apply) {
         return ApplyEntity.builder()
@@ -42,6 +45,7 @@ public class ApplyEntity {
                 .contact(apply.contact())
                 .state(apply.state())
                 .leaderMessage(apply.leaderMessage())
+                .leaderResponseAt(apply.leaderResponseAt())
                 .build();
     }
 
@@ -56,6 +60,7 @@ public class ApplyEntity {
                 .contact(contact)
                 .state(state)
                 .leaderMessage(leaderMessage)
+                .leaderResponseAt(leaderResponseAt)
                 .build();
     }
 }

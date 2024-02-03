@@ -4,6 +4,8 @@ package com.connectcrew.teamone.compositeservice.composite.adapter.in.web.respon
 import com.connectcrew.teamone.api.projectservice.enums.ApplyState;
 import com.connectcrew.teamone.api.projectservice.enums.MemberPart;
 
+import java.time.LocalDateTime;
+
 public record ApplyResponse(
         Long id,
         Long projectId,
@@ -12,6 +14,7 @@ public record ApplyResponse(
         String message,
         String contact,
         ApplyState state,
-        String leaderMessage
+        String leaderMessage,
+        LocalDateTime leaderResponseAt
 ) {
 }
